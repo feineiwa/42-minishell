@@ -1,2 +1,2 @@
 # 42-minishell
-sort of minishell but 42 project
+Sort of minishell but 42 project

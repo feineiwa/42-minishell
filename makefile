@@ -3,17 +3,18 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+         #
+#    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2024/12/16 12:32:27 by nrasamim         ###   ########.fr        #
+#    Updated: 2024/12/31 11:37:17 by frahenin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	minishell
 
 CC		=	gcc
-FLAG	=	-Wall -Wextra -Werror
+
+FLAG = 
 
 DIRLIB	=	./libft/
 FILELIB	=	libft.a
@@ -21,7 +22,7 @@ NAMELFT	=	$(addprefix $(DIRLIB), $(FILELIB))
 
 SRC_DIR	=	src/
 OBJ_DIR	=	obj/
-INCLUDE	=	-I ./inc -I ./libft
+INCLUDE	=	-I ./inc -I ./libft -lreadline
 
 FILES	=	main
 
@@ -45,9 +46,12 @@ clean :
 	@rm -rf $(OBJ_DIR)
 
 fclean : clean
-	@rm -f $(NAME)
-	@rm $(DIRLIB)/$(FILELIB)
+	@make fclean -C $(DIRLIB)
+	@rm -rf $(NAME)
 
 re : fclean all
+
+d : $(NAME)
+	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=debug -s ./minishell
 
 .PHONY : all clean fclean re

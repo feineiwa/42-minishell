@@ -6,102 +6,71 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2024/12/31 14:04:41 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/02 19:12:38 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-void	free_shell(t_shell *shell)
+void	panic(char *s)
 {
-	int	i;
-
-	if (!shell)
-		return ;
-	if (shell->env)
-	{
-		i = 0;
-		while (shell->env[i])
-		{
-			free(shell->env[i]);
-			i++;
-		}
-		free(shell->env);
-	}
-	if (shell->current_dir)
-		free(shell->current_dir);
-	free(shell);
+	perror(s);
 }
 
-t_shell	*init_shell(char **envp)
+static t_list	*populate_env_list(char **envp)
 {
-	t_shell	*shell;
-	int		i;
-	int		env_len;
+	t_list	*env_list;
+	t_list	*new_node;
+	char	*env_var;
+	size_t	i;
 
-	shell = (t_shell *)malloc(sizeof(t_shell));
-	if (!shell)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
-	env_len = 0;
-	while (envp[env_len])
-		env_len++;
-	shell->env = (char **)malloc(sizeof(char *) * ((env_len) + 1));
-	if (!shell->env)
-	{
-		perror("nalloc");
-		free(shell);
-		exit(EXIT_FAILURE);
-	}
 	i = 0;
+	env_list = NULL;
 	while (envp[i])
 	{
-		shell->env[i] = ft_strdup(envp[i]);
-		if (!shell->env[i])
+		env_var =  ft_strdup(envp[i]);
+		if (!env_var)
 		{
-			perror("ft_strdup");
-			free_shell(shell);
-			exit(EXIT_FAILURE);
+			ft_lstclear(&env_list, free);
+			return (NULL);
 		}
+		new_node = ft_lstnew(env_var);
+		if (!new_node)
+		{
+			free(env_var);
+			ft_lstclear(&env_list, free);
+			return (NULL);
+		}
+		ft_lstadd_back(&env_list, new_node);
 		i++;
 	}
-	shell->env[i] = NULL;
-	shell->status = 0;
-	shell->current_dir = getcwd(NULL, 0);
-	return (shell);
+	return (env_list);
 }
 
-int	ft_strcmp(char *s1, char *s2)
+t_shell	init_shell(char **envp)
 {
-	while (*s1 && *s2 && (*s1 == *s2))
+	t_shell	shell;
+
+	shell.envp = populate_env_list(envp);
+	if (!shell.envp)
 	{
-		s1++;
-		s2++;
+		shell.exit_status = -1;
+		shell.cmd = NULL;
+		return (shell);
 	}
-	return (*s1 - *s2);
-}
-
-t_cmd *parse_input(char *input, t_shell *shell)
-{
-	t_cmd	*cmd;
-
-	cmd = (t_cmd *)malloc(sizeof(t_cmd));
-	cmd->args
-	return (cmd);
+	shell.cmd = NULL;
+	shell.exit_status = 0;
+	return (shell);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	t_shell *shell;
-	char *input;
-	t_cmd *cmd;
+	t_shell	shell;
+	char	*input;
 
 	(void)ac;
 	(void)av;
 	shell = init_shell(envp);
-
 	while (42)
 	{
 		input = readline(PROMPT);
@@ -113,7 +82,7 @@ int	main(int ac, char **av, char **envp)
 		if (input && *input)
 		{
 			add_history(input);
-			cmd = parse_input(input, shell);
+			// parse_input(&mini, input);
 			// if (cmd)
 			// {
 			// 	execute_command(cmd, shell);
@@ -122,6 +91,6 @@ int	main(int ac, char **av, char **envp)
 		}
 		free(input);
 	}
-	free_shell(shell);
+	ft_lstclear(&shell.envp, free);
 	return (0);
 }

@@ -3,64 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/02 19:12:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/03 17:27:12 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-void	panic(char *s)
-{
-	perror(s);
-}
-
-static t_list	*populate_env_list(char **envp)
+static t_list	*check_env_var(char **envp)
 {
 	t_list	*env_list;
-	t_list	*new_node;
+	t_list	*new_list;
 	char	*env_var;
 	size_t	i;
 
-	i = 0;
 	env_list = NULL;
+	i = 0;
 	while (envp[i])
 	{
-		env_var =  ft_strdup(envp[i]);
-		if (!env_var)
-		{
-			ft_lstclear(&env_list, free);
-			return (NULL);
-		}
-		new_node = ft_lstnew(env_var);
-		if (!new_node)
+		env_var = ft_strdup(envp[i]);
+		new_list = ft_lstnew(env_var);
+		if (!env_var || !new_list)
 		{
 			free(env_var);
 			ft_lstclear(&env_list, free);
 			return (NULL);
 		}
-		ft_lstadd_back(&env_list, new_node);
+		ft_lstadd_back(&env_list, new_list);
 		i++;
 	}
 	return (env_list);
 }
 
-t_shell	init_shell(char **envp)
+static t_shell	init_shell(t_shell	*shell, char **envp)
 {
-	t_shell	shell;
-
-	shell.envp = populate_env_list(envp);
-	if (!shell.envp)
-	{
-		shell.exit_status = -1;
-		shell.cmd = NULL;
-		return (shell);
-	}
-	shell.cmd = NULL;
-	shell.exit_status = 0;
-	return (shell);
+	shell->envp = check_env_var(envp);
+	shell->cmd = NULL;
+	shell->exit_status = 0;
 }
 
 int	main(int ac, char **av, char **envp)
@@ -70,27 +51,24 @@ int	main(int ac, char **av, char **envp)
 
 	(void)ac;
 	(void)av;
-	shell = init_shell(envp);
+	init_shell(&shell, envp);
+	if (!shell.envp)
+		free_all(&shell, "Undefined Environment Variable", -1);
 	while (42)
 	{
-		input = readline(PROMPT);
+		input = readline("minishell$ ");
 		if (input == NULL)
 		{
-			write(1, "exit\n", 5);
+			printf("exit\n");
 			break ;
 		}
 		if (input && *input)
 		{
 			add_history(input);
-			// parse_input(&mini, input);
-			// if (cmd)
-			// {
-			// 	execute_command(cmd, shell);
-			// 	free_command(cmd);
-			// }
+			// Excecution??
 		}
 		free(input);
 	}
-	ft_lstclear(&shell.envp, free);
+	free_all(&shell, NULL, -1);
 	return (0);
 }

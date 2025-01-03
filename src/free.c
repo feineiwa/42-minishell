@@ -1,24 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/30 10:28:39 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/03 14:54:34 by nrasamim         ###   ########.fr       */
+/*   Created: 2025/01/03 14:06:17 by nrasamim          #+#    #+#             */
+/*   Updated: 2025/01/03 17:21:53 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-void ft_getcwd(char *buf, size_t size)
+/*static void	free_cmd(t_cmd **list)
 {
-	if (NULL == getcwd(buf, size))
-		perror("getcwd FAILED");
-}
 
-void	panic(char *str)
+}*/
+
+void	free_all(t_shell *shell, char *error, int end)
 {
-	perror(str);
+	/*if (shell->cmd)
+		free_cmd(&shell->cmd);*/
+	if (shell->envp)
+		ft_lstclear(&shell->envp, free);
+	if (error)
+		printf("Error during process: %s\n", error);
+	rl_clear_history();
+	if (end != -1)
+		exit(end);
 }

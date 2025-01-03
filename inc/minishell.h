@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/02 18:55:02 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/03 09:52:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,11 @@ typedef struct s_shell
 {
 	t_list			*envp;
 	t_cmd			*cmd;
-	int 			exit_status;
+	int				exit_status;
 }					t_shell;
+
+// ENV
+
+t_shell				init_shell(char **envp);
 
 #endif

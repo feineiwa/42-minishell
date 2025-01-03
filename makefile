@@ -6,7 +6,7 @@
 #    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2024/12/31 11:37:17 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/03 09:53:13 by frahenin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ SRC_DIR	=	src/
 OBJ_DIR	=	obj/
 INCLUDE	=	-I ./inc -I ./libft -lreadline
 
-FILES	=	main
+FILES	=	main ft_env
 
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))

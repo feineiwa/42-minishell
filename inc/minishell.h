@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/03 09:52:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/03 18:05:56 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ enum				s_tokens
 	OUTFILE,
 	HDOC,
 	APPEND,
-	ARGS,
+	ARGS,               
 };
 
 typedef struct s_cmd
 {
-	char			**args;
+	char			*args;
 	int				type;
 	struct s_cmd	*next;
 }					t_cmd;

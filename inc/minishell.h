@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/03 18:05:56 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/05 17:50:12 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,29 @@
 
 # define PROMPT "minishell$ "
 
-enum				s_tokens
+typedef enum e_tok_type
 {
-	PIPE = 1,
+	ARGS= 0,
+	PIPE,
 	INFILE,
 	OUTFILE,
-	HDOC,
 	APPEND,
-	ARGS,               
-};
+	HEREDOC
+}					t_tok_type;
+
+typedef struct s_token
+{
+	char			*value;
+	t_tok_type		type;
+	struct s_token	*next;
+}					t_token;
 
 typedef struct s_cmd
 {
-	char			*args;
-	int				type;
+	char **argv; // array of arguments
+	char			*input_file;
+	char			*output_file;
+	int				append;
 	struct s_cmd	*next;
 }					t_cmd;
 

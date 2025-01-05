@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/05 18:04:37 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/05 18:29:21 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,7 +298,22 @@ t_token	*lexer_input(char *input)
 	return (tok);
 }
 
-t_cmd	*parse_input(t_shell *shell, char *input)
+t_cmd	*parse_input(t_token *tok)
+{
+	t_cmd	*cmd_list;
+
+	cmd_list = malloc(sizeof(t_cmd));
+	if (!cmd_list)
+		return (NULL);
+	// while (tok)
+	// {
+		
+	// 	tok = tok->next;
+	// }
+	return (cmd_list);
+}
+
+t_cmd	*parsing(t_shell *shell, char *input)
 {
 	t_cmd	*cmd_list;
 	t_token	*tok;
@@ -306,12 +321,9 @@ t_cmd	*parse_input(t_shell *shell, char *input)
 	tok = lexer_input(input);
 	if (!tok)
 		return (NULL);
-	while (tok)
-	{
-		printf("[%s]->[%d]\n", tok->value, tok->type);
-		tok = tok->next;
-	}
-	cmd_list = NULL;
+	cmd_list = parse_input(tok);
+	if (!cmd_list)
+		return (NULL);
 	return (cmd_list);
 }
 
@@ -334,7 +346,7 @@ int	main(int ac, char **av, char **envp)
 		if (input && *input)
 		{
 			add_history(input);
-			shell.cmd = parse_input(&shell, input);
+			shell.cmd = parsing(&shell, input);
 			// if (shell.cmd)
 			// {
 			// 	execute_command(shell.cmd, shell);

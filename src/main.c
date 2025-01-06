@@ -6,35 +6,56 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/05 18:29:21 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/06 19:11:02 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
+int			ft_is_quote(char c);
+
 void	panic(char *s)
 {
 	perror(s);
+	exit(EXIT_FAILURE);
+}
+
+int	ft_fork(void)
+{
+	int	pid;
+
+	pid = fork();
+	if (pid == -1)
+		panic("fork");
+	return (pid);
 }
 
 int	count_quotes(char *input)
 {
 	size_t	i;
-	size_t	sq;
-	size_t	dq;
+	char	quote;
 
+	if (!input)
+		return (0);
+	quote = 0;
 	i = 0;
-	sq = 0;
-	dq = 0;
 	while (input[i])
 	{
-		if (input[i] == 39)
-			sq++;
-		if (input[i] == 34)
-			dq++;
+		if (ft_is_quote(input[i]))
+		{
+			quote = ft_is_quote(input[i]);
+			i++;
+			while (input[i] && quote)
+			{
+				if (ft_is_quote(input[i]) == quote)
+					quote = 0;
+				i++;
+			}
+			continue ;
+		}
 		i++;
 	}
-	if (sq % 2 != 0 || dq % 2 != 0)
+	if (quote)
 		return (1);
 	return (0);
 }
@@ -156,8 +177,6 @@ char	*ft_strndup(char *str, size_t n)
 	return (s);
 }
 
-
-
 char	*ft_strtok_quoted(char *str)
 {
 	static char		*saved_str = NULL;
@@ -270,11 +289,6 @@ t_token	*lexer_input(char *input)
 		return (NULL);
 	new_tok = NULL;
 	tok = NULL;
-	if (count_quotes(input))
-	{
-		panic("Error numbers of quotes");
-		return (NULL);
-	}
 	while (1)
 	{
 		token = ft_strtok_quoted(input);
@@ -298,18 +312,78 @@ t_token	*lexer_input(char *input)
 	return (tok);
 }
 
+int	ft_strlen_skip_quote(char *s)
+{
+	int		i;
+	char	quote;
+	int		len;
+
+	i = 0;
+	len = 0;
+	quote = 0;
+	while (s[i])
+	{
+		if (ft_is_quote(s[i]) && quote == 0)
+			quote = ft_is_quote(s[i]);
+		if (quote == s[i])
+		{
+			i++;
+			continue ;
+		}
+		i++;
+		len++;
+	}
+	return (len);
+}
+
+char	*ft_getarg(char *s)
+{
+	char	*arg;
+	char	quote;
+	int		i;
+	int		j;
+
+	arg = ft_calloc(sizeof(char), ft_strlen_skip_quote(s) + 1);
+	if (!arg)
+		return (NULL);
+	i = 0;
+	j = 0;
+	quote = 0;
+	while (s[i])
+	{
+		if (ft_is_quote(s[i]) && quote == 0)
+			quote = ft_is_quote(s[i]);
+		if (s[i] == quote)
+		{
+			i++;
+			continue ;
+		}
+		arg[j++] = s[i++];
+	}
+	arg[j] = 0;
+	return (arg);
+}
+
 t_cmd	*parse_input(t_token *tok)
 {
 	t_cmd	*cmd_list;
+	t_cmd	*cmd_tmp;
+	char	*arg;
+	int		i;
 
 	cmd_list = malloc(sizeof(t_cmd));
 	if (!cmd_list)
 		return (NULL);
-	// while (tok)
-	// {
-		
-	// 	tok = tok->next;
-	// }
+	i = 0;
+	while (tok)
+	{
+		arg = ft_getarg(tok->value);
+		if (!arg)
+			return (NULL);
+		// cmd_list->argv[i];
+		printf("[%s]\n", arg);
+		tok = tok->next;
+	}
 	return (cmd_list);
 }
 
@@ -318,9 +392,20 @@ t_cmd	*parsing(t_shell *shell, char *input)
 	t_cmd	*cmd_list;
 	t_token	*tok;
 
+	if (count_quotes(input))
+	{
+		panic("Error numbers of quotes");
+		return (NULL);
+	}
 	tok = lexer_input(input);
 	if (!tok)
 		return (NULL);
+	// while (tok)
+	// {
+		
+	// 	printf("[%s]->[%d]\n", tok->value, tok->type);
+	// 	tok = tok->next;
+	// }
 	cmd_list = parse_input(tok);
 	if (!cmd_list)
 		return (NULL);

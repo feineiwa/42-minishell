@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 12:14:45 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:34:35 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,19 +65,18 @@ int	main(int ac, char **av, char **envp)
 			if (shell.cmd)
 			{
 				// example commande
-				shell.cmd->argv = malloc(4 * sizeof(char *));
+				shell.cmd->argv = malloc(3 * sizeof(char *));
 				shell.cmd->argv[0] = ft_strdup("echo");
-				shell.cmd->argv[1] = ft_strdup("-n");
-				shell.cmd->argv[2] = ft_strdup("hghghghwroghroeher");
-				shell.cmd->argv[3] = NULL;
+				shell.cmd->argv[1] = ft_strdup("Hello World");
+				shell.cmd->argv[2] = NULL;
 				shell.cmd->input_file = NULL;
-				shell.cmd->output_file = NULL;
-				shell.cmd->append = 0;
+				shell.cmd->output_file = ft_strdup("text.txt");
+				shell.cmd->append = true;
 				shell.cmd->next = NULL;
 
 			 	if (!execute_command(&shell))
 				{
-					printf("Error with Pipe\n");
+					perror("Error with Pipe\n");
 					break ;
 				}
 			 	// free_cmd(shell.cmd);

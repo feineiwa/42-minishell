@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 12:03:44 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/07 14:55:57 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct s_cmd
 	char **argv;
 	char			*input_file;
 	char			*output_file;
-	int				append;
+	bool			append;
 	struct s_cmd	*next;
 }					t_cmd;
 

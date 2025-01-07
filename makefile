@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
+#    By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/05 14:41:56 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/07 11:48:14 by nrasamim         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ SRC_DIR	=	src/
 OBJ_DIR	=	obj/
 INCLUDE	=	-I ./inc -I ./libft -lreadline
 
-FILES	=	main ft_env
+FILES	=	main init utils excec parsing ft_echo ft_pwd
 
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))

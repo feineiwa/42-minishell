@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/06 19:11:02 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/07 17:08:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,11 +364,31 @@ char	*ft_getarg(char *s)
 	return (arg);
 }
 
+char	*ft_get_var(char *arg, char *tok)
+{
+	int		i;
+	t_bool	interp;
+
+	i = 0;
+	interp = FALSE;
+	while (tok[i])
+	{
+		if (tok[i] == '$')
+		{
+			if (ft_is_between(tok, i) == '"' || !ft_is_between(tok, i))
+				interp = TRUE;
+		}
+		i++;
+	}
+	return (NULL);
+}
+
 t_cmd	*parse_input(t_token *tok)
 {
 	t_cmd	*cmd_list;
 	t_cmd	*cmd_tmp;
 	char	*arg;
+	char	*var;
 	int		i;
 
 	cmd_list = malloc(sizeof(t_cmd));
@@ -380,6 +400,7 @@ t_cmd	*parse_input(t_token *tok)
 		arg = ft_getarg(tok->value);
 		if (!arg)
 			return (NULL);
+		var = ft_get_var(arg, tok->value);
 		// cmd_list->argv[i];
 		printf("[%s]\n", arg);
 		tok = tok->next;
@@ -402,7 +423,6 @@ t_cmd	*parsing(t_shell *shell, char *input)
 		return (NULL);
 	// while (tok)
 	// {
-		
 	// 	printf("[%s]->[%d]\n", tok->value, tok->type);
 	// 	tok = tok->next;
 	// }
@@ -420,26 +440,32 @@ int	main(int ac, char **av, char **envp)
 	(void)ac;
 	(void)av;
 	shell = init_shell(envp);
-	while (42)
-	{
-		input = readline(PROMPT);
-		if (input == NULL)
-		{
-			write(1, "exit\n", 5);
-			break ;
-		}
-		if (input && *input)
-		{
-			add_history(input);
-			shell.cmd = parsing(&shell, input);
-			// if (shell.cmd)
-			// {
-			// 	execute_command(shell.cmd, shell);
-			// 	free_command(shell.cmd);
-			// }
-		}
-		free(input);
-	}
-	ft_lstclear(&shell.envp, free);
+	// print_env(shell.envp);
+	ft_add_env(&shell.envp, "fan=frahenin");
+	ft_add_env(&shell.envp, "XAVER=[por]");
+	print_env(shell.envp);
+	// if (!shell.envp)
+	// 	printf("asfdsaa");
+	// while (42)
+	// {
+	// 	input = readline(PROMPT);
+	// 	if (input == NULL)
+	// 	{
+	// 		write(1, "exit\n", 5);
+	// 		break ;
+	// 	}
+	// 	if (input && *input)
+	// 	{
+	// 		add_history(input);
+	// 		shell.cmd = parsing(&shell, input);
+	// 		// if (shell.cmd)
+	// 		// {
+	// 		// 	execute_command(shell.cmd, shell);
+	// 		// 	free_command(shell.cmd);
+	// 		// }
+	// 	}
+	// 	free(input);
+	// }
+	// ft_lstclear(&shell.envp, free);
 	return (0);
 }

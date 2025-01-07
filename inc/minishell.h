@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/06 19:12:02 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/07 17:02:38 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,15 @@
 
 # define PROMPT "minishell$ "
 
-typedef	enum	e_bool
+typedef enum e_bool
 {
 	FALSE,
 	TRUE
-}	t_bool;
+}					t_bool;
 
 typedef enum e_tok_type
 {
-	ARGS= 0,
+	ARGS = 0,
 	PIPE,
 	INFILE,
 	OUTFILE,
@@ -52,17 +52,16 @@ typedef struct s_token
 
 typedef struct s_hdoc
 {
-	char	*del;
-	char	*content;
-}	t_hdoc;
+	char			*del;
+	char			*content;
+}					t_hdoc;
 
-typedef	struct s_env
+typedef struct s_env
 {
-	char 	*key;
-	char	*value;
-	struct s_env *next;
-}	t_env;
-
+	char			*key;
+	char			*value;
+	struct s_env	*next;
+}					t_env;
 
 typedef struct s_cmd
 {
@@ -72,18 +71,25 @@ typedef struct s_cmd
 	int				append;
 	t_hdoc			*hdoc;
 	t_bool			interp;
+	char			*var;
 	struct s_cmd	*next;
 }					t_cmd;
 
 typedef struct s_shell
 {
-	t_list			*envp;
+	t_env			*envp;
 	t_cmd			*cmd;
 	int				exit_status;
 }					t_shell;
 
 // ENV
+char				*ft_get_env_value(t_env *envp, char *key);
+void				print_env(t_env *envp);
+void				ft_add_env(t_env **envp, char *arg);
+t_env				*ft_get_last_env(t_env *envp);
 
 t_shell				init_shell(char **envp);
+char				*ft_strndup(char *str, size_t n);
+int					ft_strcmp(char *s1, char *s2);
 
 #endif

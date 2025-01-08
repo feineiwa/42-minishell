@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:28 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 12:22:07 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/08 11:31:22 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static bool	check_new_line(char *str)
 	return (false);
 }
 
-static void	print_echo(int count, char **args)
+static void	print_echo(int number_arg, char **args)
 {
 	int	i;
 	bool	new_line;
@@ -40,15 +40,15 @@ static void	print_echo(int count, char **args)
 		i++;
 		new_line = false;
 	}
-	while (i < count)
+	while (i < number_arg)
 	{
-		printf("%s", args[i]);
-		if (i != count - 1)
-			printf(" ");
+		write(1, args[i], ft_strlen(args[i]));
+		if (i != number_arg - 1)
+			write(1, " ", 1);
 		i++;
 	}
 	if (new_line)
-		printf("\n");
+		write(1, "\n", 1);
 }
 
 int	ft_echo(char **args)

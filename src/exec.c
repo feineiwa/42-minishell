@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   excec.c                                            :+:      :+:    :+:   */
+/*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 15:41:05 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:27:49 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-bool	is_builtin(char *cmd)
+bool	is_valid_cmd(char *cmd)
 {
 	if (!cmd)
 		return (false);
@@ -24,7 +24,7 @@ bool	is_builtin(char *cmd)
 	return (false);
 }
 
-static void	what_cmd(t_shell *shell, t_cmd *cmd)
+void	what_cmd(t_shell *shell, t_cmd *cmd)
 {
 	if (!ft_strcmp("echo", cmd->argv[0]))
 		shell->exit_status = ft_echo(cmd->argv);
@@ -65,7 +65,7 @@ bool    launch_cmd(t_shell *shell, t_cmd *cmd)
         	flags |= O_APPEND;
 		else
 			flags |= O_TRUNC;
-        output_fd = open(cmd->output_file, flags, 644);
+        output_fd = open(cmd->output_file, flags, 0644);
         if (output_fd < 0)
         {
             perror("minishell: output_file");

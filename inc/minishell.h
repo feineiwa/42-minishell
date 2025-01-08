@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 14:55:57 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/08 14:26:24 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 
 # include "../libft/libft.h"
+# include <limits.h>
 # include <errno.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -50,6 +51,7 @@ typedef struct s_cmd
 	char **argv;
 	char			*input_file;
 	char			*output_file;
+	bool			here_doc;
 	bool			append;
 	struct s_cmd	*next;
 }					t_cmd;
@@ -65,6 +67,8 @@ t_shell				init_shell(char **envp);
 t_tok_type			assign_type(char *s);
 t_token			*lexer_input(char *input);
 t_cmd			*parse_input(t_token *tok);
+int		ft_cat(char *filename);
+void	what_cmd(t_shell *shell, t_cmd *cmd);
 void	ft_getcwd(char *buf, size_t size);
 void	panic(char *s);
 int		ft_pwd(void);
@@ -76,8 +80,9 @@ int		ft_is_between(char *str, int index);
 int		ft_skip_space(char *str);
 int		ft_is_quote(char c);
 int		ft_is_belong(char c);
-bool	is_builtin(char *cmd);
+bool	is_valid_cmd(char *cmd);
 bool    launch_cmd(t_shell *shell, t_cmd *cmd);
+bool	config_with_pipe(t_shell *shell, t_cmd *cmd);
 char	*ft_strndup(char *str, size_t n);
 char	*ft_strtok_quoted(char *str);
 

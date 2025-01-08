@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 15:34:35 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/08 14:53:12 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,11 @@ static bool	execute_command(t_shell *shell)
 	t_cmd	*temp;
 
 	temp = shell->cmd;
-	if (temp->argv[0] && !temp->next && is_builtin(temp->argv[0]))
+	if (temp->argv[0] && !temp->next && is_valid_cmd(temp->argv[0]))
 		return (launch_cmd(shell, temp));
-	// Commande avec '|'
-	/*while (temp)
-	{
-		printf("%s\n", temp->argv[0]);
-		temp = temp->next;
-	}*/
-	return (true);
+	else if (temp->next)
+		return (config_with_pipe(shell, temp));
+	return (false);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -65,18 +61,23 @@ int	main(int ac, char **av, char **envp)
 			if (shell.cmd)
 			{
 				// example commande
-				shell.cmd->argv = malloc(3 * sizeof(char *));
-				shell.cmd->argv[0] = ft_strdup("echo");
-				shell.cmd->argv[1] = ft_strdup("Hello World");
-				shell.cmd->argv[2] = NULL;
+				shell.cmd->argv = (char *[]){ "echo", "-n", "Hello World", NULL };
 				shell.cmd->input_file = NULL;
-				shell.cmd->output_file = ft_strdup("text.txt");
-				shell.cmd->append = true;
-				shell.cmd->next = NULL;
+				shell.cmd->output_file = NULL;
+				shell.cmd->append = false;
+
+				t_cmd *next_cmd = malloc(sizeof(t_cmd));
+				next_cmd->argv = (char *[]){ "cat", NULL };
+				next_cmd->input_file = NULL;
+				next_cmd->output_file = ft_strdup("text.txt");
+				next_cmd->append = false;
+
+				shell.cmd->next = next_cmd;
+				next_cmd->next = NULL;
 
 			 	if (!execute_command(&shell))
 				{
-					perror("Error with Pipe\n");
+					perror("Error during excecution");
 					break ;
 				}
 			 	// free_cmd(shell.cmd);

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 10:24:31 by frahenin          #+#    #+#             */
-/*   Updated: 2024/12/31 10:31:44 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:42:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ char	*ft_strdup(const char *s1)
 	int		len;
 	size_t	i;
 
+	if (!s1)
+		return (NULL);
 	len = ft_strlen(s1);
 	str = malloc(sizeof(char) * len + 1);
 	if (!str)

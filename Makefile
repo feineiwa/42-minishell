@@ -1,18 +1,18 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    makefile                                           :+:      :+:    :+:    #
+#    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/05 14:41:56 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/09 13:06:57 by frahenin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	minishell
 
-CC		=	gcc
+CC		=	cc
 
 FLAG = 
 
@@ -22,9 +22,9 @@ NAMELFT	=	$(addprefix $(DIRLIB), $(FILELIB))
 
 SRC_DIR	=	src/
 OBJ_DIR	=	obj/
-INCLUDE	=	-I ./inc -I ./libft -lreadline
+INCLUDE	=	-g -I ./inc -I ./libft -lreadline
 
-FILES	=	main ft_env
+FILES	=	main ft_env ft_parse ft_expand 
 
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))

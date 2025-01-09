@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/07 17:08:57 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/09 12:24:35 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,15 @@ void	ft_add_env(t_env **envp, char *arg)
 {
 	int		i;
 	char	*key;
-	int		j;
 	t_env	*current;
+	t_env	*new_node;
 	t_env	*last;
 
 	i = 0;
-	j = 0;
 	key = NULL;
 	i = ft_search_equ(arg);
+	if (i < 0 || arg[i] == '\0')
+		return ;
 	key = ft_substr(arg, 0, i);
 	if (!key)
 		return ;
@@ -72,29 +73,32 @@ void	ft_add_env(t_env **envp, char *arg)
 	while (current)
 	{
 		if (!ft_strcmp(current->key, key))
-			break ;
+		{
+			ft_free(current->value);
+			current->value = ft_strdup(arg + i + 1);
+			ft_free(key);
+			return ;
+		}
 		current = current->next;
 	}
-	if (current)
-	{
-		ft_free(current->value);
-		ft_free(key);
-		current->value = ft_strdup(arg + i + 1);
-	}
+	new_node = ft_calloc(sizeof(t_env), 1);
+	if (!new_node)
+		return ;
+	new_node->key = key;
+	new_node->value = ft_strdup(arg + i + 1);
+	new_node->next = NULL;
+	if (*envp == NULL)
+		*envp = new_node;
 	else
 	{
 		last = ft_get_last_env(*envp);
-		last = malloc(sizeof(t_env));
-		last->key = key;
-		last->value = ft_strdup(arg + i + 1);
-		last->next = NULL;
+		last->next = new_node;
 	}
-	// printf("[%s]", ft_get_last_env(*envp)->key);
 }
 
 char	*ft_get_env_value(t_env *envp, char *key)
 {
-	if (key[0] != '$')
+	if (key[0] != '$' || !key)
 		return (NULL);
 	while (envp)
 	{
@@ -138,7 +142,7 @@ static t_env	*populate_env_list(char **envp)
 		else
 		{
 			tmp->next = new_node;
-			tmp = tmp = tmp->next;
+			tmp = tmp->next;
 		}
 		i++;
 	}
@@ -158,5 +162,24 @@ t_shell	init_shell(char **envp)
 	}
 	shell.cmd = NULL;
 	shell.exit_status = 0;
+	shell.pipefd[0] = -1;
+	shell.pipefd[1] = -1;
 	return (shell);
+}
+
+void	ft_free_env(t_env **envp)
+{
+	t_env	*tmp;
+
+	if (!*envp || !envp)
+		return ;
+	while (*envp)
+	{
+		tmp = (*envp)->next;
+		ft_free((*envp)->key);
+		ft_free((*envp)->value);
+		ft_free(*envp);
+		*envp = tmp;
+	}
+	ft_free(*envp);
 }

@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/08 14:53:12 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:00:20 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	main(int ac, char **av, char **envp)
 			if (shell.cmd)
 			{
 				// example commande
-				shell.cmd->argv = (char *[]){ "echo", "-n", "Hello World", NULL };
+				shell.cmd->argv = (char *[]){ "echo", "Hello World", NULL };
 				shell.cmd->input_file = NULL;
 				shell.cmd->output_file = NULL;
 				shell.cmd->append = false;
@@ -70,7 +70,7 @@ int	main(int ac, char **av, char **envp)
 				next_cmd->argv = (char *[]){ "cat", NULL };
 				next_cmd->input_file = NULL;
 				next_cmd->output_file = ft_strdup("text.txt");
-				next_cmd->append = false;
+				next_cmd->append = true;
 
 				shell.cmd->next = next_cmd;
 				next_cmd->next = NULL;

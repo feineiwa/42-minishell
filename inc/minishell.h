@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/08 14:26:24 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/09 13:54:06 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,5 +85,6 @@ bool    launch_cmd(t_shell *shell, t_cmd *cmd);
 bool	config_with_pipe(t_shell *shell, t_cmd *cmd);
 char	*ft_strndup(char *str, size_t n);
 char	*ft_strtok_quoted(char *str);
+char    *read_fd(int fd);
 
 #endif

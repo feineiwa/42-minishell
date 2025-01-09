@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/08 16:28:54 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/09 13:54:19 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
     input_fd = -1;
     while (cmd)
     {
-        if (!temp->argv[0] || !is_valid_cmd(cmd->argv[0]))
+        if (!cmd->argv[0] || !is_valid_cmd(cmd->argv[0]))
             return (false);
         if (pipe(pipefd) < 0)
         {

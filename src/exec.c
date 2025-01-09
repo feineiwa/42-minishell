@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/08 16:27:49 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/09 13:53:56 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ bool	is_valid_cmd(char *cmd)
 	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) \
 	|| !ft_strcmp("pwd", cmd) || !ft_strcmp("export", cmd) \
 	|| !ft_strcmp("unset", cmd) || !ft_strcmp("env", cmd) \
-	|| !ft_strcmp("exit", cmd))
+	|| !ft_strcmp("exit", cmd) || !ft_strcmp("cat", cmd))
 		return (true);
 	return (false);
 }
@@ -30,7 +30,24 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_echo(cmd->argv);
 	else if (!ft_strcmp("pwd", cmd->argv[0]))
 		shell->exit_status = ft_pwd();
+    else if (!ft_strcmp("cat", cmd->argv[0]))
+		shell->exit_status = ft_cat(cmd->argv[1]);
 }
+
+/*char    *read_fd(int fd)
+{
+    char    buffer[4026];
+    int bytes_read;
+
+    bytes_read = read(fd, buffer, sizeof(buffer));
+    if (bytes_read == -1)
+    {
+        perror("Error reading file");
+        close(fd);
+        return (NULL);
+    }
+    return (buffer);
+}*/
 
 bool    launch_cmd(t_shell *shell, t_cmd *cmd)
 {

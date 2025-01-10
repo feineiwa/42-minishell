@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/09 13:54:06 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/10 12:17:27 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,18 @@ typedef struct s_token
 	struct s_token	*next;
 }					t_token;
 
+typedef struct s_hdoc
+{
+	char			*del;
+	char			*content;
+}					t_hdoc;
+
 typedef struct s_cmd
 {
 	char **argv;
 	char			*input_file;
 	char			*output_file;
-	bool			here_doc;
+	t_hdoc			here_doc;
 	bool			append;
 	struct s_cmd	*next;
 }					t_cmd;

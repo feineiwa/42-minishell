@@ -6,7 +6,7 @@
 #    By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/08 13:23:37 by nrasamim         ###   ########.fr        #
+#    Updated: 2025/01/10 11:31:09 by nrasamim         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ SRC_DIR	=	src/
 OBJ_DIR	=	obj/
 INCLUDE	=	-I ./inc -I ./libft -lreadline
 
-FILES	=	main init utils exec pipe parsing ft_echo ft_pwd ft_cat
+FILES	=	main init utils exec pipe heredoc parsing ft_echo ft_pwd ft_cat
 
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))

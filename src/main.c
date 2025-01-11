@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/10 11:51:57 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/11 15:25:01 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,11 @@ int	main(int ac, char **av, char **envp)
 			if (shell.cmd)
 			{
 				// example commande
-				shell.cmd->argv = (char *[]){ "echo", "Hello World", NULL };
+				shell.cmd->argv = (char *[]){ "cat", NULL };
 				shell.cmd->input_file = NULL;
 				shell.cmd->output_file = NULL;
+				shell.cmd->here_doc.del = ft_strdup("end");
+				shell.cmd->here_doc.expanded = false;
 				shell.cmd->append = false;
 
 				t_cmd *next_cmd = malloc(sizeof(t_cmd));
@@ -78,7 +80,7 @@ int	main(int ac, char **av, char **envp)
 				last_cmd->output_file = ft_strdup("txt.txt");
 				last_cmd->append = true;
 
-				shell.cmd->next = next_cmd;
+				shell.cmd->next = NULL;
 				next_cmd->next = last_cmd;
 				last_cmd->next = NULL;
 

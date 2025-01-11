@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/09 14:20:12 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/11 15:16:32 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ bool    launch_cmd(t_shell *shell, t_cmd *cmd)
 
 	saved_stdin = dup(STDIN_FILENO);
     saved_stdout = dup(STDOUT_FILENO);
+    if (cmd->here_doc.del)
+        if (!handle_heredoc(cmd))
+            return (false);
 	input_fd = -1;
     if (cmd->input_file)
     {
@@ -110,5 +113,7 @@ bool    launch_cmd(t_shell *shell, t_cmd *cmd)
 		dup2(saved_stdout, STDOUT_FILENO);
         close(output_fd);
 	}
+    if (cmd->here_doc.del)
+        dup2(saved_stdin, STDIN_FILENO);
 	return (true);
 }

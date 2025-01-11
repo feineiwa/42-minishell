@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/10 12:17:27 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/11 14:55:42 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ typedef struct s_token
 typedef struct s_hdoc
 {
 	char			*del;
-	char			*content;
+	bool			expanded;		// Mode texte brute
 }					t_hdoc;
 
 typedef struct s_cmd
@@ -87,6 +87,7 @@ int		ft_skip_space(char *str);
 int		ft_is_quote(char c);
 int		ft_is_belong(char c);
 bool	is_valid_cmd(char *cmd);
+bool    handle_heredoc(t_cmd *cmd);
 bool    launch_cmd(t_shell *shell, t_cmd *cmd);
 bool	config_with_pipe(t_shell *shell, t_cmd *cmd);
 char	*ft_strndup(char *str, size_t n);

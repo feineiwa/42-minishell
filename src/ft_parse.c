@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/11 14:09:37 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/11 23:46:41 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,10 +344,11 @@ char	*ft_get_arg(t_shell *shell, char *tok)
 		arg[j++] = s[i++];
 	}
 	arg[j] = 0;
+	ft_free(s);
 	return (arg);
 }
 
-void	*ft_realloc(void *ptr, size_t new_size)
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 {
 	void	*new_ptr;
 
@@ -361,7 +362,7 @@ void	*ft_realloc(void *ptr, size_t new_size)
 	new_ptr = malloc(new_size);
 	if (!new_ptr)
 		return (NULL);
-	ft_memcpy(new_ptr, ptr, new_size);
+	ft_memcpy(new_ptr, ptr, old_size);
 	ft_free(ptr);
 	return (new_ptr);
 }
@@ -369,71 +370,52 @@ void	*ft_realloc(void *ptr, size_t new_size)
 t_cmd	*init_cmd(t_cmd *cmd)
 {
 	cmd = (t_cmd *)malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
 	cmd->argc = 0;
-	cmd->argv = NULL;
+	cmd->argv = (char **)malloc(sizeof(char *));
+	cmd->argv[0] = NULL;
+	if (!cmd->argv)
+	{
+		ft_free(cmd);
+		return (NULL);
+	}
 	cmd->append = FALSE;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
 	cmd->hdoc = (t_hdoc *)malloc(sizeof(t_hdoc));
+	if (!cmd->hdoc)
+	{
+		ft_free(cmd->argv);
+		ft_free(cmd);
+	}
 	cmd->hdoc->del = NULL;
 	cmd->hdoc->expanded = FALSE;
 	cmd->next = NULL;
 	return (cmd);
 }
 
-// t_token	*ft_refract_token(t_shell *shell, t_token *tok)
-// {
-// 	t_token	*tmp;
-// 	char	*arg;
-
-// 	if (!shell || !tok)
-// 		return (NULL);
-// 	tmp = tok;
-// 	arg = NULL;
-// 	while (tmp)
-// 	{
-// 		arg = ft_get_arg(shell, tmp->value);
-// 		if (!arg)
-// 			return (NULL);
-// 		ft_free(tmp->value);
-// 		tmp->value = arg;
-// 		if (ft_strcmp("<<", arg) && tmp->next && (ft_strchr(tmp->next->value,
-// 					'"') || ft_strchr(tmp->next->value, '\'')))
-// 		{
-
-// 			tmp = tmp->next;
-// 			arg = ft_get_arg(shell, tmp->value);
-// 			if (!arg)
-// 				return (NULL);
-// 			ft_free(tmp->value);
-// 			tmp->value = arg;
-// 		}
-// 		tmp = tmp->next;
-// 	}
-// 	return (tok);
-// }
-
 t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 {
 	t_cmd	*tmp;
-	t_cmd	**cmd_list;
+	t_cmd	*cmd_list;
 	int		i;
+	int		fd;
 
 	tmp = NULL;
 	if (!tok || !shell)
 		return (NULL);
-	cmd_list = malloc(sizeof(t_cmd *));
 	tmp = init_cmd(tmp);
 	if (!tmp)
 		return (NULL);
-	*cmd_list = tmp;
-	i = 0;
+	cmd_list = tmp;
+	fd = 0;
 	while (tok)
 	{
 		if (tok->type == ARGS)
 		{
 			tmp->argv = (char **)ft_realloc(tmp->argv, sizeof(char *)
-					* (tmp->argc + 2));
+					* (tmp->argc), sizeof(char *) * (tmp->argc + 2));
 			tmp->argv[tmp->argc] = ft_get_arg(shell, tok->value);
 			tmp->argc++;
 			tmp->argv[tmp->argc] = NULL;
@@ -444,8 +426,9 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!tok)
 				return (NULL);
 			tmp->input_file = ft_get_arg(shell, tok->value);
-			if (open(tmp->input_file, O_RDONLY) < 0)
+			if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
 				printf("error mila amboarina free\n");
+			close(fd);
 		}
 		else if (tok->type == OUTFILE)
 		{
@@ -453,9 +436,10 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!tok)
 				return (NULL);
 			tmp->output_file = ft_get_arg(shell, tok->value);
-			if (open(ft_get_arg(shell, tok->value),
-					O_WRONLY | O_CREAT | O_TRUNC, 0644) < 0)
+			if ((fd = open(ft_get_arg(shell, tmp->output_file),
+					O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 				printf("error mila amboarina free\n");
+			close(fd);
 		}
 		else if (tok->type == APPEND)
 		{
@@ -464,16 +448,16 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!tok)
 				return (NULL);
 			tmp->output_file = ft_get_arg(shell, tok->value);
-			if (open(ft_get_arg(shell, tok->value), O_WRONLY | O_CREAT,
+			if (fd = open(ft_get_arg(shell, tmp->output_file), O_WRONLY | O_CREAT,
 					0644) < 0)
 				printf("error mila amboarina free\n");
+			close(fd);
 		}
 		else if (tok->type == HEREDOC)
 		{
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
-			tmp->hdoc = (t_hdoc *)(malloc(sizeof(t_hdoc)));
 			if (!tmp->hdoc)
 				return (NULL);
 			if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
@@ -482,8 +466,13 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == PIPE)
 		{
+			if (tok->next && tok->next->type == PIPE)
+			{
+				perror("syntax error near unexpected token `|'");
+				break ;
+			}
+			tmp->next = init_cmd(tmp->next);
 			tmp = tmp->next;
-			tmp = init_cmd(tmp);
 		}
 		else
 		{
@@ -491,25 +480,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		tok = tok->next;
 	}
-	while ((*cmd_list))
-	{
-		i = 0;
-		while ((*cmd_list)->argv[i])
-			printf("%s\n", (*cmd_list)->argv[i++]);
-		printf("argc = %d\n", (*cmd_list)->argc);
-		printf("input file = %s\n", (*cmd_list)->input_file);
-		printf("output file = %s\n", (*cmd_list)->output_file);
-		printf("APPEND = %d\n", (*cmd_list)->append);
-		printf("delimiter heredoc = %s\n", (*cmd_list)->hdoc->del);
-		printf("del expanded = %d\n", (*cmd_list)->hdoc->expanded);
-		(*cmd_list) = (*cmd_list)->next;
-		if ((*cmd_list))
-		{
-			printf("PIPE\n");
-			printf("-----------------------------------------------\n");
-		}
-	}
-	return ((*cmd_list));
+	return (cmd_list);
 }
 
 t_cmd	*parsing(t_shell *shell, char *input)
@@ -517,6 +488,8 @@ t_cmd	*parsing(t_shell *shell, char *input)
 	t_cmd	*cmd_list;
 	t_token	*tok;
 
+	cmd_list = NULL;
+	tok = NULL;
 	if (count_quotes(input))
 	{
 		panic("Error numbers of quotes");
@@ -528,12 +501,25 @@ t_cmd	*parsing(t_shell *shell, char *input)
 	cmd_list = parse_into_cmd(shell, tok);
 	if (!cmd_list)
 		return (NULL);
+	ft_free_token(tok);
+	
 	// while (cmd_list)
 	// {
-	// 	int	i = 0;
+	// 	int i = 0;
 	// 	while (cmd_list->argv[i])
-	// 		printf("[%s]\n", cmd_list->argv[i++]);
+	// 		printf("%s\n", cmd_list->argv[i++]);
+	// 	printf("argc = %d\n", cmd_list->argc);
+	// 	printf("input file = %s\n", cmd_list->input_file);
+	// 	printf("output file = %s\n", cmd_list->output_file);
+	// 	printf("APPEND = %d\n", cmd_list->append);
+	// 	printf("delimiter heredoc = %s\n", cmd_list->hdoc->del);
+	// 	printf("del expanded = %d\n", cmd_list->hdoc->expanded);
 	// 	cmd_list = cmd_list->next;
+	// 	if (cmd_list)
+	// 	{
+	// 		printf("PIPE\n");
+	// 		printf("-----------------------------------------------\n");
+	// 	}
 	// }
 	return (cmd_list);
 }

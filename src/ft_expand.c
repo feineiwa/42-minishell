@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/09 18:22:28 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/11 23:10:41 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,13 +131,13 @@ char	*ft_expand(t_shell *shell, char *s)
 	{
 		if (s[i] == '$' && (!ft_is_between(s, i)) && ft_is_quote(s[i + 1]))
 		{
-			expanded = ft_strjoin(expanded, ft_strndup(s + start, i - start));
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			i++;
 			start = i;
 		}
 		else if (s[i] == '$' && s[i + 1] == '?')
 		{
-			expanded = ft_strjoin(expanded, ft_strndup(s + start, i - start));
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			value = ft_itoa(shell->exit_status);
 			if (value)
 				expanded = ft_strjoin_free(expanded, value);
@@ -146,7 +146,7 @@ char	*ft_expand(t_shell *shell, char *s)
 		}
 		else if (ft_is_expanded(s, i))
 		{
-			expanded = ft_strjoin(expanded, ft_strndup(s + start, i - start));
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			value = extract_var(s + i, shell);
 			if (value)
 				expanded = ft_strjoin_free(expanded, value);
@@ -158,6 +158,6 @@ char	*ft_expand(t_shell *shell, char *s)
 		else
 			i++;
 	}
-	expanded = ft_strjoin(expanded, ft_strdup(s + start));
+	expanded = ft_strjoin_free(expanded, ft_strdup(s + start));
 	return (expanded);
 }

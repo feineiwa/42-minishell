@@ -6,18 +6,18 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/10 14:13:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/11 23:24:43 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-int	ft_free(void *ptr)
+void	ft_free(void *ptr)
 {
 	if (!ptr)
-		return (0);
+		return ;
 	free(ptr);
-	return (1);
+	ptr = NULL;
 }
 
 int	ft_search_equ(char *s)

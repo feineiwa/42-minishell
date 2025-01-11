@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/09 18:45:36 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:06:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ typedef enum e_tok_type
 	INFILE,
 	OUTFILE,
 	APPEND,
-	HEREDOC
+	HEREDOC,
+	NONE
 }					t_tok_type;
 
 typedef struct s_token
@@ -53,6 +54,7 @@ typedef struct s_token
 typedef struct s_hdoc
 {
 	char			*del;
+	t_bool			expanded;
 	char			*content;
 }					t_hdoc;
 
@@ -65,7 +67,8 @@ typedef struct s_env
 
 typedef struct s_cmd
 {
-	char **argv; // array of arguments
+	char			**argv;
+	int				argc;
 	char			*input_file;
 	char			*output_file;
 	int				append;
@@ -78,7 +81,6 @@ typedef struct s_shell
 	t_env			*envp;
 	t_cmd			*cmd;
 	int				exit_status;
-	int				pipefd[2];
 }					t_shell;
 
 int					ft_free(void *ptr);

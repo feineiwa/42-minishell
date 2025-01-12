@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 13:12:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/12 19:42:51 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	main(int ac, char **av, char **envp)
 		}
 		ft_free(input);
 	}
-	ft_free_env(&shell.envp);
 	rl_clear_history();
+	ft_free_env(&shell.envp);
 	return (0);
 }

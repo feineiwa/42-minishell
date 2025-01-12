@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 00:02:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/12 13:12:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,21 +38,9 @@ int	main(int ac, char **av, char **envp)
 		{
 			add_history(input);
 			shell.cmd = parsing(&shell, input);
-			// if (!shell.cmd)
-			// {
-			// 	ft_free(input);
-			// 	ft_free_env(&shell.envp);
-			// 	exit(1);
-			// }
-			if (shell.cmd)
-			{
+			// if (shell.cmd)
 			// 	execute_command(shell.cmd, shell);
-				ft_free_cmd(&shell.cmd);
-				ft_free(input);
-				ft_free_env(&shell.envp);
-				rl_clear_history();
-				exit(0);
-			}
+			ft_free_cmd(&shell.cmd);
 		}
 		ft_free(input);
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/11 15:28:18 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:23:17 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,24 +42,24 @@ static void  between_heredoc_and_cmd(char *end_here_doc)
 	close(fd_tmp);
 }
 
-bool    handle_heredoc(t_cmd *cmd)
+t_bool    handle_heredoc(t_cmd *cmd)
 {
     int inputfd;
 
-    between_heredoc_and_cmd(cmd->here_doc.del);
+    between_heredoc_and_cmd(cmd->hdoc->del);
     inputfd = open(".heredoc.tmp", O_RDONLY);
     if (inputfd < 0)
     {
         perror("minishell: read .heredoc.tmp");
         unlink(".heredoc.tmp");
-        return (false);
+        return (FALSE);
     }
     if (dup2(inputfd, STDIN_FILENO) < 0)
     {
         perror("minishell: dup2 input");
         unlink(".heredoc.tmp");
-        return (false);
+        return (FALSE);
     }
     unlink(".heredoc.tmp");
-    return (true);
+    return (TRUE);
 }

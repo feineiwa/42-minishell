@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:18:26 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:24:05 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 t_bool	is_valid_cmd(char *cmd);
 t_bool    launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd);
+t_bool    handle_heredoc(t_cmd *cmd);
 
 //BUILTINS
 int ft_cat(char *filename);

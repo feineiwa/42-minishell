@@ -1,24 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_env.c                                           :+:      :+:    :+:   */
+/*   ft_unset.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 08:43:12 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 09:35:24 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/13 09:39:28 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/13 10:06:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-int	ft_env(t_shell *shell, t_cmd *cmd)
+int	ft_unset(t_shell *shell, t_cmd *cmd)
 {
-	if (cmd->argv[1])
+	int	i;
+
+	if (!shell || !cmd)
+		return (1);
+	i = 1;
+	while (cmd->argv[i])
 	{
-		write (STDERR_FILENO, "env: too many arguments\n", 24);
-		return (127);
+		ft_unset_env(&shell->envp, cmd->argv[i]);
+		i++;
 	}
-	print_env(shell->envp);
 	return (0);
 }

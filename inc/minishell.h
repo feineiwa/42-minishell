@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:24:05 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/13 10:39:36 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ typedef struct s_shell
 	int				exit_status;
 }					t_shell;
 
-void					ft_free(void *ptr);
+void				ft_free(void *ptr);
 // ENV
 char				*ft_get_env_value(t_env *envp, char *key);
 void				print_env(t_env *envp);
@@ -93,14 +93,13 @@ void				ft_free_env(t_env **envp);
 t_shell				init_shell(char **envp);
 char				*ft_strndup(char *str, size_t n);
 int					ft_strcmp(char *s1, char *s2);
-
+char				**convert_env_to_array(t_env *envp);
+void				ft_unset_env(t_env **envp, char *key);
 // PARSING
 t_cmd				*parsing(t_shell *shell, char *input);
 
-//PARSE UTILS
+// PARSE UTILS
 int					count_quotes(char *input);
-
-
 
 void				panic(char *s);
 int					ft_fork(void);
@@ -121,21 +120,24 @@ char				*extract_var(char *s, t_shell *shell);
 char				*ft_expand(t_shell *shell, char *s);
 
 // ft_free
-void    ft_free_token(t_token *tok);
-void    ft_free_cmd(t_cmd **cmd);
+void				ft_free_token(t_token *tok);
+void				ft_free_cmd(t_cmd **cmd);
 
-//extra_libft
-void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+// extra_libft
+void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+char				*ft_strjoin3(char *s1, char *s2, char *s3);
 
-//EXEC
-t_bool	is_valid_cmd(char *cmd);
-t_bool    launch_cmd(t_shell *shell, t_cmd *cmd);
-t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd);
-t_bool    handle_heredoc(t_cmd *cmd);
+// EXEC
+t_bool				is_valid_cmd(char *cmd);
+t_bool				launch_cmd(t_shell *shell, t_cmd *cmd);
+t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
+t_bool				handle_heredoc(t_cmd *cmd);
 
-//BUILTINS
-int ft_cat(char *filename);
-int	ft_echo(char **args);
-int	ft_pwd(void);
-
+// BUILTINS
+int					ft_cat(char *filename);
+int					ft_echo(char **args);
+int					ft_pwd(void);
+int					ft_export(t_shell *shell, t_cmd *cmd);
+int					ft_env(t_shell *shell, t_cmd *cmd);
+int					ft_unset(t_shell *shell, t_cmd *cmd);
 #endif

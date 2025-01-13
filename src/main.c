@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:02:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/13 08:25:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	main(int ac, char **av, char **envp)
 {
 	t_shell	shell;
 	char	*input;
+	int		i;
 
 	(void)ac;
 	(void)av;

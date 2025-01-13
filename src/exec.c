@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 10:37:21 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/13 17:22:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,32 +18,96 @@ t_bool	is_valid_cmd(char *cmd)
 		return (FALSE);
 	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) || !ft_strcmp("pwd",
 			cmd) || !ft_strcmp("export", cmd) || !ft_strcmp("unset", cmd)
-		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd)
-		|| !ft_strcmp("cat", cmd))
+		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd))
 		return (TRUE);
 	return (FALSE);
 }
 
-// void	other_cmd(t_shell *shell, t_cmd *cmd)
-// {
-// 	pid_t	pid;
-// 	char	*path;
-// 	char	**envp;
 
-// 	path = ft_get_env_value(shell->envp, "$PATH");
-// 	pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		perror("fork in what_cmd");
-// 		shell->exit_status = 1;
-// 		return ;
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		execve(path, cmd->argv, envp);
-// 	}
+void	ft_free_arr(char **arr)
+{
+	int	i;
+	
+	i = 0;
+	if (!arr | !*arr)
+		return ;
+	while (arr[i])
+	{
+		ft_free(arr[i]);
+		i++;
+	}
+	ft_free(arr);
+}
 
-// }
+char	*resolve_cmd_path(char *cmd, t_shell *shell)
+{
+	char	*path;
+	char	**paths;
+	int		i;
+	char	*cmd_path;
+
+	path = ft_get_env_value(shell->envp, "$PATH");
+	if (!path)
+		return (NULL);
+	paths = ft_split(path, ':');
+	i = 0;
+	while (paths[i])
+	{
+		cmd_path = ft_strjoin3(paths[i], "/", cmd);
+		printf("what cmd_path [%s]\n", cmd_path);
+		if (access(cmd_path, X_OK) == 0)
+		{
+			ft_free_arr(paths);
+			return (cmd_path);
+		}
+		ft_free(cmd_path);
+		i++;
+	}
+	ft_free_arr(paths);
+	return (NULL);
+}
+
+int	other_cmd(t_shell *shell, t_cmd *cmd)
+{
+	pid_t	pid;
+	char	*cmd_path;
+	char	**envp;
+	int		status;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork in what_cmd");
+		shell->exit_status = 1;
+		return (1);
+	}
+	if (pid == 0)
+	{
+		cmd_path = resolve_cmd_path(cmd->argv[0], shell);
+		if (!cmd_path)
+		{
+			write (STDERR_FILENO, cmd->argv[0], ft_strlen(cmd->argv[0]));
+			write (STDERR_FILENO, ": command not found\n", 20);
+			return (127);
+		}
+		envp = convert_env_to_array(shell->envp);
+		execve(cmd_path, cmd->argv, envp);
+		perror("execve");
+		ft_free(cmd_path);
+		ft_free_arr(envp);
+		return (EXIT_FAILURE);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			shell->exit_status = WEXITSTATUS(status);
+		else
+			shell->exit_status = 1;
+	}
+	return (0);
+
+}
 
 void	what_cmd(t_shell *shell, t_cmd *cmd)
 {
@@ -51,14 +115,16 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_echo(cmd->argv);
 	else if (!ft_strcmp("pwd", cmd->argv[0]))
 		shell->exit_status = ft_pwd();
-	else if (!ft_strcmp("cat", cmd->argv[0]))
-		shell->exit_status = ft_cat(cmd->argv[1]);
+	// else if (!ft_strcmp("cat", cmd->argv[0]))
+	// 	shell->exit_status = ft_cat(cmd->argv[1]);
 	else if (!ft_strcmp("export", cmd->argv[0]))
 		shell->exit_status = ft_export(shell, cmd);
 	else if (!ft_strcmp("env", cmd->argv[0]))
 		shell->exit_status = ft_env(shell, cmd);
 	else if (!ft_strcmp("unset", cmd->argv[0]))
 		shell->exit_status = ft_unset(shell, cmd);
+	else
+		shell->exit_status = other_cmd(shell, cmd);
 }
 
 /*char    *read_fd(int fd)
@@ -154,6 +220,9 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 		close(output_fd);
 	}
 	if (cmd->hdoc->del)
+	{
+		unlink(".heredoc.tmp");
 		dup2(saved_stdin, STDIN_FILENO);
+	}
 	return (TRUE);
 }

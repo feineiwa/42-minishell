@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 11:14:54 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/13 12:25:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
+			if (tmp->input_file)
+				free(tmp->input_file);
 			tmp->input_file = ft_get_arg(shell, tok->value);
 			if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
 				printf("error mila amboarina free\n");
@@ -138,6 +140,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
+			if (tmp->output_file)
+				free(tmp->output_file);
 			tmp->output_file = ft_get_arg(shell, tok->value);
 			if ((fd = open(ft_get_arg(shell, tmp->output_file),
 						O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
@@ -150,6 +154,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
+			if (tmp->output_file)
+				free(tmp->output_file);
 			tmp->output_file = ft_get_arg(shell, tok->value);
 			if ((fd = open(ft_get_arg(shell, tmp->output_file),
 						O_WRONLY | O_CREAT, 0644)) < 0)
@@ -166,12 +172,9 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
 				tmp->hdoc->expanded = TRUE;
 			tmp->hdoc->del = ft_get_arg(shell, tok->value);
-			if ((fd = open(".heredoc.tmp", O_CREAT | O_WRONLY,
-						0644) < 0))
-				printf("error mila amboarina free\n");
-			close(fd);
+			if (tmp->input_file)
+				free(tmp->input_file);
 			tmp->input_file = ft_strdup(".heredoc.tmp");
-			// tmp->input_file = ft_strdup(".heredoc.tmp");
 		}
 		else if (tok->type == PIPE)
 		{

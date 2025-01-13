@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:23:17 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/13 12:22:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,5 @@ t_bool    handle_heredoc(t_cmd *cmd)
         unlink(".heredoc.tmp");
         return (FALSE);
     }
-    unlink(".heredoc.tmp");
     return (TRUE);
 }

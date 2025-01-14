@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 10:39:36 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:59:55 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 # include "../libft/libft.h"
 # include <errno.h>
 # include <fcntl.h>
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
@@ -55,7 +55,6 @@ typedef struct s_hdoc
 {
 	char			*del;
 	t_bool			expanded;
-	char			*content;
 }					t_hdoc;
 
 typedef struct s_env
@@ -126,6 +125,7 @@ void				ft_free_cmd(t_cmd **cmd);
 // extra_libft
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char				*ft_strjoin3(char *s1, char *s2, char *s3);
+char				*ft_strjoin_free(char *s1, char *s2);
 
 // EXEC
 t_bool				is_valid_cmd(char *cmd);
@@ -140,4 +140,7 @@ int					ft_pwd(void);
 int					ft_export(t_shell *shell, t_cmd *cmd);
 int					ft_env(t_shell *shell, t_cmd *cmd);
 int					ft_unset(t_shell *shell, t_cmd *cmd);
+int					ft_exit(t_shell *shell, char **args);
+int					ft_cd(char *path, t_env *envp);
+
 #endif

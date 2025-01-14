@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 12:18:36 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/09 15:08:03 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 10:13:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,5 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	while (s2[i])
 		str[j++] = s2[i++];
 	str[j] = 0;
-	if (s1)
-		free((char *)s1);
 	return (str);
 }

@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 12:22:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:50:48 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static void  between_heredoc_and_cmd(char *end_here_doc)
+static void  between_heredoc_and_cmd(t_hdoc *hdoc)
 {
 	char    *content;
 	int fd_tmp;
@@ -31,12 +31,11 @@ static void  between_heredoc_and_cmd(char *end_here_doc)
             perror("Warning : There're not delimiter in the heredoc");
             break ;
         }
-        if (!ft_strcmp(content, end_here_doc))
+        if (!ft_strcmp(content, hdoc->del))
 			break ;
-        // variable d'environnement??
         write(fd_tmp, content, ft_strlen(content));
 		write(fd_tmp, "\n", 1);
-		free(content);
+		ft_free(content);
 	}
 	free(content);
 	close(fd_tmp);
@@ -46,7 +45,7 @@ t_bool    handle_heredoc(t_cmd *cmd)
 {
     int inputfd;
 
-    between_heredoc_and_cmd(cmd->hdoc->del);
+    between_heredoc_and_cmd(cmd->hdoc);
     inputfd = open(".heredoc.tmp", O_RDONLY);
     if (inputfd < 0)
     {

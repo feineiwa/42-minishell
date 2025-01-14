@@ -1,5 +1,23 @@
 {
 	"files.associations": {
-		"libft.h": "c"
+		"libft.h": "c",
+		"cassert": "cpp",
+		"cctype": "cpp",
+		"climits": "cpp",
+		"cmath": "cpp",
+		"cstdarg": "cpp",
+		"cstddef": "cpp",
+		"cstdio": "cpp",
+		"cstdlib": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"exception": "cpp",
+		"type_traits": "cpp",
+		"limits": "cpp",
+		"new": "cpp",
+		"*.tcc": "cpp",
+		"cstdbool": "cpp",
+		"cstdint": "cpp",
+		"typeinfo": "cpp"
 	}
 }

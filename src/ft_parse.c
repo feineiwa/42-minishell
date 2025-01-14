@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 12:25:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:49:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	t_cmd	*cmd_list;
 	int		i;
 	int		fd;
+	int		n;
 
 	tmp = NULL;
 	if (!tok || !shell)
@@ -113,6 +114,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		return (NULL);
 	cmd_list = tmp;
 	fd = 0;
+	n = 1;
 	while (tok)
 	{
 		if (tok->type == ARGS)
@@ -185,6 +187,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			}
 			tmp->next = init_cmd(tmp->next);
 			tmp = tmp->next;
+			n++;
 		}
 		else
 		{

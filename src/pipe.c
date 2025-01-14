@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:15:16 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 09:08:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
     input_fd = -1;
     while (cmd)
     {
-        if (!cmd->argv[0] || !is_valid_cmd(cmd->argv[0]))
+        if (!cmd->argv[0])
             return (FALSE);
         if (pipe(pipefd) < 0)
         {

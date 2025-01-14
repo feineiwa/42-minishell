@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 17:22:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:50:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,10 @@ t_bool	is_valid_cmd(char *cmd)
 	return (FALSE);
 }
 
-
 void	ft_free_arr(char **arr)
 {
 	int	i;
-	
+
 	i = 0;
 	if (!arr | !*arr)
 		return ;
@@ -39,7 +38,7 @@ void	ft_free_arr(char **arr)
 	ft_free(arr);
 }
 
-char	*resolve_cmd_path(char *cmd, t_shell *shell)
+char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
 {
 	char	*path;
 	char	**paths;
@@ -53,8 +52,7 @@ char	*resolve_cmd_path(char *cmd, t_shell *shell)
 	i = 0;
 	while (paths[i])
 	{
-		cmd_path = ft_strjoin3(paths[i], "/", cmd);
-		printf("what cmd_path [%s]\n", cmd_path);
+		cmd_path = ft_strjoin3(paths[i], "/", cmd->argv[0]);
 		if (access(cmd_path, X_OK) == 0)
 		{
 			ft_free_arr(paths);
@@ -83,19 +81,21 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	}
 	if (pid == 0)
 	{
-		cmd_path = resolve_cmd_path(cmd->argv[0], shell);
+		cmd_path = resolve_cmd_path(shell, cmd);
 		if (!cmd_path)
-		{
-			write (STDERR_FILENO, cmd->argv[0], ft_strlen(cmd->argv[0]));
-			write (STDERR_FILENO, ": command not found\n", 20);
-			return (127);
-		}
+			return (1);
 		envp = convert_env_to_array(shell->envp);
-		execve(cmd_path, cmd->argv, envp);
-		perror("execve");
-		ft_free(cmd_path);
-		ft_free_arr(envp);
-		return (EXIT_FAILURE);
+		if (!envp)
+		{
+			ft_free(cmd_path);
+			ft_free_arr(envp);
+			return (1);
+		}
+		if (execve(cmd_path, cmd->argv, envp) == -1)
+		{
+			perror(cmd->argv[0]);
+			return (1);
+		}
 	}
 	else
 	{
@@ -106,7 +106,6 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 			shell->exit_status = 1;
 	}
 	return (0);
-
 }
 
 void	what_cmd(t_shell *shell, t_cmd *cmd)
@@ -115,8 +114,6 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_echo(cmd->argv);
 	else if (!ft_strcmp("pwd", cmd->argv[0]))
 		shell->exit_status = ft_pwd();
-	// else if (!ft_strcmp("cat", cmd->argv[0]))
-	// 	shell->exit_status = ft_cat(cmd->argv[1]);
 	else if (!ft_strcmp("export", cmd->argv[0]))
 		shell->exit_status = ft_export(shell, cmd);
 	else if (!ft_strcmp("env", cmd->argv[0]))
@@ -126,33 +123,6 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 	else
 		shell->exit_status = other_cmd(shell, cmd);
 }
-
-/*char    *read_fd(int fd)
-{
-	char	buffer[4026];
-	int		bytes_read;
-	int		input_fd;
-	int		output_fd;
-	int		saved_stdin;
-	int		saved_stdout;
-	int		flags;
-	int		saved_stdin;
-	int		saved_stdin;
-	int		saved_stdin;
-	int		saved_stdout;
-	int		input_fd;
-	int		output_fd;
-	int		flags;
-
-	bytes_read = read(fd, buffer, sizeof(buffer));
-	if (bytes_read == -1)
-	{
-		perror("Error reading file");
-		close(fd);
-		return (NULL);
-	}
-	return (buffer);
-}*/
 
 t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 {

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 10:39:36 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:48:18 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ typedef struct s_hdoc
 {
 	char			*del;
 	t_bool			expanded;
-	char			*content;
 }					t_hdoc;
 
 typedef struct s_env
@@ -126,6 +125,7 @@ void				ft_free_cmd(t_cmd **cmd);
 // extra_libft
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char				*ft_strjoin3(char *s1, char *s2, char *s3);
+char				*ft_strjoin_free(char *s1, char *s2);
 
 // EXEC
 t_bool				is_valid_cmd(char *cmd);

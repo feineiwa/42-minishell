@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 12:48:18 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 18:09:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ typedef struct s_hdoc
 {
 	char			*del;
 	t_bool			expanded;
+	int				pipefd[2];
 }					t_hdoc;
 
 typedef struct s_env
@@ -94,6 +95,7 @@ char				*ft_strndup(char *str, size_t n);
 int					ft_strcmp(char *s1, char *s2);
 char				**convert_env_to_array(t_env *envp);
 void				ft_unset_env(t_env **envp, char *key);
+int					ft_search_equ(char *s);
 // PARSING
 t_cmd				*parsing(t_shell *shell, char *input);
 

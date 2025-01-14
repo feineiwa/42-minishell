@@ -3,27 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 09:08:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 16:53:29 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
+t_bool config_with_pipe(t_shell *shell, t_cmd *cmd)
 {
     int pipefd[2];
     int input_fd;
-    pid_t   pid;
+    pid_t pid;
 
     input_fd = -1;
     while (cmd)
     {
         if (!cmd->argv[0])
             return (FALSE);
-        if (pipe(pipefd) < 0)
+        if (cmd->next && pipe(pipefd) < 0)
         {
             perror("minishell: pipe");
             return (FALSE);
@@ -36,15 +36,34 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
         }
         if (pid == 0) // Child Process
         {
-            if (input_fd != -1)
+            if (cmd->hdoc && cmd->hdoc->del)
             {
-                dup2(input_fd, STDIN_FILENO);
+                input_fd = handle_heredoc(cmd);
+                if (dup2(input_fd, STDIN_FILENO) < 0)
+                {
+                    perror("minishell: dup2 heredoc");
+                    return (FALSE);
+                }
+                close(input_fd);
+                cmd->hdoc->del = NULL;
+            }
+            else if (input_fd != -1)
+            {
+                if (dup2(input_fd, STDIN_FILENO) < 0)
+                {
+                    perror("minishell: dup2 heredoc");
+                    return (FALSE);
+                }
                 close(input_fd);
             }
             if (cmd->next)
             {
                 close(pipefd[0]);
-                dup2(pipefd[1], STDOUT_FILENO);
+                if (dup2(pipefd[1], STDOUT_FILENO) < 0)
+                {
+                    perror("minishell: dup2 heredoc");
+                    return (FALSE);
+                }
                 close(pipefd[1]);
             }
             launch_cmd(shell, cmd);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_parse.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/14 12:49:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 14:23:53 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,8 +175,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				tmp->hdoc->expanded = TRUE;
 			tmp->hdoc->del = ft_get_arg(shell, tok->value);
 			if (tmp->input_file)
-				free(tmp->input_file);
-			tmp->input_file = ft_strdup(".heredoc.tmp");
+				ft_free(tmp->input_file);
+			tmp->input_file = NULL;
 		}
 		else if (tok->type == PIPE)
 		{

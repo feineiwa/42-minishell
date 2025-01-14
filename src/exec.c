@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 13:02:03 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:44:17 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,10 +138,9 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
-	if (cmd->hdoc->del)
-		if (!handle_heredoc(cmd))
-			return (FALSE);
 	input_fd = -1;
+	if (cmd->hdoc->del)
+		input_fd = handle_heredoc(cmd);
 	if (cmd->input_file)
 	{
 		input_fd = open(cmd->input_file, O_RDONLY);
@@ -192,11 +191,6 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	{
 		dup2(saved_stdout, STDOUT_FILENO);
 		close(output_fd);
-	}
-	if (cmd->hdoc->del)
-	{
-		unlink(".heredoc.tmp");
-		dup2(saved_stdin, STDIN_FILENO);
 	}
 	return (TRUE);
 }

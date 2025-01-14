@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 12:59:55 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:44:05 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,18 @@ typedef struct s_token
 	struct s_token	*next;
 }					t_token;
 
-typedef struct s_hdoc
-{
-	char			*del;
-	t_bool			expanded;
-}					t_hdoc;
-
 typedef struct s_env
 {
 	char			*key;
 	char			*value;
 	struct s_env	*next;
 }					t_env;
+
+typedef struct s_hdoc
+{
+	char			*del;
+	t_bool			expanded;
+}					t_hdoc;
 
 typedef struct s_cmd
 {
@@ -131,7 +131,7 @@ char				*ft_strjoin_free(char *s1, char *s2);
 t_bool				is_valid_cmd(char *cmd);
 t_bool				launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
-t_bool				handle_heredoc(t_cmd *cmd);
+int					handle_heredoc(t_cmd *cmd);
 
 // BUILTINS
 int					ft_cat(char *filename);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 11:10:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 13:33:00 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,10 @@ int	main(int ac, char **av, char **envp)
 			shell.cmd = parsing(&shell, input);
 			
 			if (!execute_command(&shell))
-				{
-					perror("Error during excecution");
-					break ;
-				}
+			{
+				perror("Error during excecution");
+				break ;
+			}
 			ft_free_cmd(&shell.cmd);
 		}
 		ft_free(input);

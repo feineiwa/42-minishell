@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_free.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/12 13:08:11 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 12:46:00 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,19 @@ void    ft_free_cmd(t_cmd **cmd)
     }
     ft_free(*cmd);
     *cmd = NULL;
+}
+
+void	ft_free_arr(char **arr)
+{
+	int	i;
+
+	i = 0;
+	if (!arr | !*arr)
+		return ;
+	while (arr[i])
+	{
+		ft_free(arr[i]);
+		i++;
+	}
+	ft_free(arr);
 }

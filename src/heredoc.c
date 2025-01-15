@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 16:07:03 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/15 13:16:48 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc)
             write(pipe_fd[1], "\n", 1);
             ft_free(content);
         }
+        ft_free(content);
         exit(0);
     }
     else
     {
-        int status;
-        waitpid(pid, &status, 0);
+        waitpid(pid, NULL, 0);
 	    close(pipe_fd[1]);
     }
     return (pipe_fd[0]);

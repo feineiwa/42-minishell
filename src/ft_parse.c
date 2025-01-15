@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/14 17:30:52 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 08:25:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	int		i;
 	int		fd;
 	int		n;
+	int		error_flag;
 
 	tmp = NULL;
 	if (!tok || !shell)
@@ -109,7 +110,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		return (NULL);
 	cmd_list = tmp;
 	fd = 0;
-	n = 1;
+	error_flag = 0;	
 	while (tok)
 	{
 		if (tok->type == ARGS)
@@ -119,26 +120,24 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tmp->argv[tmp->argc] = ft_get_arg(shell, tok->value);
 			tmp->argc++;
 			tmp->argv[tmp->argc] = NULL;
-			// if (!ft_strcmp(tmp->argv[tmp->argc], "echo"))
-			// {
-			// 	if (tok->next->type == ARGS)
-			// 	{
-			// 		tok = tok->next;
-			// 		if (!ft_strcmp(tok->value, ""))
-			// 	}
-			// }
 		}
 		else if (tok->type == INFILE)
 		{
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
-			if (tmp->input_file)
-				ft_free(tmp->input_file);
-			tmp->input_file = ft_get_arg(shell, tok->value);
-			if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
-				printf("error mila amboarina free\n");
-			close(fd);
+			if (!error_flag)
+			{
+				if (tmp->input_file)
+					ft_free(tmp->input_file);
+				tmp->input_file = ft_get_arg(shell, tok->value);
+				if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
+				{
+					error_flag = 1;
+					printf("error mila amboarina free\n");
+				}
+				close(fd);
+			}
 		}
 		else if (tok->type == OUTFILE)
 		{
@@ -177,8 +176,11 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
 				tmp->hdoc->expanded = TRUE;
 			tmp->hdoc->del = ft_get_arg(shell, tok->value);
-			if (tmp->input_file)
-				ft_free(tmp->input_file);
+			if (!error_flag)
+			{
+				if (tmp->input_file)
+					ft_free(tmp->input_file);
+			}
 		}
 		else if (tok->type == PIPE)
 		{
@@ -190,6 +192,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tmp->next = init_cmd(tmp->next);
 			tmp = tmp->next;
 			n++;
+			error_flag = 0;
 		}
 		else
 		{

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/14 18:44:54 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 07:47:15 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	ft_add_env(t_env **envp, char *arg)
 	current = *envp;
 	while (current)
 	{
-		if (!ft_strcmp(current->key, key) && current->value)
+		if (!ft_strcmp(current->key, key))
 		{
 			ft_free(current->value);
 			current->value = ft_strdup(arg + i + 1);

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 11:10:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 08:15:41 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	main(int ac, char **av, char **envp)
 			if (!execute_command(&shell))
 				{
 					perror("Error during excecution");
-					break ;
+					// break ;
 				}
 			ft_free_cmd(&shell.cmd);
 		}

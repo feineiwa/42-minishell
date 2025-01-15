@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 11:41:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 22:29:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,8 @@ void				ft_unset_env(t_env **envp, char *key);
 int					ft_search_equ(char *s);
 // PARSING
 t_cmd				*parsing(t_shell *shell, char *input);
+char				*ft_expand_for_hdoc(t_shell *shell, char *s);
+
 
 // PARSE UTILS
 int					count_quotes(char *input);
@@ -134,8 +136,7 @@ char				*ft_strjoin_free(char *s1, char *s2);
 // t_bool				is_valid_cmd(char *cmd);
 t_bool				launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
-int					handle_heredoc(t_cmd *cmd);
-
+int   				handle_heredoc(t_cmd *cmd, t_shell *shell);
 // BUILTINS
 int					ft_cat(char *filename);
 int					ft_echo(char **args);

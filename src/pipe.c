@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 11:02:48 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 21:40:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
         {
             if (cmd->hdoc && cmd->hdoc->del)
             {
-                input_fd = handle_heredoc(cmd);
+                input_fd = handle_heredoc(cmd, shell);
                 if (dup2(input_fd, STDIN_FILENO) < 0)
                 {
                     perror("minishell: dup2 heredoc");

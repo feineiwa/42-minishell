@@ -6,17 +6,18 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 14:22:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 22:29:49 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static int  between_heredoc_and_cmd(t_hdoc *hdoc)
+static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_shell *shell)
 {
 	char    *content;
     int     pipe_fd[2];
     pid_t   pid;
+    char    *expand;
 
     if (pipe(pipe_fd) == -1)
     {
@@ -44,6 +45,12 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc)
                 ft_free(content);
                 break ;
             }
+            if (hdoc->expanded)
+            {
+                expand = ft_expand_for_hdoc(shell, content);
+                ft_free(content);
+                content = expand;
+            }
             close(pipe_fd[0]);
             write (pipe_fd[1], content, ft_strlen(content));
             write (pipe_fd[1], "\n", 1);
@@ -65,7 +72,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc)
     return (pipe_fd[0]);
 }
 
-int   handle_heredoc(t_cmd *cmd)
+int   handle_heredoc(t_cmd *cmd, t_shell *shell)
 {
     int     inputfd;
     t_hdoc  *hdoc;
@@ -77,7 +84,7 @@ int   handle_heredoc(t_cmd *cmd)
     saved_std = dup(STDIN_FILENO);
     while (hdoc)
     {
-        tmp_fd = between_heredoc_and_cmd(hdoc);
+        tmp_fd = between_heredoc_and_cmd(hdoc, shell);
         if (tmp_fd < 0)
         {
             perror("minishell: read .heredoc.tmp");

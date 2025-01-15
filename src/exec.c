@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 14:19:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 22:46:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,10 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	{
 		cmd_path = resolve_cmd_path(shell, cmd);
 		if (!cmd_path)
+		{
+			perror(cmd->argv[0]);
 			return (1);
+		}
 		envp = convert_env_to_array(shell->envp);
 		if (!envp)
 		{
@@ -137,7 +140,7 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	input_fd = -1;
 	t_hdoc	*hdoc;
 
-	input_fd = handle_heredoc(cmd);
+	input_fd = handle_heredoc(cmd, shell);
 	if (cmd->input_file)
 	{
 		input_fd = open(cmd->input_file, O_RDONLY);

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/15 21:26:52 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 22:35:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	ft_strlen_expand(char *s)
 			i++;
 			return (i);
 		}
-		while (s[i] && ft_isalnum(s[i]))
+		while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
 			i++;
 	}
 	return (i);
@@ -153,6 +153,44 @@ t_bool	ft_is_expanded(char *s, int i)
 	return (FALSE);
 }
 
+char	*ft_expand_for_hdoc(t_shell *shell, char *s)
+{
+	int		i;
+	char	*expanded;
+	char	*value;
+	int		start;
+
+	if (!shell->envp || !s)
+		return (NULL);
+	i = 0;
+	expanded = ft_strdup("");
+	start = 0;
+	value = 0;
+	while (s[i])
+	{
+		if (s[i] == '$')
+		{
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
+			value = extract_var(s + i, shell);
+			if (value)
+				expanded = ft_strjoin_free(expanded, value);
+			else
+				expanded = ft_strjoin(expanded, "");
+			i += ft_strlen_expand(s + i);
+			start = i;
+		}
+		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
+		{
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
+			i++;
+			start = i;
+		}
+		else
+			i++;
+	}
+	expanded = ft_strjoin_free(expanded, ft_strdup(s + start));
+	return (expanded);
+}
 
 char	*ft_expand(t_shell *shell, char *s)
 {

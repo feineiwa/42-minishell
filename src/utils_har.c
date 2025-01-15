@@ -1,22 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils_har.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 10:28:39 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/06 16:29:32 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/12 22:50:43 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
-
-void ft_getcwd(char *buf, size_t size)
-{
-	if (NULL == getcwd(buf, size))
-		perror("getcwd FAILED");
-}
 
 void	panic(char *s)
 {

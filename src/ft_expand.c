@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/11 23:10:41 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 21:26:52 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,44 @@ t_bool	ft_is_special(char c)
 	return (0);
 }
 
+int	ft_is_after_here(char *s, int i)
+{
+	int	j;
+	int	hdoc;
+	char quote;
+
+	j = 0;
+	hdoc = -1;
+	while (j <= i)
+	{
+		if ((s[j] && s[j] == '<') && (s[j + 1] && s[j + 1] == '<') && !ft_is_between(s, j))
+		{
+			hdoc = j;
+			j += 2;
+			j += ft_skip_space(s + j);
+			if (ft_is_quote(s[j]))
+			{
+				quote = s[j];
+				j++;
+				while (s[j] && s[j] != quote && j < i)
+					j++;
+				if (s[j] == quote)
+					j++;
+			}
+			else
+			{
+				while (s[j] && !ft_isspace(s[j]) && j < i)
+					j++;
+			}
+			if (j == i)
+				return (1);
+		}
+		else
+			j++;
+	}
+	return (0);
+}
+
 t_bool	ft_is_expanded(char *s, int i)
 {
 	if (!s)
@@ -107,13 +145,14 @@ t_bool	ft_is_expanded(char *s, int i)
 	if (s[i] == '$')
 	{
 		if ((ft_is_between(s, i) == '"' || !ft_is_between(s, i))
-			&& (ft_isalnum(s[i + 1])))
+			&& (ft_isalnum(s[i + 1])) && !ft_is_after_here(s, i))
 			return (TRUE);
 		else if (!ft_is_between(s, i) && (ft_is_quote(*s + 1)))
 			return (TRUE);
 	}
 	return (FALSE);
 }
+
 
 char	*ft_expand(t_shell *shell, char *s)
 {
@@ -135,7 +174,7 @@ char	*ft_expand(t_shell *shell, char *s)
 			i++;
 			start = i;
 		}
-		else if (s[i] == '$' && s[i + 1] == '?')
+		else if (s[i] == '$' && s[i + 1] == '?' && !ft_is_after_here(s, i))
 		{
 			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			value = ft_itoa(shell->exit_status);

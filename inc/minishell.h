@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 18:09:25 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 11:41:43 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[36mminishell$\033[0m "
+# define PROMPT "\033[1;36mminishell$\033[0m "
+# define HDOC	"\033[1;33m>\033[0m "
 
 typedef enum e_bool
 {
@@ -55,7 +56,7 @@ typedef struct s_hdoc
 {
 	char			*del;
 	t_bool			expanded;
-	int				pipefd[2];
+	struct s_hdoc	*next;
 }					t_hdoc;
 
 typedef struct s_env
@@ -130,10 +131,10 @@ char				*ft_strjoin3(char *s1, char *s2, char *s3);
 char				*ft_strjoin_free(char *s1, char *s2);
 
 // EXEC
-t_bool				is_valid_cmd(char *cmd);
+// t_bool				is_valid_cmd(char *cmd);
 t_bool				launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
-t_bool				handle_heredoc(t_cmd *cmd);
+int					handle_heredoc(t_cmd *cmd);
 
 // BUILTINS
 int					ft_cat(char *filename);

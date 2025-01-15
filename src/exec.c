@@ -6,22 +6,22 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/14 12:50:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:19:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-t_bool	is_valid_cmd(char *cmd)
-{
-	if (!cmd)
-		return (FALSE);
-	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) || !ft_strcmp("pwd",
-			cmd) || !ft_strcmp("export", cmd) || !ft_strcmp("unset", cmd)
-		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd))
-		return (TRUE);
-	return (FALSE);
-}
+// t_bool	is_valid_cmd(char *cmd)
+// {
+// 	if (!cmd)
+// 		return (FALSE);
+// 	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) || !ft_strcmp("pwd",
+// 			cmd) || !ft_strcmp("export", cmd) || !ft_strcmp("unset", cmd)
+// 		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd))
+// 		return (TRUE);
+// 	return (FALSE);
+// }
 
 void	ft_free_arr(char **arr)
 {
@@ -134,10 +134,10 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
-	if (cmd->hdoc->del)
-		if (!handle_heredoc(cmd))
-			return (FALSE);
 	input_fd = -1;
+	t_hdoc	*hdoc;
+
+	input_fd = handle_heredoc(cmd);
 	if (cmd->input_file)
 	{
 		input_fd = open(cmd->input_file, O_RDONLY);
@@ -189,10 +189,7 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 		dup2(saved_stdout, STDOUT_FILENO);
 		close(output_fd);
 	}
-	if (cmd->hdoc->del)
-	{
-		unlink(".heredoc.tmp");
-		dup2(saved_stdin, STDIN_FILENO);
-	}
+	close(saved_stdin);
+	close(saved_stdout);
 	return (TRUE);
 }

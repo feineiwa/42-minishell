@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/15 08:25:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/15 13:02:17 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ char	*ft_get_arg(t_shell *shell, char *tok)
 	int		i;
 	int		j;
 	int		q;
-
 
 	if (!shell->envp || !tok)
 		return (NULL);
@@ -65,6 +64,17 @@ char	*ft_get_arg(t_shell *shell, char *tok)
 	return (arg);
 }
 
+t_hdoc	*init_hdoc(t_hdoc *hdoc)
+{
+	hdoc = (t_hdoc *)malloc(sizeof(t_hdoc));
+	if (!hdoc)
+		return (NULL);
+	hdoc->del = NULL;
+	hdoc->expanded = FALSE;
+	hdoc->next = NULL;
+	return (hdoc);
+}
+
 static t_cmd	*init_cmd(t_cmd *cmd)
 {
 	cmd = (t_cmd *)malloc(sizeof(t_cmd));
@@ -81,14 +91,7 @@ static t_cmd	*init_cmd(t_cmd *cmd)
 	cmd->append = FALSE;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
-	cmd->hdoc = (t_hdoc *)malloc(sizeof(t_hdoc));
-	if (!cmd->hdoc)
-	{
-		ft_free(cmd->argv);
-		ft_free(cmd);
-	}
-	cmd->hdoc->del = NULL;
-	cmd->hdoc->expanded = FALSE;
+	cmd->hdoc = NULL;
 	cmd->next = NULL;
 	return (cmd);
 }
@@ -101,6 +104,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	int		fd;
 	int		n;
 	int		error_flag;
+	t_hdoc	*new;
+	t_hdoc	*last;
 
 	tmp = NULL;
 	if (!tok || !shell)
@@ -110,7 +115,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		return (NULL);
 	cmd_list = tmp;
 	fd = 0;
-	error_flag = 0;	
+	error_flag = 0;
 	while (tok)
 	{
 		if (tok->type == ARGS)
@@ -168,19 +173,30 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == HEREDOC)
 		{
-			tok = tok->next;
-			if (!tok)
-				return (NULL);
-			if (!tmp->hdoc)
-				return (NULL);
-			if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
-				tmp->hdoc->expanded = TRUE;
-			tmp->hdoc->del = ft_get_arg(shell, tok->value);
-			if (!error_flag)
-			{
-				if (tmp->input_file)
-					ft_free(tmp->input_file);
-			}
+    		tok = tok->next;
+    		if (!tok)
+    		    return (NULL);
+		
+    		t_hdoc *new_hdoc = init_hdoc(NULL);
+    		if (!new_hdoc)
+    		    return (NULL);
+    		if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
+    		    new_hdoc->expanded = TRUE;
+    		new_hdoc->del = ft_get_arg(shell, tok->value);
+    		if (!tmp->hdoc) 
+    		    tmp->hdoc = new_hdoc;
+    		else 
+    		{
+    		    t_hdoc *last = tmp->hdoc;
+    		    while (last->next) 
+    		        last = last->next;
+    		    last->next = new_hdoc;
+    		}		
+    		if (!error_flag)
+    		{
+    		    if (tmp->input_file)
+    		        ft_free(tmp->input_file);
+    		}
 		}
 		else if (tok->type == PIPE)
 		{

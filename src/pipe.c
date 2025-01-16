@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/16 10:59:01 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 13:33:21 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,12 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
     int pipefd[2];
     int input_fd;
     pid_t   pid;
+    int     herdoc_fd;
+    t_cmd   *tmp;
 
     input_fd = -1;
+    close(input_fd);
+    tmp = cmd;
     while (cmd)
     {
         if (!cmd->argv[0])
@@ -36,41 +40,33 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
         }
         else if (pid == 0) // Child Process
         {
-            if (cmd->hdoc && cmd->hdoc->del)
+            input_fd = -1;
+            input_fd = handle_heredoc(cmd, shell);
+            if (dup2(input_fd, STDIN_FILENO ) < 0)
             {
-                input_fd = handle_heredoc(cmd, shell);
-                if (dup2(input_fd, STDIN_FILENO) < 0)
-                {
-                    perror("minishell: dup2 heredoc");
-                    return (FALSE);
-                }
-                close(input_fd);
+                perror("minishell: dup2 heredoc");
+                return (FALSE);
             }
-            else if (input_fd != 1)
+            if (cmd->next && dup2(pipefd[1], STDOUT_FILENO) < 0)
             {
-                if (dup2(input_fd, STDIN_FILENO) < 0)
-                {
-                    perror("minishell: dup2 heredoc");
-                    return (FALSE);
-                }
-                close(input_fd);
+                perror("dup2");
+                return (FALSE);
             }
-            if (cmd->next)
+            close(pipefd[0]);
+            close(pipefd[1]);
+            if (!cmd->next)
             {
-                close(pipefd[0]);
-                if (dup2(pipefd[1], STDOUT_FILENO) < 0)
+                while (tmp)
                 {
-                    perror("dup2");
-                    return (FALSE);
+                    launch_cmd_with_pipe(shell, tmp);
+                    tmp= tmp->next;
                 }
-                close(pipefd[1]);
             }
-            launch_cmd_with_pipe(shell, cmd);
-            exit(1);
+            exit(shell->exit_status);
         }
         else // Parent Process
         {
-            if (input_fd != -1)
+            if (input_fd >= 0)
                 close(input_fd);
             if (cmd->next)
                 close(pipefd[1]);

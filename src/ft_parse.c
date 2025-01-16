@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/16 10:01:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 13:37:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,10 +149,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (tmp->output_file)
 				ft_free(tmp->output_file);
 			tmp->output_file = ft_get_arg(shell, tok->value);
-			if ((fd = open(ft_get_arg(shell, tmp->output_file),
-						O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
-				printf("error mila amboarina free\n");
-			close(fd);
 		}
 		else if (tok->type == APPEND)
 		{

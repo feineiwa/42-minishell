@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 22:29:49 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 11:05:16 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,31 +32,52 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_shell *shell)
     }
     else if (pid == 0)
     {
-        while (42)
+        while (shell->cmd)
         {
-            content = readline(HDOC);
-            if (content == NULL)
+            while (hdoc)
             {
-                perror("Warning : There're not delimiter in the heredoc");
-                break ;
+                while (42)
+                {
+                    content = readline(HDOC);
+                    if (content == NULL)
+                    {
+                        perror("Warning : There're not delimiter in the heredoc");
+                        break ;
+                    }
+                    if (!ft_strcmp(content, hdoc->del))
+                    {
+                        ft_free(content);
+                        break ;
+                    }
+                    if (hdoc->expanded)
+                    {
+                        expand = ft_expand_for_hdoc(shell, content);
+                        ft_free(content);
+                        content = expand;
+                    }
+                    close(pipe_fd[0]);
+                    if (hdoc->next)
+                    {
+                        ft_free(content);
+                        continue ;
+                    }
+                    write (pipe_fd[1], content, ft_strlen(content));
+                    write (pipe_fd[1], "\n", 1);
+                    ft_free(content);
+                }
+                if (hdoc->next->del)
+                {
+                    hdoc = hdoc->next;
+                    continue ;
+                }
             }
-            if (!ft_strcmp(content, hdoc->del))
+            if (shell->cmd->next)
             {
-                ft_free(content);
-                break ;
+                shell->cmd = shell->cmd->next;
+                continue ;
             }
-            if (hdoc->expanded)
-            {
-                expand = ft_expand_for_hdoc(shell, content);
-                ft_free(content);
-                content = expand;
-            }
-            close(pipe_fd[0]);
-            write (pipe_fd[1], content, ft_strlen(content));
-            write (pipe_fd[1], "\n", 1);
-            ft_free(content);
+            exit(0);
         }
-        exit(0);
     }
     else
     {
@@ -75,30 +96,9 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_shell *shell)
 int   handle_heredoc(t_cmd *cmd, t_shell *shell)
 {
     int     inputfd;
-    t_hdoc  *hdoc;
-    int     tmp_fd;
-    int     saved_std;
 
     inputfd = -1;
-    hdoc = cmd->hdoc;
-    saved_std = dup(STDIN_FILENO);
-    while (hdoc)
-    {
-        tmp_fd = between_heredoc_and_cmd(hdoc, shell);
-        if (tmp_fd < 0)
-        {
-            perror("minishell: read .heredoc.tmp");
-            if (inputfd != -1)
-                close(inputfd);
-            return (-1);
-        }
-        if (inputfd != 1)
-            close(inputfd);
-        inputfd = tmp_fd;
-        // ft_free(cmd->hdoc->del);
-        // cmd->hdoc->del = NULL;
-        hdoc = hdoc->next;
-    }
+    inputfd = between_heredoc_and_cmd(cmd->hdoc, shell);
     if (inputfd != -1 && dup2(inputfd, STDIN_FILENO) < 0)
     {
         perror("minishell: dup2 input");

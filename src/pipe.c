@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 21:40:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:59:01 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
                 }
                 close(pipefd[1]);
             }
-            launch_cmd(shell, cmd);
+            launch_cmd_with_pipe(shell, cmd);
             exit(1);
         }
         else // Parent Process

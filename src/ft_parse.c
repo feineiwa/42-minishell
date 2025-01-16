@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/15 21:30:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:01:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,10 +137,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 					ft_free(tmp->input_file);
 				tmp->input_file = ft_get_arg(shell, tok->value);
 				if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
-				{
 					error_flag = 1;
-					printf("error mila amboarina free\n");
-				}
 				close(fd);
 			}
 		}

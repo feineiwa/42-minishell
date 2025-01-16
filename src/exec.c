@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/15 22:46:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 11:00:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 			perror(cmd->argv[0]);
 			return (1);
 		}
+		exit(0);
 	}
 	else
 	{
@@ -127,7 +128,7 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = other_cmd(shell, cmd);
 }
 
-t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
+t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 {
 	int	saved_stdin;
 	int	saved_stdout;
@@ -140,7 +141,80 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	input_fd = -1;
 	t_hdoc	*hdoc;
 
-	input_fd = handle_heredoc(cmd, shell);
+	if (cmd->hdoc)
+	{
+		input_fd = handle_heredoc(cmd, shell);
+		close(input_fd);
+	}
+	if (cmd->input_file)
+	{
+		input_fd = open(cmd->input_file, O_RDONLY);
+		if (input_fd < 0)
+		{
+			perror(cmd->input_file);
+			return (FALSE);
+		}
+		if (dup2(input_fd, STDIN_FILENO) < 0)
+		{
+			perror(cmd->input_file);
+			close(input_fd);
+			return (FALSE);
+		}
+	}
+	output_fd = -1;
+	if (cmd->output_file)
+	{
+		flags = O_WRONLY | O_CREAT;
+		if (cmd->append)
+			flags |= O_APPEND;
+		else
+			flags |= O_TRUNC;
+		output_fd = open(cmd->output_file, flags, 0644);
+		if (output_fd < 0)
+		{
+			perror("minishell: output_file");
+			if (input_fd != -1)
+				close(input_fd);
+			return (FALSE);
+		}
+		if (dup2(output_fd, STDOUT_FILENO) < 0)
+		{
+			perror("minishell: dup2 output");
+			close(output_fd);
+			if (input_fd != -1)
+				close(input_fd);
+			return (FALSE);
+		}
+	}
+	what_cmd(shell, cmd);
+	if (input_fd != -1)
+	{
+		dup2(saved_stdin, STDIN_FILENO);
+		close(input_fd);
+	}
+	if (output_fd != -1)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(output_fd);
+	}
+	close(saved_stdin);
+	close(saved_stdout);
+	return (TRUE);
+}
+
+t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+{
+	int	saved_stdin;
+	int	saved_stdout;
+	int	input_fd;
+	int	output_fd;
+	int	flags;
+	
+	saved_stdin = dup(STDIN_FILENO);
+	saved_stdout = dup(STDOUT_FILENO);
+	input_fd = -1;
+	t_hdoc	*hdoc;
+
 	if (cmd->input_file)
 	{
 		input_fd = open(cmd->input_file, O_RDONLY);
@@ -196,3 +270,4 @@ t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 	close(saved_stdout);
 	return (TRUE);
 }
+

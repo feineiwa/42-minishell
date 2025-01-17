@@ -6,60 +6,95 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 20:23:17 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 12:05:08 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static void  between_heredoc_and_cmd(char *end_here_doc)
+static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 {
 	char    *content;
-	int fd_tmp;
+    int     pipe_fd[2];
+    pid_t   pid;
+    char    *expand;
 
-	fd_tmp = open(".heredoc.tmp", O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (fd_tmp == -1)
-	{
-		perror("minishell: create .heredoc.tmp");
-		exit(1);
-	}
-	while (42)
-	{
-		content = readline("> ");
-		if (content == NULL)
+    if (pipe(pipe_fd) == -1)
+    {
+        perror("pipe");
+        return (-1);
+    }
+    pid = fork();
+    if (pid < 0)
+    {
+        perror("fork");
+        return (-1);
+    }
+    else if (pid == 0)
+    {
+        while (hdoc)
         {
-            perror("Warning : There're not delimiter in the heredoc");
-            break ;
+            while (42)
+            {
+                content = readline(HDOC);
+                if (content == NULL)
+                {
+                    perror("Warning : There're not delimiter in the heredoc");
+                    break ;
+                }
+                if (!ft_strcmp(content, hdoc->del))
+                {
+                    ft_free(content);
+                    break ;
+                }
+                if (hdoc->expanded)
+                {
+                    expand = ft_expand_for_hdoc(shell, content);
+                    ft_free(content);
+                    content = expand;
+                }
+                close(pipe_fd[0]);
+                if (hdoc->next)
+                {
+                    ft_free(content);
+                    continue ;
+                }
+                else
+                {
+                    write (pipe_fd[1], content, ft_strlen(content));
+                    write (pipe_fd[1], "\n", 1);
+                    ft_free(content);
+                }
+            }
+            hdoc = hdoc->next;        
         }
-        if (!ft_strcmp(content, end_here_doc))
-			break ;
-        // variable d'environnement??
-        write(fd_tmp, content, ft_strlen(content));
-		write(fd_tmp, "\n", 1);
-		free(content);
-	}
-	free(content);
-	close(fd_tmp);
+        exit(0);
+    }
+    else
+    {
+        int status;
+        close(pipe_fd[1]);
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+        {
+            close(pipe_fd[0]);
+            return (-1);
+        }
+    }
+    return (pipe_fd[0]);
 }
 
-t_bool    handle_heredoc(t_cmd *cmd)
+int   handle_heredoc(t_cmd *cmd, t_shell *shell)
 {
-    int inputfd;
+    int     inputfd;
 
-    between_heredoc_and_cmd(cmd->hdoc->del);
-    inputfd = open(".heredoc.tmp", O_RDONLY);
-    if (inputfd < 0)
-    {
-        perror("minishell: read .heredoc.tmp");
-        unlink(".heredoc.tmp");
-        return (FALSE);
-    }
-    if (dup2(inputfd, STDIN_FILENO) < 0)
+    inputfd = -1;
+    inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, shell);
+    if (inputfd != -1 && dup2(inputfd, STDIN_FILENO) < 0)
     {
         perror("minishell: dup2 input");
-        unlink(".heredoc.tmp");
-        return (FALSE);
+        close(inputfd);
+        return (-1);
     }
-    unlink(".heredoc.tmp");
-    return (TRUE);
+    return (inputfd);
 }

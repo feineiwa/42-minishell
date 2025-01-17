@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 10:39:36 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 12:47:36 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,17 @@
 # include "../libft/libft.h"
 # include <errno.h>
 # include <fcntl.h>
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[36mminishell$\033[0m "
+# define PROMPT "\033[1;36mminishell$\033[0m "
+# define HDOC	"\033[1;33m>\033[0m "
 
 typedef enum e_bool
 {
@@ -55,7 +56,7 @@ typedef struct s_hdoc
 {
 	char			*del;
 	t_bool			expanded;
-	char			*content;
+	struct s_hdoc	*next;
 }					t_hdoc;
 
 typedef struct s_env
@@ -95,8 +96,11 @@ char				*ft_strndup(char *str, size_t n);
 int					ft_strcmp(char *s1, char *s2);
 char				**convert_env_to_array(t_env *envp);
 void				ft_unset_env(t_env **envp, char *key);
+int					ft_search_equ(char *s);
 // PARSING
 t_cmd				*parsing(t_shell *shell, char *input);
+char				*ft_expand_for_hdoc(t_shell *shell, char *s);
+
 
 // PARSE UTILS
 int					count_quotes(char *input);
@@ -126,13 +130,14 @@ void				ft_free_cmd(t_cmd **cmd);
 // extra_libft
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char				*ft_strjoin3(char *s1, char *s2, char *s3);
+char				*ft_strjoin_free(char *s1, char *s2);
 
 // EXEC
-t_bool				is_valid_cmd(char *cmd);
-t_bool				launch_cmd(t_shell *shell, t_cmd *cmd);
+// t_bool				is_valid_cmd(char *cmd);
+t_bool				launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
+t_bool				launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
-t_bool				handle_heredoc(t_cmd *cmd);
-
+int   				handle_heredoc(t_cmd *cmd, t_shell *shell);
 // BUILTINS
 int					ft_cat(char *filename);
 int					ft_echo(char **args);

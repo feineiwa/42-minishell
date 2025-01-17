@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/12 13:08:11 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:38:43 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,17 @@ void    ft_free_arg(char **argv)
     argv = NULL;
 }
 
-void    ft_free_hdoc(t_hdoc *hdoc)
+void    ft_free_hdoc(t_hdoc **hdoc)
 {
-    if (!hdoc)
+    if (!hdoc || !*hdoc)
         return ;
-    ft_free(hdoc->del);
-    ft_free(hdoc);
-    hdoc = NULL;
+    while (*hdoc)
+    {
+        ft_free((*hdoc)->del);
+        ft_free(*hdoc);
+        (*hdoc)->expanded = FALSE;
+        *hdoc = (*hdoc)->next;
+    }
 }
 
 void    ft_free_cmd(t_cmd **cmd)
@@ -61,7 +65,7 @@ void    ft_free_cmd(t_cmd **cmd)
         next = (*cmd)->next;
         ft_free((*cmd)->input_file);
         ft_free((*cmd)->output_file);
-        ft_free_hdoc((*cmd)->hdoc);
+        ft_free_hdoc(&(*cmd)->hdoc);
         ft_free_arg((*cmd)->argv);
         ft_free(*cmd);
         *cmd = next;

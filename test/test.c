@@ -6,21 +6,26 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 09:52:43 by frahenin          #+#    #+#             */
-/*   Updated: 2024/12/17 10:45:20 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/14 12:15:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "test.h"
+#include <stdio.h>
 
-int	main()
+int	main(void)
 {
-	int	f;
+	char *str[] = {"cadfasdf",
+		"asdshhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhssssssssssssssssssssfasdf",
+		"asdfsadfasd", NULL};
+	double size;
 
-	int	*o = &f;
-	describe_group("resaka pipe 👑");
-	describe_test("test momban zao ");
-	should_be_int("resaka int", 5, 5);
-	should_be_str("resaka str", "faneva", "faneva");
-	should_be_ptr("message ity", &f, &o);
+	size = sizeof(str) / sizeof(char *);
+	int i;
+	i = 0;
+	while (str[i])
+		i++;
+	printf("size %f et %d\n", size, i);
+	size = sizeof() / sizeof(char);
+	printf("size %f", size);
 	return (0);
 }

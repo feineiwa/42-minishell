@@ -3,14 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:21:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 11:53:51 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/12 22:50:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void ft_getcwd(char *buf, size_t size)
+{
+	if (NULL == getcwd(buf, size))
+		perror("getcwd FAILED");
+}
 
 int	ft_pwd(void)
 {

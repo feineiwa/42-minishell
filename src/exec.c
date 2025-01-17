@@ -6,22 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/16 13:20:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 16:46:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
-
-// t_bool	is_valid_cmd(char *cmd)
-// {
-// 	if (!cmd)
-// 		return (FALSE);
-// 	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) || !ft_strcmp("pwd",
-// 			cmd) || !ft_strcmp("export", cmd) || !ft_strcmp("unset", cmd)
-// 		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd))
-// 		return (TRUE);
-// 	return (FALSE);
-// }
 
 void	ft_free_arr(char **arr)
 {
@@ -96,7 +85,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 		}
 		if (execve(cmd_path, cmd->argv, envp) == -1)
 		{
-			perror(cmd->argv[0]);
+			cmd->err = ft_strdup(strerror(errno));
 			return (1);
 		}
 		exit(0);
@@ -152,6 +141,7 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 		if (input_fd < 0)
 		{
 			perror(cmd->input_file);
+			close(input_fd);
 			return (FALSE);
 		}
 		if (dup2(input_fd, STDIN_FILENO) < 0)
@@ -202,72 +192,76 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	return (TRUE);
 }
 
-t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+// 
+
+t_bool launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 {
-	int	saved_stdin;
-	int	saved_stdout;
-	int	input_fd;
-	int	output_fd;
-	int	flags;
-	
-	saved_stdin = dup(STDIN_FILENO);
-	saved_stdout = dup(STDOUT_FILENO);
-	input_fd = -1;
-	t_hdoc	*hdoc;
+    int     saved_stdin;
+    int     saved_stdout;
+    int     input_fd;
+    int     output_fd;
+    int     flags;
 
-	if (cmd->input_file)
-	{
-		input_fd = open(cmd->input_file, O_RDONLY);
-		if (input_fd < 0)
-		{
-			perror("minishell: input_file");
-			return (FALSE);
-		}
-		if (dup2(input_fd, STDIN_FILENO) < 0)
-		{
-			perror("minishell: dup2 input");
-			close(input_fd);
-			return (FALSE);
-		}
-	}
-	output_fd = -1;
-	if (cmd->output_file)
-	{
-		flags = O_WRONLY | O_CREAT;
-		if (cmd->append)
-			flags |= O_APPEND;
-		else
-			flags |= O_TRUNC;
-		output_fd = open(cmd->output_file, flags, 0644);
-		if (output_fd < 0)
-		{
-			perror("minishell: output_file");
-			if (input_fd != -1)
-				close(input_fd);
-			return (FALSE);
-		}
-		if (dup2(output_fd, STDOUT_FILENO) < 0)
-		{
-			perror("minishell: dup2 output");
-			close(output_fd);
-			if (input_fd != -1)
-				close(input_fd);
-			return (FALSE);
-		}
-	}
-	what_cmd(shell, cmd);
-	if (input_fd != -1)
-	{
-		dup2(saved_stdin, STDIN_FILENO);
-		close(input_fd);
-	}
-	if (output_fd != -1)
-	{
-		dup2(saved_stdout, STDOUT_FILENO);
-		close(output_fd);
-	}
-	close(saved_stdin);
-	close(saved_stdout);
-	return (TRUE);
+    saved_stdin = dup(STDIN_FILENO);
+    saved_stdout = dup(STDOUT_FILENO);
+    input_fd = -1;
+    if (cmd->input_file)
+    {
+        input_fd = open(cmd->input_file, O_RDONLY);
+        if (input_fd < 0)
+        {
+			fprintf(stderr, "%s\n", "mandalo ato");
+            return (FALSE);
+        }
+        if (dup2(input_fd, STDIN_FILENO) < 0)
+        {
+            cmd->err = ft_strdup("minishell: dup2 input failed");
+            close(input_fd);
+            return (FALSE);
+        }
+    }
+
+    output_fd = -1;
+    if (cmd->output_file)
+    {
+        flags = O_WRONLY | O_CREAT;
+        if (cmd->append)
+            flags |= O_APPEND;
+        else
+            flags |= O_TRUNC;
+        output_fd = open(cmd->output_file, flags, 0644);
+        if (output_fd < 0)
+        {
+            cmd->err = ft_strdup(strerror(errno));  // Store the error message
+            if (input_fd != -1)
+                close(input_fd);
+            return (FALSE);
+        }
+        if (dup2(output_fd, STDOUT_FILENO) < 0)
+        {
+            cmd->err = ft_strdup("minishell: dup2 output failed");
+            close(output_fd);
+            if (input_fd != -1)
+                close(input_fd);
+            return (FALSE);
+        }
+    }
+
+    // Execute the command
+    what_cmd(shell, cmd);
+
+    if (input_fd != -1)
+    {
+        dup2(saved_stdin, STDIN_FILENO);
+        close(input_fd);
+    }
+    if (output_fd != -1)
+    {
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(output_fd);
+    }
+
+    close(saved_stdin);
+    close(saved_stdout);
+    return (TRUE);
 }
-

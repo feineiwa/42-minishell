@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/14 17:55:03 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:15:08 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,6 @@ t_shell	init_shell(char **envp)
 		shell.cmd = NULL;
 		return (shell);
 	}
-	shell.cmd = NULL;
 	shell.exit_status = 0;
 	return (shell);
 }

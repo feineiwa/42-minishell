@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/16 09:35:55 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:51:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <unistd.h>
 
 # define PROMPT "\033[1;36mminishell$\033[0m "
-# define HDOC	"\033[1;33m>\033[0m "
+# define HDOC "\033[1;33m>\033[0m "
 
 typedef enum e_bool
 {
@@ -74,6 +74,7 @@ typedef struct s_cmd
 	char			*output_file;
 	int				append;
 	t_hdoc			*hdoc;
+	char			*err;
 	struct s_cmd	*next;
 }					t_cmd;
 
@@ -100,7 +101,6 @@ int					ft_search_equ(char *s);
 // PARSING
 t_cmd				*parsing(t_shell *shell, char *input);
 char				*ft_expand_for_hdoc(t_shell *shell, char *s);
-
 
 // PARSE UTILS
 int					count_quotes(char *input);
@@ -137,7 +137,7 @@ char				*ft_strjoin_free(char *s1, char *s2);
 t_bool				launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
 t_bool				launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 t_bool				config_with_pipe(t_shell *shell, t_cmd *cmd);
-int   				handle_heredoc(t_cmd *cmd, t_shell *shell);
+int					handle_heredoc(t_cmd *cmd, t_shell *shell);
 // BUILTINS
 int					ft_cat(char *filename);
 int					ft_echo(char **args);

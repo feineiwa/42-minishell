@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/16 13:37:25 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:15:31 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ static t_cmd	*init_cmd(t_cmd *cmd)
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
 	cmd->hdoc = NULL;
+	cmd->err = NULL;
 	cmd->next = NULL;
 	return (cmd);
 }
@@ -106,6 +107,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	int		error_flag;
 	t_hdoc	*new;
 	t_hdoc	*last;
+	t_hdoc	*new_hdoc;
 
 	tmp = NULL;
 	if (!tok || !shell)
@@ -166,30 +168,29 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == HEREDOC)
 		{
-    		tok = tok->next;
-    		if (!tok)
-    		    return (NULL);
-		
-    		t_hdoc *new_hdoc = init_hdoc(NULL);
-    		if (!new_hdoc)
-    		    return (NULL);
-    		if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
-    		    new_hdoc->expanded = TRUE;
-    		new_hdoc->del = ft_get_arg(shell, tok->value);
-    		if (!tmp->hdoc) 
-    		    tmp->hdoc = new_hdoc;
-    		else 
-    		{
-    		    t_hdoc *last = tmp->hdoc;
-    		    while (last->next) 
-    		        last = last->next;
-    		    last->next = new_hdoc;
-    		}		
-    		if (!error_flag)
-    		{
-    		    if (tmp->input_file)
-    		        ft_free(tmp->input_file);
-    		}
+			tok = tok->next;
+			if (!tok)
+				return (NULL);
+			new_hdoc = init_hdoc(NULL);
+			if (!new_hdoc)
+				return (NULL);
+			if (!ft_strchr(tok->value, '\'') && !ft_strchr(tok->value, '"'))
+				new_hdoc->expanded = TRUE;
+			new_hdoc->del = ft_get_arg(shell, tok->value);
+			if (!tmp->hdoc)
+				tmp->hdoc = new_hdoc;
+			else
+			{
+				last = tmp->hdoc;
+				while (last->next)
+					last = last->next;
+				last->next = new_hdoc;
+			}
+			if (!error_flag)
+			{
+				if (tmp->input_file)
+					ft_free(tmp->input_file);
+			}
 		}
 		else if (tok->type == PIPE)
 		{

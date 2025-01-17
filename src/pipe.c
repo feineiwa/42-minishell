@@ -6,74 +6,84 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/16 13:33:21 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/17 16:56:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-t_bool    config_with_pipe(t_shell *shell, t_cmd *cmd)
+t_bool config_with_pipe(t_shell *shell, t_cmd *cmd)
 {
-    int pipefd[2];
-    int input_fd;
-    pid_t   pid;
-    int     herdoc_fd;
+    int     pipefd[2];
+    int     input_fd;
+	int		pid;
     t_cmd   *tmp;
 
-    input_fd = -1;
-    close(input_fd);
+	input_fd = -1;
     tmp = cmd;
-    while (cmd)
+    while (tmp)
     {
-        if (!cmd->argv[0])
-            return (FALSE);
-        if (cmd->next && pipe(pipefd) < 0)
+		if (!tmp->argv[0])
+			return (FALSE);
+        if (tmp->next && pipe(pipefd) < 0)
         {
-            perror("minishell: pipe");
+            perror("pipe");
             return (FALSE);
         }
         pid = fork();
         if (pid < 0)
         {
-            perror("minishell: fork");
+            perror("fork");
             return (FALSE);
         }
-        else if (pid == 0) // Child Process
+        if (pid == 0) // Child process
         {
-            input_fd = -1;
-            input_fd = handle_heredoc(cmd, shell);
-            if (dup2(input_fd, STDIN_FILENO ) < 0)
+            if (tmp->hdoc && tmp->hdoc->del)
             {
-                perror("minishell: dup2 heredoc");
-                return (FALSE);
-            }
-            if (cmd->next && dup2(pipefd[1], STDOUT_FILENO) < 0)
-            {
-                perror("dup2");
-                return (FALSE);
-            }
-            close(pipefd[0]);
-            close(pipefd[1]);
-            if (!cmd->next)
-            {
-                while (tmp)
-                {
-                    launch_cmd_with_pipe(shell, tmp);
-                    tmp= tmp->next;
-                }
-            }
-            exit(shell->exit_status);
-        }
-        else // Parent Process
-        {
-            if (input_fd >= 0)
+                input_fd = handle_heredoc(tmp, shell);
+				if (dup2(input_fd, STDIN_FILENO) < 0)
+				{
+					perror("minishell: dup2 heredoc");
+					return (FALSE);
+				}
                 close(input_fd);
-            if (cmd->next)
+				tmp->hdoc->del = NULL;
+            }
+			else if (input_fd != -1)
+            {
+                if (dup2(input_fd, STDIN_FILENO) < 0)
+				{
+					perror("dup2 pipe");
+					return (FALSE);
+				}
+                close(input_fd);
+            }
+            if (tmp->next)
+            {
+            	close(pipefd[0]);
+                if (dup2(pipefd[1], STDOUT_FILENO) < 0)
+				{
+					perror("dup2");
+					return (FALSE);
+				}
                 close(pipefd[1]);
+            }
+			if (!launch_cmd_with_pipe(shell, tmp))
+                exit(1);
+            exit(0);
+        }
+        else
+	    {
+            if (input_fd != -1)
+                close(input_fd);
+
+            if (tmp->next)
+                close(pipefd[1]);
+
             input_fd = pipefd[0];
             waitpid(pid, &shell->exit_status, 0);
         }
-        cmd = cmd->next;
+    	tmp = tmp->next;
     }
     return (TRUE);
 }

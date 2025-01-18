@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 06:08:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:43:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 		}
 		if (execve(cmd_path, cmd->argv, envp) == -1)
 		{
-			cmd->err = ft_strdup(strerror(errno));
+			perror(cmd->argv[0]);
 			return (1);
 		}
 		exit(0);

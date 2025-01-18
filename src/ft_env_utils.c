@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/17 15:15:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:57:32 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,4 +187,5 @@ void	ft_free_env(t_env **envp)
 		*envp = tmp;
 	}
 	ft_free(*envp);
+	*envp = NULL;
 }

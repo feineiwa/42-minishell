@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/16 10:38:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:47:05 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,15 @@ void    ft_free_hdoc(t_hdoc **hdoc)
 {
     if (!hdoc || !*hdoc)
         return ;
+    t_hdoc  *tmp;
+
     while (*hdoc)
     {
+        tmp = (*hdoc)->next;  
         ft_free((*hdoc)->del);
-        ft_free(*hdoc);
         (*hdoc)->expanded = FALSE;
-        *hdoc = (*hdoc)->next;
+        ft_free(*hdoc);
+        *hdoc = tmp;
     }
 }
 

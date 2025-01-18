@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/17 15:51:07 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 07:02:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ typedef struct s_cmd
 	char			*output_file;
 	int				append;
 	t_hdoc			*hdoc;
-	char			*err;
 	struct s_cmd	*next;
 }					t_cmd;
 
@@ -131,6 +130,7 @@ void				ft_free_cmd(t_cmd **cmd);
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char				*ft_strjoin3(char *s1, char *s2, char *s3);
 char				*ft_strjoin_free(char *s1, char *s2);
+char				*ft_strjoin_s1(char *s1, char *s2);
 
 // EXEC
 // t_bool				is_valid_cmd(char *cmd);

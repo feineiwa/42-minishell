@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/17 15:15:31 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 07:05:01 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ static t_cmd	*init_cmd(t_cmd *cmd)
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
 	cmd->hdoc = NULL;
-	cmd->err = NULL;
 	cmd->next = NULL;
 	return (cmd);
 }
@@ -270,7 +269,11 @@ t_cmd	*parsing(t_shell *shell, char *input)
 		return (NULL);
 	tok = lexer_input(expand);
 	if (!tok)
+	{
+		ft_free(expand);
 		return (NULL);
+	}
+	ft_free(expand);
 	cmd_list = parse_into_cmd(shell, tok);
 	if (!cmd_list)
 		return (NULL);

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 07:02:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 09:27:27 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	value = 0;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && s[i + 1] != '?'))
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || s[i + 1] == '_')))
 		{
 			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			value = extract_var(s + i, shell);

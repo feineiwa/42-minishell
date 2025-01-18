@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 06:13:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 09:41:55 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
                     ft_free(content);
                 }
             }
-            hdoc = hdoc->next;        
+            hdoc = hdoc->next;
         }
         exit(0);
     }

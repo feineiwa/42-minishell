@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/17 16:46:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:08:19 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,12 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	if (cmd->hdoc)
 	{
 		input_fd = handle_heredoc(cmd, shell);
-		close(input_fd);
+		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
+    	{
+        	perror("minishell: dup2 input");
+        	close(input_fd);
+        	return (FALSE);
+    	}
 	}
 	if (cmd->input_file)
 	{
@@ -210,12 +215,12 @@ t_bool launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
         input_fd = open(cmd->input_file, O_RDONLY);
         if (input_fd < 0)
         {
-			fprintf(stderr, "%s\n", "mandalo ato");
+			perror(cmd->input_file);
             return (FALSE);
         }
         if (dup2(input_fd, STDIN_FILENO) < 0)
         {
-            cmd->err = ft_strdup("minishell: dup2 input failed");
+            perror(cmd->input_file);
             close(input_fd);
             return (FALSE);
         }
@@ -232,14 +237,14 @@ t_bool launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
         output_fd = open(cmd->output_file, flags, 0644);
         if (output_fd < 0)
         {
-            cmd->err = ft_strdup(strerror(errno));  // Store the error message
+            perror(cmd->output_file);  // Store the error message
             if (input_fd != -1)
                 close(input_fd);
             return (FALSE);
         }
         if (dup2(output_fd, STDOUT_FILENO) < 0)
         {
-            cmd->err = ft_strdup("minishell: dup2 output failed");
+            perror(cmd->output_file);  // Store the error message
             close(output_fd);
             if (input_fd != -1)
                 close(input_fd);

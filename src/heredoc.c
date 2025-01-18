@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/16 12:05:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:13:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,5 @@ int   handle_heredoc(t_cmd *cmd, t_shell *shell)
 
     inputfd = -1;
     inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, shell);
-    if (inputfd != -1 && dup2(inputfd, STDIN_FILENO) < 0)
-    {
-        perror("minishell: dup2 input");
-        close(inputfd);
-        return (-1);
-    }
     return (inputfd);
 }

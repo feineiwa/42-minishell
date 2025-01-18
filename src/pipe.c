@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/17 16:56:07 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:12:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,15 @@ t_bool config_with_pipe(t_shell *shell, t_cmd *cmd)
     int     input_fd;
 	int		pid;
     t_cmd   *tmp;
+    int     i;
 
 	input_fd = -1;
+    tmp = cmd;
+    while (tmp)
+    {
+        input_fd =  handle_heredoc(tmp, shell);
+        tmp = tmp->next;
+    }
     tmp = cmd;
     while (tmp)
     {
@@ -40,14 +47,11 @@ t_bool config_with_pipe(t_shell *shell, t_cmd *cmd)
         {
             if (tmp->hdoc && tmp->hdoc->del)
             {
-                input_fd = handle_heredoc(tmp, shell);
-				if (dup2(input_fd, STDIN_FILENO) < 0)
-				{
-					perror("minishell: dup2 heredoc");
+			    if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
+                {
+                    perror("dup2 pipe");
 					return (FALSE);
-				}
-                close(input_fd);
-				tmp->hdoc->del = NULL;
+                }
             }
 			else if (input_fd != -1)
             {

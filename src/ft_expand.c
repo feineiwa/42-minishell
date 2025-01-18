@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/15 22:35:22 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 06:26:37 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	value = 0;
 	while (s[i])
 	{
-		if (s[i] == '$')
+		if (s[i] == '$' && (s[i + 1] && s[i + 1] != '?'))
 		{
 			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
 			value = extract_var(s + i, shell);
@@ -182,7 +182,10 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
 		{
 			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			i++;
+			value = ft_itoa(shell->exit_status);
+			if (value)
+				expanded = ft_strjoin_free(expanded, value);
+			i += 2;
 			start = i;
 		}
 		else

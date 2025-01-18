@@ -6,7 +6,7 @@
 #    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/13 10:07:38 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/18 11:40:05 by frahenin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ OBJ_DIR	=	obj/
 INCLUDE	=	-g -I ./inc -I ./libft -lreadline
 
 FILES	=	main ft_env_utils ft_parse ft_expand ft_free ft_error_parsing parse_utils extra_libft \
-			exec ft_cat ft_echo ft_pwd heredoc pipe ft_export ft_env ft_unset
+			exec ft_cat ft_echo ft_pwd heredoc pipe ft_export ft_env ft_unset ft_cd ft_exit
 
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 10:50:18 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 11:39:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ char				*ft_get_env_value(t_env *envp, char *key);
 void				print_env(t_env *envp);
 void				ft_add_env(t_env **envp, char *arg);
 t_env				*ft_get_last_env(t_env *envp);
-void				ft_free_env(t_env **envp);
 t_shell				init_shell(char **envp);
 char				*ft_strndup(char *str, size_t n);
 int					ft_strcmp(char *s1, char *s2);
@@ -125,6 +124,8 @@ char				*ft_expand(t_shell *shell, char *s);
 // ft_free
 void				ft_free_token(t_token *tok);
 void				ft_free_cmd(t_cmd **cmd);
+void				ft_free_env(t_env **envp);
+void				ft_free_all(t_shell *shell);
 
 // extra_libft
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
@@ -145,4 +146,7 @@ int					ft_pwd(void);
 int					ft_export(t_shell *shell, t_cmd *cmd);
 int					ft_env(t_shell *shell, t_cmd *cmd);
 int					ft_unset(t_shell *shell, t_cmd *cmd);
+int					ft_exit(t_shell *shell, char **argv);
+int					ft_cd(char *path, t_env *envp);
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 06:43:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 11:37:05 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,10 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_env(shell, cmd);
 	else if (!ft_strcmp("unset", cmd->argv[0]))
 		shell->exit_status = ft_unset(shell, cmd);
+	else if (!ft_strcmp("cd", cmd->argv[0]))
+		shell->exit_status = ft_cd(cmd->argv[1], shell->envp);
+	else if (!ft_strcmp("exit", cmd->argv[0]))
+		shell->exit_status = ft_exit(shell, cmd->argv);
 	else
 		shell->exit_status = other_cmd(shell, cmd);
 }

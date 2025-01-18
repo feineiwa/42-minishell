@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 06:47:05 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/18 11:34:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,11 @@ void    ft_free_cmd(t_cmd **cmd)
     }
     ft_free(*cmd);
     *cmd = NULL;
+}
+
+void    ft_free_all(t_shell *shell)
+{
+    rl_clear_history();
+    ft_free_cmd(&shell->cmd);
+    ft_free_env(&shell->envp);
 }

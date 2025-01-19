@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 09:27:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 11:39:03 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 			if (value)
 				expanded = ft_strjoin_free(expanded, value);
 			else
-				expanded = ft_strjoin(expanded, "");
+				expanded = ft_strjoin_s1(expanded, "");
 			i += ft_strlen_expand(s + i);
 			start = i;
 		}

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 11:37:05 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 13:46:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,23 +70,28 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	}
 	if (pid == 0)
 	{
+		envp = convert_env_to_array(shell->envp);
+		if (!envp)
+			exit(1);
+		if (ft_strchr(cmd->argv[0], '/'))
+		{
+			if (execve(cmd->argv[0], cmd->argv, envp) == -1)
+			{
+				perror(cmd->argv[0]);
+				exit(1);
+			}
+		}
 		cmd_path = resolve_cmd_path(shell, cmd);
 		if (!cmd_path)
 		{
-			perror(cmd->argv[0]);
-			return (1);
-		}
-		envp = convert_env_to_array(shell->envp);
-		if (!envp)
-		{
-			ft_free(cmd_path);
 			ft_free_arr(envp);
-			return (1);
+			perror(cmd->argv[0]);
+			exit(1);
 		}
 		if (execve(cmd_path, cmd->argv, envp) == -1)
 		{
 			perror(cmd->argv[0]);
-			return (1);
+			exit(1);
 		}
 		exit(0);
 	}
@@ -123,26 +128,60 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 
 t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 {
-	int	saved_stdin;
-	int	saved_stdout;
-	int	input_fd;
-	int	output_fd;
-	int	flags;
-	
+	int		saved_stdin;
+	int		saved_stdout;
+	int		input_fd;
+	int		output_fd;
+	int		flags;
+	t_hdoc	*hdoc;
+
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	input_fd = -1;
-	t_hdoc	*hdoc;
-
 	if (cmd->hdoc)
 	{
 		input_fd = handle_heredoc(cmd, shell);
 		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
-    	{
-        	perror("minishell: dup2 input");
-        	close(input_fd);
-        	return (FALSE);
-    	}
+		{
+			perror("minishell: dup2 input");
+			close(input_fd);
+			return (FALSE);
+		}
+		close(input_fd);
+	}
+	if (cmd->error_file)
+	{
+		if (cmd->flag_err == 1)
+		{
+			input_fd = open(cmd->error_file, O_RDONLY);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		else if (cmd->flag_err == 2)
+		{
+			input_fd = open(cmd->error_file,O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		else if (cmd->flag_err == 3)
+		{
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		close(input_fd);
 	}
 	if (cmd->input_file)
 	{
@@ -159,6 +198,7 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 			close(input_fd);
 			return (FALSE);
 		}
+		close(input_fd);
 	}
 	output_fd = -1;
 	if (cmd->output_file)
@@ -201,76 +241,106 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	return (TRUE);
 }
 
-// 
+//
 
-t_bool launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 {
-    int     saved_stdin;
-    int     saved_stdout;
-    int     input_fd;
-    int     output_fd;
-    int     flags;
+	int	saved_stdin;
+	int	saved_stdout;
+	int	input_fd;
+	int	output_fd;
+	int	flags;
 
-    saved_stdin = dup(STDIN_FILENO);
-    saved_stdout = dup(STDOUT_FILENO);
-    input_fd = -1;
-    if (cmd->input_file)
-    {
-        input_fd = open(cmd->input_file, O_RDONLY);
-        if (input_fd < 0)
-        {
+	saved_stdin = dup(STDIN_FILENO);
+	saved_stdout = dup(STDOUT_FILENO);
+	input_fd = -1;
+	if (cmd->error_file)
+	{
+		if (cmd->flag_err == 1)
+		{
+			input_fd = open(cmd->error_file, O_RDONLY);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		else if (cmd->flag_err == 2)
+		{
+			input_fd = open(cmd->error_file,O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		else if (cmd->flag_err == 3)
+		{
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (input_fd < 0)
+			{
+				perror(cmd->error_file);
+				close(input_fd);
+				return (FALSE);
+			}
+		}
+		close(input_fd);
+	}
+	if (cmd->input_file)
+	{
+		input_fd = open(cmd->input_file, O_RDONLY);
+		if (input_fd < 0)
+		{
 			perror(cmd->input_file);
-            return (FALSE);
-        }
-        if (dup2(input_fd, STDIN_FILENO) < 0)
-        {
-            perror(cmd->input_file);
-            close(input_fd);
-            return (FALSE);
-        }
-    }
-
-    output_fd = -1;
-    if (cmd->output_file)
-    {
-        flags = O_WRONLY | O_CREAT;
-        if (cmd->append)
-            flags |= O_APPEND;
-        else
-            flags |= O_TRUNC;
-        output_fd = open(cmd->output_file, flags, 0644);
-        if (output_fd < 0)
-        {
-            perror(cmd->output_file);  // Store the error message
-            if (input_fd != -1)
-                close(input_fd);
-            return (FALSE);
-        }
-        if (dup2(output_fd, STDOUT_FILENO) < 0)
-        {
-            perror(cmd->output_file);  // Store the error message
-            close(output_fd);
-            if (input_fd != -1)
-                close(input_fd);
-            return (FALSE);
-        }
-    }
-
-    // Execute the command
-    what_cmd(shell, cmd);
-
-    if (input_fd != -1)
-    {
-        dup2(saved_stdin, STDIN_FILENO);
-        close(input_fd);
-    }
-    if (output_fd != -1)
-    {
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(output_fd);
-    }
-
-    close(saved_stdin);
-    close(saved_stdout);
-    return (TRUE);
+			return (FALSE);
+		}
+		if (dup2(input_fd, STDIN_FILENO) < 0)
+		{
+			perror(cmd->input_file);
+			close(input_fd);
+			return (FALSE);
+		}
+	}
+	output_fd = -1;
+	if (cmd->output_file)
+	{
+		flags = O_WRONLY | O_CREAT;
+		if (cmd->append)
+			flags |= O_APPEND;
+		else
+			flags |= O_TRUNC;
+		output_fd = open(cmd->output_file, flags, 0644);
+		if (output_fd < 0)
+		{
+			perror(cmd->output_file); // Store the error message
+			if (input_fd != -1)
+				close(input_fd);
+			return (FALSE);
+		}
+		if (dup2(output_fd, STDOUT_FILENO) < 0)
+		{
+			perror(cmd->output_file); // Store the error message
+			close(output_fd);
+			if (input_fd != -1)
+				close(input_fd);
+			return (FALSE);
+		}
+	}
+	// Execute the command
+	what_cmd(shell, cmd);
+	if (input_fd != -1)
+	{
+		dup2(saved_stdin, STDIN_FILENO);
+		close(input_fd);
+	}
+	if (output_fd != -1)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(output_fd);
+	}
+	close(saved_stdin);
+	close(saved_stdout);
+	return (TRUE);
 }

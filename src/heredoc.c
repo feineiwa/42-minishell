@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 09:41:55 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 12:02:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,14 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     int     pipe_fd[2];
     pid_t   pid;
     char    *expand;
+    int     in_fd;
 
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
         return (-1);
     }
+    in_fd = -1;
     pid = fork();
     if (pid < 0)
     {
@@ -72,14 +74,19 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     }
     else
     {
-        int status;
-        close(pipe_fd[1]);
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-        {
-            close(pipe_fd[0]);
-            return (-1);
-        }
+        int     status;
+		close(pipe_fd[1]);
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+		{
+			if (cmd->input_file)
+			{
+				close(pipe_fd[0]);
+				if ((in_fd = open(cmd->input_file, O_RDONLY) < 0))
+					return (-1);
+                close(in_fd);
+			}
+		}
     }
     return (pipe_fd[0]);
 }

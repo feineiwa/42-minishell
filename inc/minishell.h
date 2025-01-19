@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/18 11:39:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 13:27:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ typedef struct s_cmd
 	int				argc;
 	char			*input_file;
 	char			*output_file;
+	char			*error_file;
+	int				flag_err;
 	int				append;
 	t_hdoc			*hdoc;
 	struct s_cmd	*next;

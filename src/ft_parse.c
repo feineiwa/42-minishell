@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 07:05:01 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 13:45:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ static t_cmd	*init_cmd(t_cmd *cmd)
 	cmd->append = FALSE;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
+	cmd->error_file = NULL;
+	cmd->flag_err = 0;
 	cmd->hdoc = NULL;
 	cmd->next = NULL;
 	return (cmd);
@@ -135,10 +137,17 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!error_flag)
 			{
 				if (tmp->input_file)
+				{
 					ft_free(tmp->input_file);
+					tmp->input_file = NULL;
+				}
 				tmp->input_file = ft_get_arg(shell, tok->value);
 				if ((fd = open(tmp->input_file, O_RDONLY)) < 0)
+				{
+					tmp->error_file = ft_strdup(tmp->input_file);
+					tmp->flag_err = 1;
 					error_flag = 1;
+				}
 				close(fd);
 			}
 		}
@@ -147,9 +156,22 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
-			if (tmp->output_file)
-				ft_free(tmp->output_file);
-			tmp->output_file = ft_get_arg(shell, tok->value);
+			if (!error_flag)
+			{
+				if (tmp->output_file)
+				{
+					ft_free(tmp->output_file);
+					tmp->output_file = NULL;
+				}
+				tmp->output_file = ft_get_arg(shell, tok->value);
+				if ((fd = open(tmp->output_file, O_RDONLY | O_WRONLY | O_TRUNC)) < 0)
+				{
+					tmp->error_file = ft_strdup(tmp->output_file);
+					tmp->flag_err = 2;
+					error_flag = 1;
+				}
+				close(fd);
+			}
 		}
 		else if (tok->type == APPEND)
 		{
@@ -158,11 +180,18 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			if (!tok)
 				return (NULL);
 			if (tmp->output_file)
+			{
 				ft_free(tmp->output_file);
+				tmp->output_file = NULL;
+			}
 			tmp->output_file = ft_get_arg(shell, tok->value);
 			if ((fd = open(ft_get_arg(shell, tmp->output_file),
-						O_WRONLY | O_CREAT, 0644)) < 0)
-				printf("error mila amboarina free\n");
+						O_WRONLY | O_CREAT | O_APPEND, 0644)) < 0)
+			{
+				tmp->error_file = ft_strdup(tmp->output_file);
+				tmp->flag_err = 3;
+				error_flag = 1;
+			}
 			close(fd);
 		}
 		else if (tok->type == HEREDOC)
@@ -170,6 +199,11 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			tok = tok->next;
 			if (!tok)
 				return (NULL);
+			if (tmp->input_file)
+			{
+				ft_free(tmp->input_file);
+				tmp->input_file = NULL;
+			}
 			new_hdoc = init_hdoc(NULL);
 			if (!new_hdoc)
 				return (NULL);
@@ -184,11 +218,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				while (last->next)
 					last = last->next;
 				last->next = new_hdoc;
-			}
-			if (!error_flag)
-			{
-				if (tmp->input_file)
-					ft_free(tmp->input_file);
 			}
 		}
 		else if (tok->type == PIPE)

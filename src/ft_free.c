@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 11:34:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 14:56:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void    ft_free_cmd(t_cmd **cmd)
         next = (*cmd)->next;
         ft_free((*cmd)->input_file);
         ft_free((*cmd)->output_file);
+        ft_free((*cmd)->error_file);
         ft_free_hdoc(&(*cmd)->hdoc);
         ft_free_arg((*cmd)->argv);
         ft_free(*cmd);

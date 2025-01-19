@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 13:27:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 18:33:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,13 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }					t_cmd;
 
+typedef struct g_sig
+{
+	int				pid;
+	int				exit_status;
+	int				signum;
+}					t_g_sig;
+
 typedef struct s_shell
 {
 	t_env			*envp;
@@ -149,6 +156,11 @@ int					ft_export(t_shell *shell, t_cmd *cmd);
 int					ft_env(t_shell *shell, t_cmd *cmd);
 int					ft_unset(t_shell *shell, t_cmd *cmd);
 int					ft_exit(t_shell *shell, char **argv);
-int					ft_cd(char *path, t_env *envp);
+int					ft_cd(t_cmd *cmd, t_env *envp);
+
+// SIGNALS
+void				handle_sigint(int sig);
+void				set_signal_value(int new_value);
+int					get_signal_value(void);
 
 #endif

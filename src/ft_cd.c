@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 11:22:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 11:53:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 16:18:17 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,25 @@ static int	update_oldpwd(t_env *envp, char *old_pwd)
 	return (0);
 }
 
-int	ft_cd(char *path, t_env *envp)
+int	ft_cd(t_cmd *cmd, t_env *envp)
 {
 	char	*old_pwd;
+	char	*path;
 
+	if (cmd->argc > 2)
+	{
+		write (STDERR_FILENO, "minishell: ", 11);
+		write (STDERR_FILENO, cmd->argv[0], ft_strlen(cmd->argv[0]));
+		write (STDERR_FILENO, ": ", 2);
+		write (STDERR_FILENO, "too many arguments\n", 19);
+		return (1);
+	}
+	if (cmd->argv[0] && (!cmd->argv[1] || !ft_strcmp(cmd->argv[1], "~")))
+		path = ft_get_env_value(envp, "$HOME");
+	else if (cmd->argv[0] && (!cmd->argv[1] || !ft_strcmp(cmd->argv[1], "-")))
+		path = ft_get_env_value(envp, "$OLDPWD");
+	else
+		path = cmd->argv[1];
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
 	{
@@ -68,5 +83,7 @@ int	ft_cd(char *path, t_env *envp)
 		return (1);
 	}
 	ft_free(old_pwd);
+	if (cmd->argv[0] && (!cmd->argv[1] || !ft_strcmp(cmd->argv[1], "-")))
+		ft_pwd();
 	return (0);
 }

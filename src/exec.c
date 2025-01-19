@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 13:46:44 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/19 17:46:56 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
+		waitpid(pid, &shell->exit_status, 0);
 		if (WIFEXITED(status))
 			shell->exit_status = WEXITSTATUS(status);
 		else
@@ -108,6 +108,8 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 
 void	what_cmd(t_shell *shell, t_cmd *cmd)
 {
+	if (!cmd->argv[0])
+		return ;
 	if (!ft_strcmp("echo", cmd->argv[0]))
 		shell->exit_status = ft_echo(cmd->argv);
 	else if (!ft_strcmp("pwd", cmd->argv[0]))
@@ -119,7 +121,7 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 	else if (!ft_strcmp("unset", cmd->argv[0]))
 		shell->exit_status = ft_unset(shell, cmd);
 	else if (!ft_strcmp("cd", cmd->argv[0]))
-		shell->exit_status = ft_cd(cmd->argv[1], shell->envp);
+		shell->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
 		shell->exit_status = ft_exit(shell, cmd->argv);
 	else

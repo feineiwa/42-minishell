@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 17:46:56 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:53:21 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,20 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	char	**envp;
 	int		status;
 
+	g_global()->is_runing = 1;
+	ignore_sig();
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork in what_cmd");
 		shell->exit_status = 1;
+		g_global()->is_runing = 0;
 		return (1);
 	}
 	if (pid == 0)
 	{
+		g_global()->is_runing = 1;
+		setup_signal();
 		envp = convert_env_to_array(shell->envp);
 		if (!envp)
 			exit(1);
@@ -97,17 +102,27 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	}
 	else
 	{
-		waitpid(pid, &shell->exit_status, 0);
+		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
 			shell->exit_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+		{
+			shell->exit_status = 128 + WTERMSIG(status);
+			if (WTERMSIG(status) == SIGQUIT)
+				write(STDERR_FILENO, "Quit (core dumped)\n", 20);
+			else if (WTERMSIG(status) == SIGINT)
+				ft_putchar_fd('\n', STDOUT_FILENO);
+		}
 		else
 			shell->exit_status = 1;
 	}
+	g_global()->is_runing = 0;
 	return (0);
 }
 
 void	what_cmd(t_shell *shell, t_cmd *cmd)
 {
+	g_global()->is_runing = 1;
 	if (!cmd->argv[0])
 		return ;
 	if (!ft_strcmp("echo", cmd->argv[0]))
@@ -126,6 +141,7 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_exit(shell, cmd->argv);
 	else
 		shell->exit_status = other_cmd(shell, cmd);
+	g_global()->is_runing = 0;
 }
 
 t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
@@ -137,6 +153,7 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	int		flags;
 	t_hdoc	*hdoc;
 
+	g_global()->is_runing = 1;
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	input_fd = -1;
@@ -165,7 +182,8 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		else if (cmd->flag_err == 2)
 		{
-			input_fd = open(cmd->error_file,O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC,
+					0644);
 			if (input_fd < 0)
 			{
 				perror(cmd->error_file);
@@ -175,7 +193,8 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		else if (cmd->flag_err == 3)
 		{
-			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND,
+					0644);
 			if (input_fd < 0)
 			{
 				perror(cmd->error_file);
@@ -243,8 +262,6 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	return (TRUE);
 }
 
-//
-
 t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 {
 	int	saved_stdin;
@@ -270,7 +287,8 @@ t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		else if (cmd->flag_err == 2)
 		{
-			input_fd = open(cmd->error_file,O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC,
+					0644);
 			if (input_fd < 0)
 			{
 				perror(cmd->error_file);
@@ -280,7 +298,8 @@ t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		else if (cmd->flag_err == 3)
 		{
-			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND,
+					0644);
 			if (input_fd < 0)
 			{
 				perror(cmd->error_file);

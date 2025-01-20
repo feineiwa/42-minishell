@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 12:48:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/20 12:44:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 				input_fd = pipefd[0];
 			else
 				input_fd = -1;
-			if (hdoc_fd[i] != 1)
+			if (hdoc_fd[i] != -1)
 				close(hdoc_fd[i]);
 		}
 		tmp = tmp->next;

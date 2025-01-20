@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 12:02:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:13:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     pid_t   pid;
     char    *expand;
     int     in_fd;
+    int     saved_stdout;
 
+    saved_stdout = dup(STDOUT_FILENO);
+    ignore_sig();
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
@@ -34,6 +37,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     }
     else if (pid == 0)
     {
+        signal(SIGINT, SIG_DFL);
         while (hdoc)
         {
             while (42)
@@ -79,6 +83,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
 		{
+            g_global()->exit_status = WEXITSTATUS(status);
 			if (cmd->input_file)
 			{
 				close(pipe_fd[0]);
@@ -87,6 +92,17 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
                 close(in_fd);
 			}
 		}
+        else if (WIFSIGNALED(status))
+        {
+            g_global()->exit_status = 128 + WTERMSIG(status);
+            if (WTERMSIG(status) == SIGINT)
+            {
+                close(pipe_fd[0]);
+                dup2(saved_stdout, STDOUT_FILENO);
+                ft_putchar_fd('\n', 1);
+                return (-1);
+            }
+        }
     }
     return (pipe_fd[0]);
 }

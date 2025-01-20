@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/20 18:53:21 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/20 23:10:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	char	**envp;
 	int		status;
 
-	g_global()->is_runing = 1;
 	ignore_sig();
 	pid = fork();
 	if (pid == -1)
@@ -116,7 +115,6 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 		else
 			shell->exit_status = 1;
 	}
-	g_global()->is_runing = 0;
 	return (0);
 }
 
@@ -141,7 +139,6 @@ void	what_cmd(t_shell *shell, t_cmd *cmd)
 		shell->exit_status = ft_exit(shell, cmd->argv);
 	else
 		shell->exit_status = other_cmd(shell, cmd);
-	g_global()->is_runing = 0;
 }
 
 t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
@@ -153,13 +150,14 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	int		flags;
 	t_hdoc	*hdoc;
 
-	g_global()->is_runing = 1;
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	input_fd = -1;
 	if (cmd->hdoc)
 	{
 		input_fd = handle_heredoc(cmd, shell);
+		if (input_fd == -2)
+			return (FALSE);
 		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
 		{
 			perror("minishell: dup2 input");

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/20 12:44:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 00:03:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	t_cmd	*tmp;
 	int		*hdoc_fd;
 	int		i;
+	int	status;
+
 
 	input_fd = -1;
 	tmp = cmd;
@@ -40,6 +42,11 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 			hdoc_fd[i] = handle_heredoc(tmp, shell);
 		else
 			hdoc_fd[i] = -1;
+		if (hdoc_fd[i] == -2)
+		{
+			ft_free(hdoc_fd);
+			return (FALSE);
+		}
 		i++;
 		tmp = tmp->next;
 	}
@@ -47,6 +54,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	i = 0;
 	while (tmp)
 	{
+		ignore_sig();
 		if (!tmp->argv[0])
 			return (FALSE);
 		if (tmp->next && pipe(pipefd) < 0)
@@ -64,6 +72,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		if (pid == 0) // Child process
 		{
+			signal(SIGINT, SIG_DFL);
 			if (tmp->hdoc && tmp->hdoc->del)
 				input_fd = hdoc_fd[i];
 			if (input_fd != -1)
@@ -101,13 +110,29 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 				input_fd = -1;
 			if (hdoc_fd[i] != -1)
 				close(hdoc_fd[i]);
+			waitpid(pid, &status, 0);
+			if (WIFSIGNALED(status))
+        	{
+            g_global()->exit_status = 128 + WTERMSIG(status);
+            if (WTERMSIG(status) == SIGINT)
+            {
+                close(pipefd[0]);
+				close(input_fd);
+				close(pipefd[1]);
+                // dup2(saved_stdin, STDIN_FILENO);
+                // dup2(saved_stdout, STDOUT_FILENO);
+                ft_putchar_fd('\n', 2);
+                return (-2);
+            }
+        }
+			
 		}
 		tmp = tmp->next;
 		i++;
 	}
 	while (wait(NULL) > 0)
 		;
-	waitpid(pid, &shell->exit_status, 0);
+	waitpid(pid, &status, 0);
     ft_free(hdoc_fd);
 	return (TRUE);
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/20 19:13:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/20 22:43:50 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     char    *expand;
     int     in_fd;
     int     saved_stdout;
+    int     saved_stdin;
 
-    saved_stdout = dup(STDOUT_FILENO);
+    // saved_stdout = dup(STDOUT_FILENO);
+    // saved_stdin = dup(STDIN_FILENO);
     ignore_sig();
     if (pipe(pipe_fd) == -1)
     {
@@ -38,6 +40,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
     else if (pid == 0)
     {
         signal(SIGINT, SIG_DFL);
+        close(pipe_fd[0]);
         while (hdoc)
         {
             while (42)
@@ -45,7 +48,7 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
                 content = readline(HDOC);
                 if (content == NULL)
                 {
-                    perror("Warning : There're not delimiter in the heredoc");
+                    ft_putendl_fd("warning: here-document delimited by end-of-file", 2);
                     break ;
                 }
                 if (!ft_strcmp(content, hdoc->del))
@@ -98,9 +101,10 @@ static int  between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
             if (WTERMSIG(status) == SIGINT)
             {
                 close(pipe_fd[0]);
-                dup2(saved_stdout, STDOUT_FILENO);
-                ft_putchar_fd('\n', 1);
-                return (-1);
+                // dup2(saved_stdin, STDIN_FILENO);
+                // dup2(saved_stdout, STDOUT_FILENO);
+                ft_putchar_fd('\n', 2);
+                return (-2);
             }
         }
     }

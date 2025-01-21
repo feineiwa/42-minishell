@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 17:28:16 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 22:04:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 		if (execve(cmd->argv[0], cmd->argv, envp) == -1)
 		{
 			perror(cmd->argv[0]);
-			exit(1);
+			return (1);
 		}
 	}
 	cmd_path = resolve_cmd_path(shell, cmd);

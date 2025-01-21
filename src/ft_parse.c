@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 17:56:22 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 22:46:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ t_bool	synthax_error(t_token *tok)
 		if (tok->next && tok->next->type != ARGS)
 			return (TRUE);
 	if (!ft_strcmp(tok->value, "<<") && tok->type == HEREDOC)
-		if (tok->next && tok->next->type != ARGS)
+		if ((tok->next && tok->next->type != ARGS) || (!tok->next || (tok->next && tok->next->type != ARGS)))
 			return (TRUE);
 	if (!ft_strcmp(tok->value, ">") && tok->type == OUTFILE)
 		if (tok->next && tok->next->type != ARGS)
@@ -187,6 +187,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				return (NULL);
 			if (synthax_error(tok))
 			{
+				write(STDERR_FILENO, "syntax error near unexpected token\n",
+					36);
 				ft_free_cmd(&cmd_list);
 				return (NULL);
 			}
@@ -194,8 +196,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 			{
 				if (tmp->output_file)
 				{
-					write(STDERR_FILENO, "syntax error near unexpected token\n",
-					36);
 					ft_free(tmp->output_file);
 					tmp->output_file = NULL;
 				}
@@ -218,13 +218,13 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				return (NULL);
 			if (synthax_error(tok))
 			{
+				write(STDERR_FILENO, "syntax error near unexpected token\n",
+					36);
 				ft_free_cmd(&cmd_list);
 				return (NULL);
 			}
 			if (tmp->output_file)
 			{
-				write(STDERR_FILENO, "syntax error near unexpected token\n",
-					36);
 				ft_free(tmp->output_file);
 				tmp->output_file = NULL;
 			}
@@ -240,18 +240,18 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == HEREDOC)
 		{
-			tok = tok->next;
-			if (!tok)
-				return (NULL);
 			if (synthax_error(tok))
-			{
-				ft_free_cmd(&cmd_list);
-				return (NULL);
-			}
-			if (tmp->input_file)
 			{
 				write(STDERR_FILENO, "syntax error near unexpected token\n",
 					36);
+				ft_free_cmd(&cmd_list);
+				return (NULL);
+			}
+			tok = tok->next;
+			if (!tok)
+				return (NULL);
+			if (tmp->input_file)
+			{
 				ft_free(tmp->input_file);
 				tmp->input_file = NULL;
 			}

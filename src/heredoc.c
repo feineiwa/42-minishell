@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 17:27:59 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 23:27:21 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,14 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 	pid_t	pid;
 	char	*expand;
 	int		in_fd;
-		int status;
+	int		status;
 
-	g_global()->is_runing = 2;
-	setup_signal();
+
 	if (pipe(pipe_fd) == -1)
 	{
 		perror("pipe");
 		return (-1);
 	}
-	in_fd = -1;
 	pid = fork();
 	if (pid < 0)
 	{
@@ -99,8 +97,8 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 			if (WTERMSIG(status) == SIGINT)
 			{
 				close(pipe_fd[0]);
-				ft_putchar_fd('\n', 1);
-				return (-1);
+				write (STDOUT_FILENO, "\n", 1);
+				return (-2);
 			}
 		}
 	}
@@ -129,15 +127,17 @@ int	*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell)
 	i = 0;
 	while (tmp)
 	{
+		g_global()->is_runing = 2;
+		setup_signal();
 		if (tmp->hdoc && tmp->hdoc->del)
 			hdoc_fd[i] = handle_heredoc(tmp, shell);
 		else
 			hdoc_fd[i] = -1;
-		// if (hdoc_fd[i] == -2)
-		// {
-		// 	ft_free(hdoc_fd);
-		// 	return (NULL);
-		// }
+		if (hdoc_fd[i] == -2)
+		{
+			ft_free(hdoc_fd);
+			return (NULL);
+		}
 		i++;
 		tmp = tmp->next;
 	}

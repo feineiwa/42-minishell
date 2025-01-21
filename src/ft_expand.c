@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/19 11:39:03 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 14:17:28 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,16 +125,13 @@ t_bool	ft_is_special(char c)
 int	ft_is_after_here(char *s, int i)
 {
 	int	j;
-	int	hdoc;
 	char quote;
 
 	j = 0;
-	hdoc = -1;
 	while (j <= i)
 	{
 		if ((s[j] && s[j] == '<') && (s[j + 1] && s[j + 1] == '<') && !ft_is_between(s, j))
 		{
-			hdoc = j;
 			j += 2;
 			j += ft_skip_space(s + j);
 			if (ft_is_quote(s[j]))
@@ -240,7 +237,7 @@ char	*ft_expand(t_shell *shell, char *s)
 		else if (s[i] == '$' && s[i + 1] == '?' && !ft_is_after_here(s, i))
 		{
 			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			value = ft_itoa(shell->exit_status);
+			value = ft_itoa(g_global()->exit_status);
 			if (value)
 				expanded = ft_strjoin_free(expanded, value);
 			i += 2;

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 10:28:39 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/12 22:50:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:46:39 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,81 +122,81 @@ char	*ft_strndup(char *str, size_t n)
 	return (s);
 }
 
-char	*ft_strtok_quoted(char *str)
-{
-	static char		*saved_str = NULL;
-	char			*token;
-	static size_t	index = 0;
-	char			quote;
-	int				i;
-	char			del;
+// char	*ft_strtok_quoted(char *str)
+// {
+// 	static char		*saved_str = NULL;
+// 	char			*token;
+// 	static size_t	index = 0;
+// 	char			quote;
+// 	int				i;
+// 	char			del;
 
-	if (str)
-		saved_str = str;
-	if (!saved_str)
-		return (NULL);
-	i = 0;
-	quote = 0;
-	token = NULL;
-	index += ft_skip_space(saved_str + index);
-	if (!saved_str[index])
-	{
-		saved_str = NULL;
-		index = 0;
-		return (NULL);
-	}
-	i = 0;
-	if (ft_is_quote(saved_str[index + i]))
-	{
-		quote = ft_is_quote(saved_str[index + i]);
-		i++;
-		while (saved_str[index + i] && quote)
-		{
-			if (ft_is_quote(saved_str[index + i]) == quote)
-				quote = 0;
-			i++;
-		}
-		if (!ft_isspace(saved_str[index + i]) || !ft_is_belong(saved_str[index
-				+ i]))
-		{
-			while (saved_str[index + i] && (!ft_is_belong(saved_str[index + i])
-					&& !ft_isspace(saved_str[index + i])))
-			{
-				i++;
-				if (ft_is_belong(saved_str[index + i])
-					&& ft_is_between(saved_str, index + i))
-					i++;
-			}
-		}
-		token = ft_strndup(saved_str + index, i);
-		index += i;
-	}
-	else
-	{
-		if (ft_is_belong(saved_str[index + i]))
-		{
-			del = ft_is_belong(saved_str[index + i]);
-			i++;
-			if (ft_is_belong(saved_str[index + i]) == del && (del == '<'
-					|| del == '>'))
-				i++;
-			token = ft_strndup(saved_str + index, i);
-			index += i;
-			return (token);
-		}
-		while (saved_str[index + i] && (!ft_is_belong(saved_str[index + i])
-				&& !ft_isspace(saved_str[index + i])))
-		{
-			i++;
-			if (ft_is_belong(saved_str[index + i]) && ft_is_between(saved_str,
-					index + i))
-				i++;
-		}
-		token = ft_strndup(saved_str + index, i);
-		index += i;
-	}
-	return (token);
-}
+// 	if (str)
+// 		saved_str = str;
+// 	if (!saved_str)
+// 		return (NULL);
+// 	i = 0;
+// 	quote = 0;
+// 	token = NULL;
+// 	index += ft_skip_space(saved_str + index);
+// 	if (!saved_str[index])
+// 	{
+// 		saved_str = NULL;
+// 		index = 0;
+// 		return (NULL);
+// 	}
+// 	i = 0;
+// 	if (ft_is_quote(saved_str[index + i]))
+// 	{
+// 		quote = ft_is_quote(saved_str[index + i]);
+// 		i++;
+// 		while (saved_str[index + i] && quote)
+// 		{
+// 			if (ft_is_quote(saved_str[index + i]) == quote)
+// 				quote = 0;
+// 			i++;
+// 		}
+// 		if (!ft_isspace(saved_str[index + i]) || !ft_is_belong(saved_str[index
+// 				+ i]))
+// 		{
+// 			while (saved_str[index + i] && (!ft_is_belong(saved_str[index + i])
+// 					&& !ft_isspace(saved_str[index + i])))
+// 			{
+// 				i++;
+// 				if (ft_is_belong(saved_str[index + i])
+// 					&& ft_is_between(saved_str, index + i))
+// 					i++;
+// 			}
+// 		}
+// 		token = ft_strndup(saved_str + index, i);
+// 		index += i;
+// 	}
+// 	else
+// 	{
+// 		// else if (ft_is_belong(saved_str[index + i]))
+// 		// {
+// 		// 	del = ft_is_belong(saved_str[index + i]);
+// 		// 	i++;
+// 		// 	// if (ft_is_belong(saved_str[index + i]) == del && (del == '<'
+// 		// 	// 		|| del == '>'))
+// 		// 	// 	i++;
+// 		// 	token = ft_strndup(saved_str + index, i);
+// 		// 	index += i;
+// 		// 	return (token);
+// 		// }
+// 		// while (saved_str[index + i] && (!ft_is_belong(saved_str[index + i])
+// 		// 		&& !ft_isspace(saved_str[index + i])))
+// 		// {
+// 		// 	i++;
+// 		// 	if (ft_is_belong(saved_str[index + i]) && ft_is_between(saved_str,
+// 		// 			index + i))
+// 		// 		i++;
+// 		// }
+// 		token = ft_strndup(saved_str + index, i);
+// 		index += i;
+// 	}
+// 	return (token);
+// }
 
 int	ft_strcmp(char *s1, char *s2)
 {

@@ -6,11 +6,35 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 10:43:11 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:27:59 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+static t_bool	child_process(t_cmd *tmp, int *pipefd, int fd)
+{
+	if (fd != -1)
+	{
+		if (dup2(fd, STDIN_FILENO) < 0)
+		{
+			perror("dup2 pipe");
+			return (FALSE);
+		}
+		close(fd);
+	}
+	if (tmp->next)
+	{
+		close(pipefd[0]);
+		if (dup2(pipefd[1], STDOUT_FILENO) < 0)
+		{
+			perror("dup2");
+			return (FALSE);
+		}
+		close(pipefd[1]);
+	}
+	return (TRUE);
+}
 
 t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 {
@@ -23,32 +47,8 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	int		status;
 
 	input_fd = -1;
-	tmp = cmd;
-	i = 0;
-	while (tmp)
-	{
-		i++;
-		tmp = tmp->next;
-	}
-	hdoc_fd = malloc(sizeof(int) * i);
-	if (!hdoc_fd)
-		return (FALSE);
-	tmp = cmd;
-	i = 0;
-	while (tmp)
-	{
-		if (tmp->hdoc && tmp->hdoc->del)
-			hdoc_fd[i] = handle_heredoc(tmp, shell);
-		else
-			hdoc_fd[i] = -1;
-		if (hdoc_fd[i] == -2)
-		{
-			ft_free(hdoc_fd);
-			return (FALSE);
-		}
-		i++;
-		tmp = tmp->next;
-	}
+	g_global()->is_runing = 2;
+	hdoc_fd = handle_heredoc_with_pipe(cmd, shell);
 	tmp = cmd;
 	i = 0;
 	setup_signal();
@@ -71,32 +71,12 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		if (pid == 0) // Child process
 		{
-			if (cmd->next)
-				g_global()->is_runing = 2;
-			else
-				g_global()->is_runing = 1;
+			g_global()->is_runing = 1;
 			setup_signal();
 			if (tmp->hdoc && tmp->hdoc->del)
 				input_fd = hdoc_fd[i];
-			if (input_fd != -1)
-			{
-				if (dup2(input_fd, STDIN_FILENO) < 0)
-				{
-					perror("dup2 pipe");
-					return (FALSE);
-				}
-				close(input_fd);
-			}
-			if (tmp->next)
-			{
-				close(pipefd[0]);
-				if (dup2(pipefd[1], STDOUT_FILENO) < 0)
-				{
-					perror("dup2");
-					return (FALSE);
-				}
-				close(pipefd[1]);
-			}
+			if (!child_process(tmp, pipefd, input_fd))
+				return (FALSE);
 			if (!launch_cmd_with_pipe(shell, tmp))
 				exit(1);
 			exit(0);
@@ -125,7 +105,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		g_global()->exit_status = 128 + WTERMSIG(status);
 		if (WTERMSIG(status) == SIGINT)
 		{
-			write (2, "\n", 1);
+			write(1, "\n", 1);
 			return (FALSE);
 		}
 		else if (WTERMSIG(status) == SIGQUIT)

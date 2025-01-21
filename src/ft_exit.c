@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 11:40:28 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 13:06:27 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,12 @@ t_bool	ft_is_number(char *s)
 	return (TRUE);
 }
 
-int	ft_exit(t_shell *shell, char **argv)
+int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 {
 	if (!argv[1])
 	{
+		close(stdin);
+		close(stdout);
 		ft_free_all(shell);
 		exit(0);
 	}
@@ -40,6 +42,8 @@ int	ft_exit(t_shell *shell, char **argv)
 	}
 	if (ft_is_number(argv[1]))
 	{
+		close(stdin);
+		close(stdout);
 		shell->exit_status = ft_atoi(argv[1]);
 		ft_free_all(shell);
 		exit(shell->exit_status);

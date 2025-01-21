@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 08:20:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 16:56:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,21 @@
 int	ft_isspace(char c)
 {
 	return ((c == 32 || (c >= 7 && c <= 13)));
+}
+
+int	ft_cmdsize(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+	int	size;
+
+	tmp = cmd;
+	size = 0;
+	while (tmp)
+	{
+		size++;
+		tmp = tmp->next;
+	}
+	return (size);
 }
 
 int	ft_skip_space(char *str)
@@ -32,7 +47,7 @@ int	ft_skip_space(char *str)
 char	*ft_strndup(char *str, size_t n)
 {
 	char	*s;
-	int		i;
+	size_t	i;
 
 	if (!str)
 		return (NULL);

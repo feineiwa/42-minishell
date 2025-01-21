@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/18 06:57:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 13:55:03 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,11 +135,10 @@ t_shell	init_shell(char **envp)
 	shell.envp = populate_env_list(envp);
 	if (!shell.envp)
 	{
-		shell.exit_status = -1;
+		g_global()->exit_status = 1;
 		shell.cmd = NULL;
 		return (shell);
 	}
-	shell.exit_status = 0;
 	return (shell);
 }
 

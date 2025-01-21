@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/20 18:27:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:21:19 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static t_bool	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
 
-	g_global()->is_runing = 1;
+	g_global()->is_runing = 2;
 	temp = shell->cmd;
 	if (temp && !temp->next)
 		return (launch_cmd_without_pipe(shell, temp));

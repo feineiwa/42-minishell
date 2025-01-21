@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 00:03:44 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:43:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	t_cmd	*tmp;
 	int		*hdoc_fd;
 	int		i;
-	int	status;
-
+	int		status;
 
 	input_fd = -1;
 	tmp = cmd;
@@ -52,9 +51,9 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	}
 	tmp = cmd;
 	i = 0;
+	setup_signal();
 	while (tmp)
 	{
-		ignore_sig();
 		if (!tmp->argv[0])
 			return (FALSE);
 		if (tmp->next && pipe(pipefd) < 0)
@@ -72,7 +71,11 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		if (pid == 0) // Child process
 		{
-			signal(SIGINT, SIG_DFL);
+			if (cmd->next)
+				g_global()->is_runing = 2;
+			else
+				g_global()->is_runing = 1;
+			setup_signal();
 			if (tmp->hdoc && tmp->hdoc->del)
 				input_fd = hdoc_fd[i];
 			if (input_fd != -1)
@@ -95,7 +98,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 				close(pipefd[1]);
 			}
 			if (!launch_cmd_with_pipe(shell, tmp))
-                exit(1);
+				exit(1);
 			exit(0);
 		}
 		else
@@ -110,22 +113,6 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 				input_fd = -1;
 			if (hdoc_fd[i] != -1)
 				close(hdoc_fd[i]);
-			waitpid(pid, &status, 0);
-			if (WIFSIGNALED(status))
-        	{
-            g_global()->exit_status = 128 + WTERMSIG(status);
-            if (WTERMSIG(status) == SIGINT)
-            {
-                close(pipefd[0]);
-				close(input_fd);
-				close(pipefd[1]);
-                // dup2(saved_stdin, STDIN_FILENO);
-                // dup2(saved_stdout, STDOUT_FILENO);
-                ft_putchar_fd('\n', 2);
-                return (-2);
-            }
-        }
-			
 		}
 		tmp = tmp->next;
 		i++;
@@ -133,6 +120,20 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	while (wait(NULL) > 0)
 		;
 	waitpid(pid, &status, 0);
-    ft_free(hdoc_fd);
+	if (WIFSIGNALED(status))
+	{
+		g_global()->exit_status = 128 + WTERMSIG(status);
+		if (WTERMSIG(status) == SIGINT)
+		{
+			write (2, "\n", 1);
+			return (FALSE);
+		}
+		else if (WTERMSIG(status) == SIGQUIT)
+		{
+			printf("mandalo ato\n");
+			return (FALSE);
+		}
+	}
+	ft_free(hdoc_fd);
 	return (TRUE);
 }

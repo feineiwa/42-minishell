@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/20 23:10:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:50:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 	char	**envp;
 	int		status;
 
-	ignore_sig();
+	setup_signal();
 	pid = fork();
 	if (pid == -1)
 	{
@@ -108,7 +108,7 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 		{
 			shell->exit_status = 128 + WTERMSIG(status);
 			if (WTERMSIG(status) == SIGQUIT)
-				write(STDERR_FILENO, "Quit (core dumped)\n", 20);
+				write(STDOUT_FILENO, "Quit (core dumped)\n", 20);
 			else if (WTERMSIG(status) == SIGINT)
 				ft_putchar_fd('\n', STDOUT_FILENO);
 		}
@@ -120,7 +120,6 @@ int	other_cmd(t_shell *shell, t_cmd *cmd)
 
 void	what_cmd(t_shell *shell, t_cmd *cmd)
 {
-	g_global()->is_runing = 1;
 	if (!cmd->argv[0])
 		return ;
 	if (!ft_strcmp("echo", cmd->argv[0]))

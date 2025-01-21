@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/20 18:30:07 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:00:39 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,15 @@ void	setup_signal(void)
 	sa_quit.sa_flags = 0;
 	sigemptyset(&sa_int.sa_mask);
 	sigemptyset(&sa_quit.sa_mask);
-	if (g_global()->is_runing)
+	if (g_global()->is_runing == 1)
 	{
 		sa_int.sa_handler = SIG_DFL;
 		sa_quit.sa_handler = SIG_DFL;
+	}
+	else if (g_global()->is_runing == 2)
+	{
+		sa_int.sa_handler = SIG_IGN;
+		sa_quit.sa_handler = SIG_IGN;
 	}
 	else
 	{

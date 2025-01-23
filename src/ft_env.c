@@ -6,11 +6,28 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:43:12 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 09:35:24 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:57:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void	print_env(t_env *envp)
+{
+	if (!envp)
+		return ;
+	while (envp)
+	{
+		if (envp->value)
+		{
+			ft_putstr_fd(envp->key, 1);
+			ft_putchar_fd('=', 1);
+			ft_putstr_fd(envp->value, 1);
+			ft_putchar_fd('\n', 1);
+		}
+		envp = envp->next;
+	}
+}
 
 int	ft_env(t_shell *shell, t_cmd *cmd)
 {

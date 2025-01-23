@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:16:31 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/12 14:03:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/21 22:34:09 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,8 +144,19 @@ char	*ft_strtok_quoted(char *str)
 	}
 	else
 	{
-		while (ft_is_belong(saved_str[index + i]))
+		if (ft_is_belong(saved_str[index + i]) == '|')
+		{
 			i++;
+			token = ft_strndup(saved_str + index, i);
+			index += i;
+			return (token);
+		}
+		while (ft_is_belong(saved_str[index + i]))
+		{
+			if (saved_str[index + i] == '|')
+				break ;
+			i++;
+		}
 		token = ft_strndup(saved_str + index, i);
 		index += i;
 		return (token);

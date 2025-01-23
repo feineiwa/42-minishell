@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 10:54:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:24:59 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,6 @@ int	ft_search_equ(char *s)
 	return (i);
 }
 
-void	print_env(t_env *envp)
-{
-	while (envp)
-	{
-		ft_putstr_fd(envp->key, 1);
-		ft_putchar_fd('=', 1);
-		ft_putstr_fd(envp->value, 1);
-		ft_putchar_fd('\n', 1);
-		envp = envp->next;
-	}
-}
-
 t_env	*ft_get_last_env(t_env *envp)
 {
 	if (!envp)
@@ -51,49 +39,6 @@ t_env	*ft_get_last_env(t_env *envp)
 	while (envp->next)
 		envp = envp->next;
 	return (envp);
-}
-
-void	ft_add_env(t_env **envp, char *arg)
-{
-	int		i;
-	char	*key;
-	t_env	*current;
-	t_env	*new_node;
-	t_env	*last;
-
-	i = 0;
-	key = NULL;
-	i = ft_search_equ(arg);
-	if (i < 0 || arg[i] == '\0')
-		return ;
-	key = ft_substr(arg, 0, i);
-	if (!key)
-		return ;
-	current = *envp;
-	while (current)
-	{
-		if (!ft_strcmp(current->key, key))
-		{
-			ft_free(current->value);
-			current->value = ft_strdup(arg + i + 1);
-			ft_free(key);
-			return ;
-		}
-		current = current->next;
-	}
-	new_node = ft_calloc(sizeof(t_env), 1);
-	if (!new_node)
-		return ;
-	new_node->key = key;
-	new_node->value = ft_strdup(arg + i + 1);
-	new_node->next = NULL;
-	if (*envp == NULL)
-		*envp = new_node;
-	else
-	{
-		last = ft_get_last_env(*envp);
-		last->next = new_node;
-	}
 }
 
 void	ft_unset_env(t_env **envp, char *key)
@@ -190,12 +135,10 @@ t_shell	init_shell(char **envp)
 	shell.envp = populate_env_list(envp);
 	if (!shell.envp)
 	{
-		shell.exit_status = -1;
+		g_global()->exit_status = 1;
 		shell.cmd = NULL;
 		return (shell);
 	}
-	shell.cmd = NULL;
-	shell.exit_status = 0;
 	return (shell);
 }
 
@@ -243,4 +186,5 @@ void	ft_free_env(t_env **envp)
 		*envp = tmp;
 	}
 	ft_free(*envp);
+	*envp = NULL;
 }

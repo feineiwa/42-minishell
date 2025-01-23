@@ -6,154 +6,204 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/13 10:37:21 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/22 22:17:28 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-t_bool	is_valid_cmd(char *cmd)
+static void	save_fds_standart(int *stdin, int *stdout)
 {
-	if (!cmd)
-		return (FALSE);
-	if (!ft_strcmp("echo", cmd) || !ft_strcmp("cd", cmd) || !ft_strcmp("pwd",
-			cmd) || !ft_strcmp("export", cmd) || !ft_strcmp("unset", cmd)
-		|| !ft_strcmp("env", cmd) || !ft_strcmp("exit", cmd)
-		|| !ft_strcmp("cat", cmd))
-		return (TRUE);
-	return (FALSE);
+	*stdin = dup(STDIN_FILENO);
+	*stdout = dup(STDOUT_FILENO);
 }
 
-// void	other_cmd(t_shell *shell, t_cmd *cmd)
-// {
-// 	pid_t	pid;
-// 	char	*path;
-// 	char	**envp;
-
-// 	path = ft_get_env_value(shell->envp, "$PATH");
-// 	pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		perror("fork in what_cmd");
-// 		shell->exit_status = 1;
-// 		return ;
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		execve(path, cmd->argv, envp);
-// 	}
-
-// }
-
-void	what_cmd(t_shell *shell, t_cmd *cmd)
+static t_bool	retore_fds_standart(int input_fd, int output_fd, int stdin,
+		int stdout)
 {
-	if (!ft_strcmp("echo", cmd->argv[0]))
-		shell->exit_status = ft_echo(cmd->argv);
-	else if (!ft_strcmp("pwd", cmd->argv[0]))
-		shell->exit_status = ft_pwd();
-	else if (!ft_strcmp("cat", cmd->argv[0]))
-		shell->exit_status = ft_cat(cmd->argv[1]);
-	else if (!ft_strcmp("export", cmd->argv[0]))
-		shell->exit_status = ft_export(shell, cmd);
-	else if (!ft_strcmp("env", cmd->argv[0]))
-		shell->exit_status = ft_env(shell, cmd);
-	else if (!ft_strcmp("unset", cmd->argv[0]))
-		shell->exit_status = ft_unset(shell, cmd);
-}
-
-/*char    *read_fd(int fd)
-{
-	char	buffer[4026];
-	int		bytes_read;
-	int		input_fd;
-	int		output_fd;
-	int		saved_stdin;
-	int		saved_stdout;
-	int		flags;
-	int		saved_stdin;
-	int		saved_stdin;
-	int		saved_stdin;
-	int		saved_stdout;
-	int		input_fd;
-	int		output_fd;
-	int		flags;
-
-	bytes_read = read(fd, buffer, sizeof(buffer));
-	if (bytes_read == -1)
+	if (input_fd != -1)
 	{
-		perror("Error reading file");
-		close(fd);
-		return (NULL);
-	}
-	return (buffer);
-}*/
-
-t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
-{
-	int	saved_stdin;
-	int	saved_stdout;
-	int	input_fd;
-	int	output_fd;
-	int	flags;
-	
-	saved_stdin = dup(STDIN_FILENO);
-	saved_stdout = dup(STDOUT_FILENO);
-	if (cmd->hdoc->del)
-		if (!handle_heredoc(cmd))
-			return (FALSE);
-	input_fd = -1;
-	if (cmd->input_file)
-	{
-		input_fd = open(cmd->input_file, O_RDONLY);
-		if (input_fd < 0)
-		{
-			perror("minishell: input_file");
-			return (FALSE);
-		}
-		if (dup2(input_fd, STDIN_FILENO) < 0)
+		if (dup2(stdin, STDIN_FILENO) < 0)
 		{
 			perror("minishell: dup2 input");
 			close(input_fd);
 			return (FALSE);
 		}
-	}
-	output_fd = -1;
-	if (cmd->output_file)
-	{
-		flags = O_WRONLY | O_CREAT;
-		if (cmd->append)
-			flags |= O_APPEND;
-		else
-			flags |= O_TRUNC;
-		output_fd = open(cmd->output_file, flags, 0644);
-		if (output_fd < 0)
-		{
-			perror("minishell: output_file");
-			if (input_fd != -1)
-				close(input_fd);
-			return (FALSE);
-		}
-		if (dup2(output_fd, STDOUT_FILENO) < 0)
-		{
-			perror("minishell: dup2 output");
-			close(output_fd);
-			if (input_fd != -1)
-				close(input_fd);
-			return (FALSE);
-		}
-	}
-	what_cmd(shell, cmd);
-	if (input_fd != -1)
-	{
-		dup2(saved_stdin, STDIN_FILENO);
 		close(input_fd);
 	}
 	if (output_fd != -1)
 	{
-		dup2(saved_stdout, STDOUT_FILENO);
+		if (dup2(stdout, STDOUT_FILENO) < 0)
+		{
+			perror("minishell: dup2 output");
+			close(output_fd);
+			return (FALSE);
+		}
 		close(output_fd);
 	}
-	if (cmd->hdoc->del)
-		dup2(saved_stdin, STDIN_FILENO);
+	close(stdin);
+	close(stdout);
+	return (TRUE);
+}
+
+static int	handler_input_redirection(char *input_file)
+{
+	int	fd;
+
+	fd = open(input_file, O_RDONLY);
+	if (fd < 0)
+	{
+		perror(input_file);
+		return (-1);
+	}
+	if (dup2(fd, STDIN_FILENO) < 0)
+	{
+		perror(input_file);
+		close(fd);
+		return (-1);
+	}
+	return (fd);
+}
+
+static int	handler_output_redirection(t_cmd *cmd, int input_fd)
+{
+	int	fd;
+	int	flags;
+
+	flags = O_WRONLY | O_CREAT;
+	if (cmd->append)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+	fd = open(cmd->output_file, flags, 0644);
+	if (fd < 0)
+	{
+		perror("minishell: output_file");
+		if (input_fd != -1)
+			close(input_fd);
+		return (-1);
+	}
+	if (dup2(fd, STDOUT_FILENO) < 0)
+	{
+		perror("minishell: dup2 output");
+		close(fd);
+		if (input_fd != -1)
+			close(input_fd);
+		return (-1);
+	}
+	return (fd);
+}
+
+static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
+{
+	if (cmd->flag_err == 1)
+	{
+		*input_fd = open(cmd->error_file, O_RDONLY);
+		if (*input_fd < 0)
+		{
+			g_global()->exit_status = 1;
+			perror(cmd->error_file);
+			return (FALSE);
+		}
+	}
+	else if (cmd->flag_err == 2)
+	{
+		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (*output_fd < 0)
+		{
+			g_global()->exit_status = 1;
+			perror(cmd->error_file);
+			return (FALSE);
+		}
+	}
+	else if (cmd->flag_err == 3)
+	{
+		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (*output_fd < 0)
+		{
+			g_global()->exit_status = 1;
+			perror(cmd->error_file);
+			return (FALSE);
+		}
+	}
+	close(*input_fd);
+	close(*output_fd);
+	*input_fd = -1;
+	*output_fd = -1;
+	return (TRUE);
+}
+
+int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+{
+	int	output_fd;
+	int	input_fd;
+	int	saved_stdin;
+	int	saved_stdout;
+
+	save_fds_standart(&saved_stdin, &saved_stdout);
+	if (cmd->error_file)
+		if (!handler_error_flag(cmd, &input_fd, &output_fd))
+			return (FALSE);
+	input_fd = -1;
+	if (cmd->input_file)
+	{
+		input_fd = handler_input_redirection(cmd->input_file);
+		if (!input_fd)
+			return (FALSE);
+	}
+	output_fd = -1;
+	if (cmd->output_file)
+	{
+		output_fd = handler_output_redirection(cmd, input_fd);
+		if (!output_fd)
+			return (FALSE);
+	}
+	what_cmd(shell, cmd, saved_stdin, saved_stdout);
+	retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout);
+		return (FALSE);
+	return (TRUE);
+}
+
+t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
+{
+	int	output_fd;
+	int	input_fd;
+	int	saved_stdin;
+	int	saved_stdout;
+
+	save_fds_standart(&saved_stdin, &saved_stdout);
+	input_fd = -1;
+	if (cmd->hdoc)
+	{
+		input_fd = handle_heredoc(cmd, shell);
+		if (input_fd == -2)
+			return (FALSE);
+		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
+		{
+			perror("minishell: dup2 input");
+			close(input_fd);
+			return (FALSE);
+		}
+		close(input_fd);
+	}
+	if (cmd->error_file)
+		if (!handler_error_flag(cmd, &input_fd, &output_fd))
+			return (FALSE);
+	if (cmd->input_file)
+	{
+		input_fd = handler_input_redirection(cmd->input_file);
+		if (!input_fd)
+			return (FALSE);
+	}
+	output_fd = -1;
+	if (cmd->output_file)
+	{
+		output_fd = handler_output_redirection(cmd, input_fd);
+		if (!output_fd)
+			return (FALSE);
+	}
+	what_cmd(shell, cmd, saved_stdin, saved_stdout);
+	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
+		return (FALSE);
 	return (TRUE);
 }

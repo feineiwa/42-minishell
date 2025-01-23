@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 08:20:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:55:00 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,21 @@
 int	ft_isspace(char c)
 {
 	return ((c == 32 || (c >= 7 && c <= 13)));
+}
+
+int	ft_cmdsize(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+	int	size;
+
+	tmp = cmd;
+	size = 0;
+	while (tmp)
+	{
+		size++;
+		tmp = tmp->next;
+	}
+	return (size);
 }
 
 int	ft_skip_space(char *str)
@@ -32,7 +47,7 @@ int	ft_skip_space(char *str)
 char	*ft_strndup(char *str, size_t n)
 {
 	char	*s;
-	int		i;
+	size_t	i;
 
 	if (!str)
 		return (NULL);
@@ -100,6 +115,34 @@ char	*ft_strjoin3(char *s1, char *s2, char *s3)
 	i = 0;
 	while (s3[i])
 		str[j++] = s3[i++];
+	str[j] = 0;
+	return (str);
+}
+
+char	*ft_strjoin3_free(char *s1, char *s2, char *s3)
+{
+	char	*str;
+	int		i;
+	int		j;
+
+	j = 0;
+	if (!s2 || !s1 || !s3)
+		return (NULL);
+	str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3)
+				+ 1));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (s1[i])
+		str[j++] = s1[i++];
+	i = 0;
+	while (s2[i])
+		str[j++] = s2[i++];
+	i = 0;
+	while (s3[i])
+		str[j++] = s3[i++];
+	ft_free(s1);
+	ft_free(s2);
 	str[j] = 0;
 	return (str);
 }

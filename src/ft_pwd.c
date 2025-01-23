@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:21:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/07 11:53:51 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:51:15 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,6 @@ int	ft_pwd(void)
 		return (0);
 	}
 	else
-		perror("pwd");
+		write(2, "pwd\n", 4);
 	return (1);
 }

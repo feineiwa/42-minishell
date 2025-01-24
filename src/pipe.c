@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/23 16:54:35 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:18:08 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
 {
     int     pipefd[2];
     int     input_fd;
-    pid_t   *pid; 
+    pid_t   *pid;
+    t_cmd   *tmp;
     int     *hdoc_fd;
     int     i;
 	int		j;
@@ -54,16 +55,17 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
     if (pid == NULL)
 	{
         perror("malloc");
-        ft_free(hdoc_fd);
+        free(hdoc_fd);
         return (FALSE);
     }
 	i = 0;
+    tmp = cmd;
     while (cmd)
     {
         if (cmd->next && pipe(pipefd) < 0)
         {
             perror("pipe");
-            ft_free(hdoc_fd);
+            free(hdoc_fd);
             free(pid);
             return (FALSE);
         }
@@ -71,7 +73,7 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
         if (pid[i] < 0)
         {
             perror("fork");
-            ft_free(hdoc_fd);
+            free(hdoc_fd);
             free(pid);
             return (FALSE);
         }
@@ -83,7 +85,12 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
                 input_fd = hdoc_fd[i];
             if (!child_process(cmd, pipefd, input_fd))
                 exit(1);
-            g_global()->exit_status = launch_cmd_with_pipe(shell, cmd);
+            if (!launch_cmd(shell, cmd))
+            {
+                free(hdoc_fd);
+                free(pid);
+                exit(1);
+            }
             exit(g_global()->exit_status);
         }
         else
@@ -106,11 +113,19 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
         i++;
     }
     j = 0;
-	while(j < i)
+	while(tmp)
 	{
 		waitpid(pid[j], &status, 0);
 		if (WIFEXITED(status))
+        {
 			g_global()->exit_status = WEXITSTATUS(status);
+            if (!ft_strcmp("exit", tmp->argv[0]))
+            {
+                free(hdoc_fd);
+                free(pid);
+                return (EXIT);
+            }
+        }
 		else if (WIFSIGNALED(status))
 		{
 			g_global()->exit_status = 128 + WTERMSIG(status);
@@ -122,9 +137,10 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
 		}
 		else
 			g_global()->exit_status = 1;
+        tmp = tmp->next;
 		j++;
     }
+    free(hdoc_fd);
     free(pid);
-    ft_free(hdoc_fd);
     return (TRUE);
 }

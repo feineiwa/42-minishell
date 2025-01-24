@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/23 16:50:02 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:18:43 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ typedef struct g_sig	t_g_sig;
 typedef enum e_bool
 {
 	FALSE,
-	TRUE
+	TRUE,
+	EXIT
 }						t_bool;
 
 typedef enum e_tok_type
@@ -150,15 +151,13 @@ char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
-t_bool					launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
-int						launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
+t_bool					launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool					config_with_pipe(t_shell *shell, t_cmd *cmd);
 void					what_cmd(t_shell *shell, t_cmd *cmd, int stdin,
 							int stdout);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell);
 int						*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell);
-int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
-int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
+int						other_cmd(t_shell *shell, t_cmd *cmd);
 char					*resolve_cmd_path(t_shell *shell, t_cmd *cmd);
 
 // BUILTINS

@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/23 16:58:43 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/24 10:54:06 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
 	return (NULL);
 }
 
-int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+int	other_cmd(t_shell *shell, t_cmd *cmd)
 {
 	char	*cmd_path;
 	char	**envp;
@@ -92,76 +92,6 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	return (g_global()->exit_status);
 }
 
-int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
-{
-	pid_t	pid;
-	char	*cmd_path;
-	char	**envp;
-	int		status;
-
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork in what_cmd");
-		return (1);
-	}
-	if (pid == 0)
-	{
-		g_global()->is_runing = 1;
-		setup_signal();
-		envp = convert_env_to_array(shell->envp);
-		if (!envp)
-			exit(1);
-		if (ft_strchr(cmd->argv[0], '/'))
-		{
-			if (execve(cmd->argv[0], cmd->argv, envp) == -1)
-			{
-				ft_free_arr(envp);
-				perror(cmd->argv[0]);
-				exit(1);
-			}
-		}
-		cmd_path = resolve_cmd_path(shell, cmd);
-		if (!cmd_path)
-		{
-			ft_free_arr(envp);
-			ft_putstr_fd("command not found: ", STDERR_FILENO);
-			ft_putstr_fd(cmd->argv[0], STDERR_FILENO);
-			write(2, "\n", 1);
-			exit(127);
-		}
-		if (execve(cmd_path, cmd->argv, envp) == -1)
-		{
-			ft_free_arr(envp);
-			ft_free(cmd_path);
-			perror(cmd->argv[0]);
-			exit(1);
-		}
-		ft_free_arr(envp);
-		ft_free(cmd_path);
-		exit(0);
-	}
-	else
-	{
-		g_global()->is_runing = 2;
-		setup_signal();
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			g_global()->exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			g_global()->exit_status = 128 + WTERMSIG(status);
-			if (WTERMSIG(status) == SIGQUIT)
-				write(STDERR_FILENO, "Quit (core dumped)\n", 20);
-			else if (WTERMSIG(status) == SIGINT)
-				ft_putchar_fd('\n', STDERR_FILENO);
-		}
-		else
-			g_global()->exit_status = 1;
-	}
-	return (g_global()->exit_status);
-}
-
 void	what_cmd(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 {
 	if (cmd->argv[0] == NULL)
@@ -181,12 +111,5 @@ void	what_cmd(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 	else if (!ft_strcmp("exit", cmd->argv[0]))
 		g_global()->exit_status = ft_exit(shell, cmd->argv, stdin, stdout);
 	else
-	{
-		// petit probleme avec la signalisation
-		/*if (g_global()->exit_status == 0) 	// avec parent
-			g_global()->exit_status = other_cmd_without_pipe(shell, cmd);
-		else if (g_global()->exit_status == 1)	// avec enfant
-		*/
-			g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
-	}
+		g_global()->exit_status = other_cmd(shell, cmd);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/22 15:38:54 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:16:07 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdout);
 		g_global()->exit_status = ft_atoi(argv[1]);
 		ft_free_all(shell);
-		write(STDERR_FILENO, "exit\n", 6);
 		exit(g_global()->exit_status);
 	}
 	else if (!argv[1])
@@ -44,7 +43,6 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdin);
 		close(stdout);
 		ft_free_all(shell);
-		write(STDERR_FILENO, "exit\n", 6);
 		exit(g_global()->exit_status % 256);
 	}
 	else if (argv[2])
@@ -52,8 +50,7 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdin);
 		close(stdout);
 		ft_free_all(shell);
-		write(STDERR_FILENO, "exit\n", 6);
-		write(STDERR_FILENO, ",exit: too many arguments", 25);
+		write(STDERR_FILENO, "exit: too many arguments", 25);
 		exit(1);
 	}
 	else
@@ -61,7 +58,6 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdin);
 		close(stdout);
 		ft_free_all(shell);
-		write(STDERR_FILENO, "exit\n", 6);
 		write(STDERR_FILENO, "numeric argument required\n", 27);
 		exit(2);
 	}

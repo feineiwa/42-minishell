@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/22 22:17:28 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/24 10:54:37 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 	return (TRUE);
 }
 
-int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+t_bool	launch_cmd(t_shell *shell, t_cmd *cmd)
 {
 	int	output_fd;
 	int	input_fd;
@@ -160,50 +160,6 @@ int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	}
 	what_cmd(shell, cmd, saved_stdin, saved_stdout);
 	retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout);
-		return (FALSE);
-	return (TRUE);
-}
-
-t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
-{
-	int	output_fd;
-	int	input_fd;
-	int	saved_stdin;
-	int	saved_stdout;
-
-	save_fds_standart(&saved_stdin, &saved_stdout);
-	input_fd = -1;
-	if (cmd->hdoc)
-	{
-		input_fd = handle_heredoc(cmd, shell);
-		if (input_fd == -2)
-			return (FALSE);
-		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
-		{
-			perror("minishell: dup2 input");
-			close(input_fd);
-			return (FALSE);
-		}
-		close(input_fd);
-	}
-	if (cmd->error_file)
-		if (!handler_error_flag(cmd, &input_fd, &output_fd))
-			return (FALSE);
-	if (cmd->input_file)
-	{
-		input_fd = handler_input_redirection(cmd->input_file);
-		if (!input_fd)
-			return (FALSE);
-	}
-	output_fd = -1;
-	if (cmd->output_file)
-	{
-		output_fd = handler_output_redirection(cmd, input_fd);
-		if (!output_fd)
-			return (FALSE);
-	}
-	what_cmd(shell, cmd, saved_stdin, saved_stdout);
-	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
 		return (FALSE);
 	return (TRUE);
 }

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
+#    By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/22 15:21:51 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/24 13:10:08 by nrasamim         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,7 @@ fclean : clean
 re : fclean all
 
 debug : $(NAME)
-	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-origins=yes --suppressions=debug -s ./minishell
+	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
 run : fclean all
 	@clear ; ./minishell

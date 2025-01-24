@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/22 17:28:05 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:29:21 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ t_bool	execute_command(t_shell *shell)
 
 	g_global()->is_runing = 2;
 	temp = shell->cmd;
-	if (temp && !temp->next)
-		return (launch_cmd_without_pipe(shell, temp));
-	else if (temp->next)
+	if (temp)
 		return (config_with_pipe(shell, temp));
 	return (FALSE);
 }
@@ -28,6 +26,7 @@ t_bool	execute_command(t_shell *shell)
 int	main(int ac, char **av, char **envp)
 {
 	t_shell				shell;
+	t_bool				status;
 	char				*input;
 
 	(void)ac;
@@ -59,11 +58,19 @@ int	main(int ac, char **av, char **envp)
 				ft_free(input);
 				continue ;
 			}
-			if (!execute_command(&shell))
+			status = execute_command(&shell);
+			if (status == FALSE)
 			{
 				ft_free(input);
 				ft_free_cmd(&shell.cmd);
-				continue ;
+				break ;
+			}
+			else if (status == EXIT)
+			{
+				write(STDERR_FILENO, "exit\n", 6);
+				ft_free(input);
+				ft_free_cmd(&shell.cmd);
+				break ;
 			}
 			ft_free_cmd(&shell.cmd);
 		}

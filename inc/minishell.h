@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/24 12:18:43 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:27:16 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[36mminishell$\033[0m "
-// # define PROMPT "minishell$ "
+// # define PROMPT "\033[36mminishell$\033[0m "
+# define PROMPT "minishell$ "
 # define HDOC "\033[1;33m>\033[0m "
 
 typedef struct g_sig	t_g_sig;
@@ -96,8 +96,6 @@ typedef struct s_shell
 	int					exit_status;
 }						t_shell;
 
-void					ft_free(void *ptr);
-
 // ENV
 char					*ft_get_env_value(t_env *envp, char *key);
 void					print_env(t_env *envp);
@@ -130,26 +128,6 @@ int						ft_strlen_skip_quote(char *s);
 char					*ft_get_arg(t_shell *shell, char *tok);
 t_cmd					*parse_into_cmd(t_shell *shell, t_token *tok);
 
-// expand;
-char					*extract_var(char *s, t_shell *shell);
-char					*ft_expand(t_shell *shell, char *s);
-char					*ft_strjoin3_free(char *s1, char *s2, char *s3);
-
-// ft_free
-void					ft_free_token(t_token *tok);
-void					ft_free_cmd(t_cmd **cmd);
-void					ft_free_env(t_env **envp);
-void					ft_free_all(t_shell *shell);
-void					ft_free_arr(char **arr);
-
-// extra_libft
-void					*ft_realloc(void *ptr, size_t old_size,
-							size_t new_size);
-char					*ft_strjoin3(char *s1, char *s2, char *s3);
-char					*ft_strjoin_free(char *s1, char *s2);
-char					*ft_strjoin_s1(char *s1, char *s2);
-int						ft_cmdsize(t_cmd *cmd);
-
 // EXEC
 t_bool					launch_cmd(t_shell *shell, t_cmd *cmd);
 t_bool					config_with_pipe(t_shell *shell, t_cmd *cmd);
@@ -173,5 +151,26 @@ int						ft_cd(t_cmd *cmd, t_env *envp);
 // SIGNALS
 t_g_sig					*g_global(void);
 void					setup_signal(void);
+
+// expand
+char					*extract_var(char *s, t_shell *shell);
+char					*ft_expand(t_shell *shell, char *s);
+char					*ft_strjoin3_free(char *s1, char *s2, char *s3);
+
+// ft_free
+void					ft_free(void *ptr);
+void					ft_free_token(t_token *tok);
+void					ft_free_cmd(t_cmd **cmd);
+void					ft_free_env(t_env **envp);
+void					ft_free_all(t_shell *shell);
+void					ft_free_arr(char **arr);
+
+// extra_libft
+void					*ft_realloc(void *ptr, size_t old_size,
+							size_t new_size);
+char					*ft_strjoin3(char *s1, char *s2, char *s3);
+char					*ft_strjoin_free(char *s1, char *s2);
+char					*ft_strjoin_s1(char *s1, char *s2);
+int						ft_cmdsize(t_cmd *cmd);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:06:07 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
     if (!hdoc_fd)
         return (FALSE);
     input_fd = -1;
-    pid = (pid_t *)malloc(sizeof(pid_t) * ft_cmdsize(cmd)); 
+    pid = (pid_t *)malloc(sizeof(pid_t) * ft_cmdsize(cmd));
     if (pid == NULL)
 	{
         perror("malloc");
@@ -69,7 +69,7 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
             free(pid);
             return (FALSE);
         }
-        pid[i] = fork(); 
+        pid[i] = fork();
         if (pid[i] < 0)
         {
             perror("fork");
@@ -140,6 +140,8 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
         tmp = tmp->next;
 		j++;
     }
+    while (wait(NULL) > 0)
+        ;
     free(hdoc_fd);
     free(pid);
     return (TRUE);

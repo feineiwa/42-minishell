@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:01:49 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,4 @@ void	ft_free_cmd(t_cmd **cmd)
 	}
 	ft_free(*cmd);
 	*cmd = NULL;
-}
-
-void	ft_free_all(t_shell *shell)
-{
-	rl_clear_history();
-	ft_free_cmd(&shell->cmd);
-	ft_free_env(&shell->envp);
 }

@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:16:20 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	what_cmd(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 	else if (!ft_strcmp("cd", cmd->argv[0]))
 		g_global()->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
-		g_global()->exit_status = ft_exit(shell, cmd->argv, stdin, stdout);
+		g_global()->exit_status = ft_exit(cmd->argv, stdin, stdout);
 	else
 		g_global()->exit_status = other_cmd(shell, cmd);
 }

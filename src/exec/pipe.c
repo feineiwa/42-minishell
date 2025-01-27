@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 13:06:07 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:17:22 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,7 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
             setup_signal();
             if (cmd->hdoc && cmd->hdoc->del)
                 input_fd = hdoc_fd[i];
-            if (!child_process(cmd, pipefd, input_fd))
-                exit(1);
-            if (!launch_cmd(shell, cmd))
+            if (!child_process(cmd, pipefd, input_fd) || !launch_cmd(shell, cmd))
             {
                 free(hdoc_fd);
                 free(pid);
@@ -121,6 +119,12 @@ t_bool  config_with_pipe(t_shell *shell, t_cmd *cmd)
 			g_global()->exit_status = WEXITSTATUS(status);
             if (!ft_strcmp("exit", tmp->argv[0]))
             {
+                if (j == 0 && tmp->next)
+                {
+                    tmp = tmp->next;
+                    j++;
+                    continue ;
+                }
                 free(hdoc_fd);
                 free(pid);
                 return (EXIT);

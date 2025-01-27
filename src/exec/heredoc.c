@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:49:31 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,10 @@ int	*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell)
 
 	hdoc_fd = malloc(sizeof(int) * ft_cmdsize(cmd));
 	if (!hdoc_fd)
+	{
+		perror("malloc");
 		return (NULL);
+	}
 	tmp = cmd;
 	i = 0;
 	while (tmp)
@@ -136,7 +139,7 @@ int	*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell)
 			hdoc_fd[i] = -1;
 		if (hdoc_fd[i] == -2)
 		{
-			ft_free(hdoc_fd);
+			free(hdoc_fd);
 			return (NULL);
 		}
 		i++;

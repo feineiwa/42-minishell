@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/27 11:48:37 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:16:37 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,66 @@ void	print_export(t_shell *shell)
 	
 }
 
+void	ft_add_env(t_env **envp, char *arg)
+{
+	int		i;
+	char	*key;
+	t_env	*current;
+	t_env	*new_node;
+	t_env	*last;
+
+	i = 0;
+	key = NULL;
+	i = ft_search_equ(arg);
+	if (i < 0)
+		return ;
+	key = ft_substr(arg, 0, i);
+	if (!key)
+		return ;
+	current = *envp;
+	while (current)
+	{
+		if (!ft_strcmp(current->key, key))
+		{
+			ft_free(current->value);
+			current->value = ft_strdup(arg + i + 1);
+			ft_free(key);
+			return ;
+		}
+		current = current->next;
+	}
+	new_node = ft_calloc(sizeof(t_env), 1);
+	if (!new_node)
+		return ;
+	if (arg[i] == '=')
+	{
+		new_node->key = key;
+		ft_free(new_node->value);
+		new_node->value = ft_strdup(arg + i + 1);
+		if (!new_node->value)
+			new_node->value = ft_strdup("");
+		new_node->next = NULL;
+	}
+	else
+	{
+		new_node->key = key;
+		new_node->value = NULL;
+		new_node->next = NULL;
+	}
+	if (*envp == NULL)
+		*envp = new_node;
+	else
+	{
+		last = ft_get_last_env(*envp);
+		last->next = new_node;
+	}
+}
+
 int	ft_export(t_shell *shell, t_cmd *cmd)
 {
-	int	i;
-
-	i = 1;
-
-	if (!cmd->argv[i])
+	if (!cmd->argv[1])
 		print_export(shell);
-	while (cmd->argv[i])
-		ft_add_env(&shell->envp,cmd->argv[i++]);
+	while (cmd->argv[1])
+		ft_add_env(&shell->envp,cmd->argv[2]);
 	return (0);
 }

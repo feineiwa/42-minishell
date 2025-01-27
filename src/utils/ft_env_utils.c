@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/27 11:46:53 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:53:28 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,18 @@ void	ft_free(void *ptr)
 		return ;
 	free(ptr);
 	ptr = NULL;
+}
+
+int	ft_search_equ(char *s)
+{
+	size_t	i;
+
+	if (!s)
+		return (-1);
+	i = 0;
+	while (s[i] && s[i] != '=')
+		i++;
+	return (i);
 }
 
 t_env	*ft_get_last_env(t_env *envp)

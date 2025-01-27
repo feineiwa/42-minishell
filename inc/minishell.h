@@ -6,7 +6,7 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 12:27:16 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:17:37 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-// # define PROMPT "\033[36mminishell$\033[0m "
 # define PROMPT "minishell$ "
 # define HDOC "\033[1;33m>\033[0m "
 
@@ -144,8 +143,7 @@ int						ft_pwd(void);
 int						ft_export(t_shell *shell, t_cmd *cmd);
 int						ft_env(t_shell *shell, t_cmd *cmd);
 int						ft_unset(t_shell *shell, t_cmd *cmd);
-int						ft_exit(t_shell *shell, char **argv, int stdin,
-							int stdout);
+int						ft_exit(char **argv, int stdin, int stdout);
 int						ft_cd(t_cmd *cmd, t_env *envp);
 
 // SIGNALS
@@ -162,7 +160,6 @@ void					ft_free(void *ptr);
 void					ft_free_token(t_token *tok);
 void					ft_free_cmd(t_cmd **cmd);
 void					ft_free_env(t_env **envp);
-void					ft_free_all(t_shell *shell);
 void					ft_free_arr(char **arr);
 
 // extra_libft

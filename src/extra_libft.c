@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 16:56:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:09:16 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ int	ft_cmdsize(t_cmd *cmd)
 
 	tmp = cmd;
 	size = 0;
+	if (!tmp)
+		return (0);
 	while (tmp)
 	{
 		size++;

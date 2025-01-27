@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 16:59:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:19:48 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[36mminishell$\033[0m "
-// # define PROMPT "minishell$ "
+// # define PROMPT "\033[36mminishell$\033[0m "
+# define PROMPT "minishell$ "
 # define HDOC "\033[1;33m>\033[0m "
 
 typedef struct g_sig	t_g_sig;
@@ -150,14 +150,17 @@ char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
-t_bool					launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
+int						launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
 t_bool					launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 t_bool					config_with_pipe(t_shell *shell, t_cmd *cmd);
-void					what_cmd(t_shell *shell, t_cmd *cmd, int stdin,
-							int stdout);
+void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
+							int stdin, int stdout);
+void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
+							int stdin, int stdout);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell);
 int						*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell);
-int						other_cmd(t_shell *shell, t_cmd *cmd);
+int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
+int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 char					*resolve_cmd_path(t_shell *shell, t_cmd *cmd);
 
 // BUILTINS

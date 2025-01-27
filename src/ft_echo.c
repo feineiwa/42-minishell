@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:28 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/19 12:18:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:46:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,17 @@ static t_bool	check_new_line(char *str)
 
 static void	print_echo(int number_arg, char **args)
 {
-	int	i;
+	int		i;
 	t_bool	new_line;
 
 	i = 1;
 	new_line = TRUE;
-	while(check_new_line(args[i]))
+	while (args[i] && check_new_line(args[i]))
 	{
 		new_line = FALSE;
 		i++;
 	}
-	while (i < number_arg)
+	while (i < number_arg && args[i])
 	{
 		write(1, args[i], ft_strlen(args[i]));
 		if (i != number_arg - 1)
@@ -53,7 +53,7 @@ static void	print_echo(int number_arg, char **args)
 
 int	ft_echo(char **args)
 {
-	int		number_arg;
+	int	number_arg;
 
 	number_arg = 0;
 	while (args[number_arg])

@@ -6,21 +6,22 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 22:05:59 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:19:31 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-t_bool	execute_command(t_shell *shell)
+static void	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
 
 	g_global()->is_runing = 2;
 	temp = shell->cmd;
-	if (temp)
-		return (config_with_pipe(shell, temp));
-	return (FALSE);
+	if (temp && !temp->next)
+		g_global()->exit_status = launch_cmd_without_pipe(shell, temp);
+	// else if (temp->next)
+	// 	g_global()->exit_status = config_with_pipe(shell, temp);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -57,14 +58,10 @@ int	main(int ac, char **av, char **envp)
 				ft_free(input);
 				continue ;
 			}
-			if (!execute_command(&shell))
-			{
-				ft_free(input);
-				ft_free_cmd(&shell.cmd);
-				continue ;
-			}
+			execute_command(&shell);
 			ft_free_cmd(&shell.cmd);
 		}
+		ft_free(input);
 	}
 	rl_clear_history();
 	ft_free_env(&shell.envp);

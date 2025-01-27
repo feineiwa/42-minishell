@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/21 23:52:09 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:41:30 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 	return (TRUE);
 }
 
-t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
+int	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 {
 	int		saved_stdin;
 	int		saved_stdout;
@@ -141,37 +141,37 @@ t_bool	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	{
 		input_fd = handle_heredoc(cmd, shell);
 		if (input_fd == -2)
-			return (FALSE);
+			return (g_global()->exit_status);
 		if (input_fd != -1 && dup2(input_fd, STDIN_FILENO) < 0)
 		{
 			perror("minishell: dup2 input");
 			close(input_fd);
-			return (FALSE);
+			return (1);
 		}
 		close(input_fd);
 	}
 	if (cmd->error_file)
 	{
 		if(!handler_error_flag(cmd, &input_fd, &output_fd))
-			return (FALSE);
+			return (1);
 	}
 	if (cmd->input_file)
 	{
 		input_fd = handler_input_redirection(cmd->input_file);
 		if (!input_fd)
-			return (FALSE);
+			return (1);
 	}
 	output_fd = -1;
 	if (cmd->output_file)
 	{
 		output_fd = handler_output_redirection(cmd, input_fd);
 		if (!output_fd)
-			return (FALSE);
+			return (1);
 	}
-	what_cmd(shell, cmd, saved_stdin, saved_stdout);
+	what_cmd_without_pipe(shell, cmd, saved_stdin, saved_stdout);
 	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
-		return (FALSE);
-	return (TRUE);
+		return (1);
+	return (g_global()->exit_status);
 }
 
 t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
@@ -201,8 +201,8 @@ t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		if (!output_fd)
 			return (FALSE);
 	}
-	what_cmd(shell, cmd, saved_stdin, saved_stdout);
+	what_cmd_with_pipe(shell, cmd, saved_stdin, saved_stdout);
 	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
 		return (FALSE);
-	return (TRUE);
+	return (g_global()->exit_status);
 }

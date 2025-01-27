@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:19:48 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:18:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,8 @@ int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
 int						launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
-t_bool					launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
-t_bool					config_with_pipe(t_shell *shell, t_cmd *cmd);
+int						launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
+int						config_with_pipe(t_shell *shell, t_cmd *cmd);
 void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,

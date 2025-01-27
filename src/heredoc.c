@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:29:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:13:38 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,10 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 			{
 				close(pipe_fd[0]);
 				if ((in_fd = open(cmd->input_file, O_RDONLY) < 0))
+				{
+					g_global()->exit_status = 1;
 					return (-1);
+				}
 				close(in_fd);
 			}
 		}

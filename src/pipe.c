@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:09:26 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 19:04:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static t_bool	child_process(t_cmd *cmd, int *pipefd, int fd)
 	return (TRUE);
 }
 
-t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
+int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 {
 	int		pipefd[2];
 	int		input_fd;
@@ -49,14 +49,14 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 
 	hdoc_fd = handle_heredoc_with_pipe(cmd, shell);
 	if (hdoc_fd == NULL)
-		return (FALSE);
+		return (g_global()->exit_status);
 	input_fd = -1;
 	pid = (pid_t *)malloc(sizeof(pid_t) * ft_cmdsize(cmd));
 	if (pid == NULL)
 	{
 		perror("malloc");
 		free(hdoc_fd);
-		return (FALSE);
+		return (1);
 	}
 	i = 0;
 	setup_signal();
@@ -64,13 +64,13 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	while (cmd)
 	{
 		if (!cmd->argv[0])
-			return (FALSE);
+			return (1);
 		if (cmd->next && pipe(pipefd) < 0)
 		{
 			perror("pipe");
 			ft_free(hdoc_fd);
 			ft_free(pid);
-			return (FALSE);
+			return (1);
 		}
 		pid[i] = fork();
 		if (pid[i] < 0)
@@ -78,7 +78,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 			perror("fork");
 			free(hdoc_fd);
 			ft_free(pid);
-			return (FALSE);
+			return (1);
 		}
 		if (pid[i] == 0)
 		{
@@ -88,8 +88,7 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 				input_fd = hdoc_fd[i];
 			if (!child_process(cmd, pipefd, input_fd))
 				exit(1);
-			if (!launch_cmd_with_pipe(shell, cmd))
-				exit(1);
+			g_global()->exit_status = launch_cmd_with_pipe(shell, cmd);
 			exit(g_global()->exit_status);
 		}
 		else
@@ -118,21 +117,21 @@ t_bool	config_with_pipe(t_shell *shell, t_cmd *cmd)
 			if (WTERMSIG(status) == SIGINT)
 			{
 				write(STDOUT_FILENO, "\n", 1);
-				return (FALSE);
+				return (g_global()->exit_status);
 			}
 			else if (WTERMSIG(status) == SIGQUIT)
 			{
 				write(STDOUT_FILENO, "Quit (core dumped)\n", 20);
-				return (FALSE);
+				return (g_global()->exit_status);
 			}
 		}
 		else if (WIFEXITED(status))
-			g_global()->exit_status = WIFEXITED(status);
+			g_global()->exit_status = WEXITSTATUS(status);
 		tmp = tmp->next;
 		j++;
 	}
 	while (wait(NULL) > 0)
 		;
 	ft_free(hdoc_fd);
-	return (TRUE);
+	return (g_global()->exit_status);
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 13:06:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:53:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdin);
 		close(stdout);
 		ft_free_all(shell);
-		exit(0);
+		exit(g_global()->exit_status);
 	}
 	else if (argv[2])
 	{
@@ -44,13 +44,14 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 	{
 		close(stdin);
 		close(stdout);
-		shell->exit_status = ft_atoi(argv[1]);
+		g_global()->exit_status = ft_atoi(argv[1]);
 		ft_free_all(shell);
-		exit(shell->exit_status);
+		exit(g_global()->exit_status);
 	}
 	else
 	{
 		perror(argv[1]);
 		return (1);
 	}
+	return (0);
 }

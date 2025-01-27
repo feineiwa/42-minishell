@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:19:31 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:00:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ static void	execute_command(t_shell *shell)
 	temp = shell->cmd;
 	if (temp && !temp->next)
 		g_global()->exit_status = launch_cmd_without_pipe(shell, temp);
-	// else if (temp->next)
-	// 	g_global()->exit_status = config_with_pipe(shell, temp);
+	else if (temp->next)
+		g_global()->exit_status = config_with_pipe(shell, temp);
 }
 
 int	main(int ac, char **av, char **envp)

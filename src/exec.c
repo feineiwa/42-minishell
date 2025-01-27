@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:41:30 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:54:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ static void	save_fds_standart(int *saved_stdin, int *saved_stdout)
 	*saved_stdout = dup(STDOUT_FILENO);
 }
 
-static t_bool retore_fds_standart(int input_fd, int output_fd, int stdin, int stdout)
+static t_bool	retore_fds_standart(int input_fd, int output_fd, int stdin,
+		int stdout)
 {
 	if (input_fd != -1)
 	{
@@ -106,8 +107,7 @@ static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 	}
 	else if (cmd->flag_err == 2)
 	{
-		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC,
-			0644);
+		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (*output_fd < 0)
 		{
 			perror(cmd->error_file);
@@ -116,8 +116,7 @@ static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 	}
 	else if (cmd->flag_err == 3)
 	{
-		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND,
-			0644);
+		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (*output_fd < 0)
 		{
 			perror(cmd->error_file);
@@ -130,10 +129,10 @@ static t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 
 int	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 {
-	int		saved_stdin;
-	int		saved_stdout;
-	int		input_fd;
-	int		output_fd;
+	int	saved_stdin;
+	int	saved_stdout;
+	int	input_fd;
+	int	output_fd;
 
 	save_fds_standart(&saved_stdin, &saved_stdout);
 	input_fd = -1;
@@ -152,7 +151,7 @@ int	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	}
 	if (cmd->error_file)
 	{
-		if(!handler_error_flag(cmd, &input_fd, &output_fd))
+		if (!handler_error_flag(cmd, &input_fd, &output_fd))
 			return (1);
 	}
 	if (cmd->input_file)
@@ -174,7 +173,7 @@ int	launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	return (g_global()->exit_status);
 }
 
-t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 {
 	int	saved_stdin;
 	int	saved_stdout;
@@ -185,24 +184,25 @@ t_bool	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	input_fd = -1;
 	if (cmd->error_file)
 	{
-		if(!handler_error_flag(cmd, &input_fd, &output_fd))
-			return (FALSE);
+		if (!handler_error_flag(cmd, &input_fd, &output_fd))
+			return (1);
 	}
 	if (cmd->input_file)
 	{
 		input_fd = handler_input_redirection(cmd->input_file);
 		if (!input_fd)
-			return (FALSE);
+			return (1);
 	}
 	output_fd = -1;
 	if (cmd->output_file)
 	{
 		output_fd = handler_output_redirection(cmd, input_fd);
 		if (!output_fd)
-			return (FALSE);
+			return (1);
 	}
-	what_cmd_with_pipe(shell, cmd, saved_stdin, saved_stdout);
+	what_cmd_with_pipe(shell, cmd, saved_stdin,
+			saved_stdout);
 	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
-		return (FALSE);
+		return (1);
 	return (g_global()->exit_status);
 }

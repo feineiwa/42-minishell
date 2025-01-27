@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:36:55 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:51:48 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
 	while (paths[i])
 	{
 		cmd_path = ft_strjoin3(paths[i], "/", cmd->argv[0]);
-		if (access(cmd_path, X_OK) == 0)
+		if (access(cmd_path, X_OK | F_OK) == 0)
 		{
 			ft_free_arr(paths);
 			return (cmd_path);
@@ -129,7 +129,7 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		if (execve(cmd->argv[0], cmd->argv, envp) == -1)
 		{
 			perror(cmd->argv[0]);
-			exit (131);
+			return (1);
 
 		}
 	}
@@ -138,12 +138,12 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	{
 		ft_free_arr(envp);
 		perror(cmd->argv[0]);
-		exit (130);
+		return (1);
 	}
 	if (execve(cmd_path, cmd->argv, envp) == -1)
 	{
 		perror(cmd->argv[0]);
-		exit (131);
+		return (1);
 	}
 	return (0);
 }

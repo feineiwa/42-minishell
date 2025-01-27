@@ -1,27 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   example.c                                          :+:      :+:    :+:   */
+/*   ft_error_parsing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/30 09:53:26 by frahenin          #+#    #+#             */
-/*   Updated: 2024/12/31 11:54:03 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/12 13:20:44 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include "../../inc/minishell.h"
 
-int	main(int ac, char **av)
+void	panic(char *s)
 {
-	(void)ac;
-	int status;
-
-	if (fork() == 0)
-		execvp(av[1], &av[1]);
-	wait(&status);
-	return (0);
+	perror(s);
 }

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parse_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:16:31 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 22:34:09 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 int	ft_is_between(char *str, int index)
 {

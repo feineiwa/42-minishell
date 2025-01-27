@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   extra_libft.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/22 17:55:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 int	ft_isspace(char c)
 {

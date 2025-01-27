@@ -6,11 +6,11 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/24 10:54:06 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 void	ft_free_arr(char **arr)
 {

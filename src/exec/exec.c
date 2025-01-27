@@ -6,11 +6,11 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/24 10:54:37 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 static void	save_fds_standart(int *stdin, int *stdout)
 {

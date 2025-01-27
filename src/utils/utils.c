@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_error_parsing.c                                 :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/12 13:20:44 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/12 13:22:21 by frahenin         ###   ########.fr       */
+/*   Created: 2024/12/30 10:28:39 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-void	panic(char *s)
+void ft_getcwd(char *buf, size_t size)
 {
-	perror(s);
+	if (NULL == getcwd(buf, size))
+		perror("getcwd FAILED");
 }

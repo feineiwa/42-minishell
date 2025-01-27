@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_env.c                                           :+:      :+:    :+:   */
+/*   ft_env_copy.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/11 13:52:38 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:49:18 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 int	ft_search_equ(char *s)
 {
@@ -22,27 +22,6 @@ int	ft_search_equ(char *s)
 	while (s[i] && s[i] != '=')
 		i++;
 	return (i);
-}
-
-void	print_env(t_env *envp)
-{
-	while (envp)
-	{
-		ft_putstr_fd(envp->key, 1);
-		ft_putchar_fd('=', 1);
-		ft_putstr_fd(envp->value, 1);
-		ft_putchar_fd('\n', 1);
-		envp = envp->next;
-	}
-}
-
-t_env	*ft_get_last_env(t_env *envp)
-{
-	if (!envp)
-		return (NULL);
-	while (envp->next)
-		envp = envp->next;
-	return (envp);
 }
 
 void	ft_add_env(t_env **envp, char *arg)
@@ -86,34 +65,4 @@ void	ft_add_env(t_env **envp, char *arg)
 		last = ft_get_last_env(*envp);
 		last->next = new_node;
 	}
-}
-
-char	*ft_get_env_value(t_env *envp, char *key)
-{
-	if (key[0] != '$' || !key)
-		return (NULL);
-	while (envp)
-	{
-		if (!ft_strcmp(key + 1, envp->key))
-			return (envp->value);
-		envp = envp->next;
-	}
-	return (NULL);
-}
-
-void	ft_free_env(t_env **envp)
-{
-	t_env	*tmp;
-
-	if (!*envp || !envp)
-		return ;
-	while (*envp)
-	{
-		tmp = (*envp)->next;
-		ft_free((*envp)->key);
-		ft_free((*envp)->value);
-		ft_free(*envp);
-		*envp = tmp;
-	}
-	ft_free(*envp);
 }

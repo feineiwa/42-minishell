@@ -1,19 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   ft_unset.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/30 10:28:39 by frahenin          #+#    #+#             */
-/*   Updated: 2024/12/30 10:41:03 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/13 09:39:28 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-void ft_getcwd(char *buf, size_t size)
+int	ft_unset(t_shell *shell, t_cmd *cmd)
 {
-	if (NULL == getcwd(buf, size))
-		perror("getcwd FAILED");
+	int	i;
+
+	if (!shell || !cmd)
+		return (1);
+	i = 1;
+	while (cmd->argv[i])
+	{
+		ft_unset_env(&shell->envp, cmd->argv[i]);
+		i++;
+	}
+	return (0);
 }

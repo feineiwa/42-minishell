@@ -6,11 +6,11 @@
 /*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/23 13:22:14 by nrasamim         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:02:39 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 {

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 10:33:02 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 11:59:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	int		j;
 	int		status;
 	t_cmd	*tmp;
+	int		stdout;
+	int		stdin;
 
 	hdoc_fd = handle_heredoc_with_pipe(cmd, shell);
 	if (hdoc_fd == NULL)
@@ -61,11 +63,11 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	i = 0;
 	setup_signal();
 	tmp = cmd;
-	while (cmd)
+	while (tmp)
 	{
-		if (!cmd->argv[0])
+		if (!tmp->argv[0])
 			return (1);
-		if (cmd->next && pipe(pipefd) < 0)
+		if (tmp->next && pipe(pipefd) < 0)
 		{
 			perror("pipe");
 			ft_free(hdoc_fd);
@@ -84,30 +86,31 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		{
 			g_global()->is_runing = 1;
 			setup_signal();
-			if (cmd->hdoc && cmd->hdoc->del)
+			if (tmp->hdoc && tmp->hdoc->del)
 				input_fd = hdoc_fd[i];
-			if (!child_process(cmd, pipefd, input_fd))
+			if (!child_process(tmp, pipefd, input_fd))
 				exit(1);
-			g_global()->exit_status = launch_cmd_with_pipe(shell, cmd);
+			g_global()->exit_status = launch_cmd_with_pipe(shell, tmp);
 			exit(g_global()->exit_status);
 		}
 		else
 		{
 			if (input_fd != -1 && input_fd != hdoc_fd[i])
 				close(input_fd);
-			if (cmd->next)
+			if (tmp->next)
 				close(pipefd[1]);
-			if (cmd->next)
+			if (tmp->next)
 				input_fd = pipefd[0];
 			else
 				input_fd = -1;
 			if (hdoc_fd[i] != -1)
 				close(hdoc_fd[i]);
 		}
-		cmd = cmd->next;
+		tmp = tmp->next;
 		i++;
 	}
 	j = 0;
+	tmp = cmd;
 	while (tmp)
 	{
 		waitpid(pid[j], &status, 0);

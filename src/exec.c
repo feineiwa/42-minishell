@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 18:54:29 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 12:02:46 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	int	input_fd;
 	int	output_fd;
 
-	save_fds_standart(&saved_stdin, &saved_stdout);
+	save_fds_standart(&saved_stdin, &saved_stdout);	
 	input_fd = -1;
 	if (cmd->error_file)
 	{

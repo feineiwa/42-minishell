@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 10:22:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 11:15:37 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				}
 				tmp->output_file = ft_get_arg(shell, tok->value);
 				if ((fd = open(tmp->output_file,
-							O_RDONLY | O_WRONLY | O_TRUNC)) < 0)
+							O_CREAT | O_WRONLY | O_TRUNC, 0644)) < 0)
 				{
 					tmp->error_file = ft_strdup(tmp->output_file);
 					tmp->flag_err = 2;
@@ -273,6 +273,13 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == PIPE)
 		{
+			if (!cmd_list->argv[0])
+			{
+				write(STDERR_FILENO, "syntax error near unexpected token '|'\n",
+					40);
+				ft_free_cmd(&cmd_list);
+				return (NULL);
+			}
 			if (synthax_error(tok))
 			{
 				write(STDERR_FILENO, "syntax error near unexpected token '|'\n",

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:43:12 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/14 18:12:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:38:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	ft_env(t_shell *shell, t_cmd *cmd)
 	if (cmd->argv[1])
 	{
 		write (STDERR_FILENO, "env: too many arguments\n", 24);
-		return (127);
+		return (1);
 	}
 	print_env(shell->envp);
 	return (0);

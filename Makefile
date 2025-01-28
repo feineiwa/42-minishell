@@ -6,7 +6,7 @@
 #    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/21 15:09:59 by frahenin         ###   ########.fr        #
+#    Updated: 2025/01/28 14:58:53 by frahenin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,7 @@ fclean : clean
 re : fclean all
 
 debug : $(NAME)
-	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-origins=yes --suppressions=debug -s ./minishell
+	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
 run : fclean all
 	@clear ; ./minishell

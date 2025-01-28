@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 14:17:28 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 16:33:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,24 @@ int	ft_strlen_expand(char *s)
 	}
 	return (i);
 }
+
+// char	*format_value(char *s)
+// {
+// 	char	*value;
+// 	int		i;
+	
+// 	value = ft_strdup("");
+// 	i = 0;
+// 	while (s[i])
+// 	{
+// 		if (s[i + 1] && ft_is_special(s[i + 1]))
+// 		{
+// 			value = ft_substr()
+// 		}
+// 		i++;
+// 	}
+// 	return (value);
+// }
 
 char	*extract_var(char *s, t_shell *shell)
 {
@@ -63,6 +81,7 @@ char	*extract_var(char *s, t_shell *shell)
 		ft_free(key);
 		return (NULL);
 	}
+	// value = format_value(value);
 	ft_free(key);
 	return (value);
 }

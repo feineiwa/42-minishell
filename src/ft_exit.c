@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/27 18:53:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:20:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,26 +32,35 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		close(stdin);
 		close(stdout);
 		ft_free_all(shell);
+		write(STDOUT_FILENO, "exit\n", 5);
 		exit(g_global()->exit_status);
 	}
-	else if (argv[2])
-	{
-		write(STDERR_FILENO, "exit\n", 5);
-		perror(argv[2]);
-		return (1);
-	}
-	if (ft_is_number(argv[1]))
+	if (!ft_is_number(argv[1]))
 	{
 		close(stdin);
 		close(stdout);
-		g_global()->exit_status = ft_atoi(argv[1]);
+		write(STDOUT_FILENO, "exit\n", 5);
+		ft_putstr_fd(argv[1], 2);
+		ft_putstr_fd(": numeric argument required\n", 2);
+		ft_free_all(shell);
+		g_global()->exit_status = 2;
+		exit (g_global()->exit_status);
+	}
+	if (ft_is_number(argv[1]) && !argv[2])
+	{
+		close(stdin);
+		close(stdout);
+		g_global()->exit_status =  ft_atoi(argv[1]);
+		write(STDOUT_FILENO, "exit\n", 5);
 		ft_free_all(shell);
 		exit(g_global()->exit_status);
 	}
 	else
 	{
-		perror(argv[1]);
-		return (1);
+		write(STDERR_FILENO, "exit\n", 5);
+		ft_putstr_fd("exit: too many arguments\n", 2);
+		g_global()->exit_status = 1;
+		return (g_global()->exit_status);
 	}
 	return (0);
 }

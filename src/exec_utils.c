@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 18:51:48 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 10:30:50 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,9 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 		if (!cmd_path)
 		{
 			ft_free_arr(envp);
-			perror(cmd->argv[0]);
-			exit(1);
+			ft_putstr_fd(cmd->argv[0], 2);
+			ft_putstr_fd(": command not found\n", 2);
+			exit(127);
 		}
 		if (execve(cmd_path, cmd->argv, envp) == -1)
 		{
@@ -137,8 +138,9 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	if (!cmd_path)
 	{
 		ft_free_arr(envp);
-		perror(cmd->argv[0]);
-		return (1);
+		ft_putstr_fd(cmd->argv[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
+		return(127);
 	}
 	if (execve(cmd_path, cmd->argv, envp) == -1)
 	{

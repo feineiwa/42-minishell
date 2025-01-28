@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/21 22:46:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 10:22:00 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ t_bool	synthax_error(t_token *tok)
 		if (tok->next && tok->next->type != ARGS)
 			return (TRUE);
 	if (!ft_strcmp(tok->value, "<<") && tok->type == HEREDOC)
-		if ((tok->next && tok->next->type != ARGS) || (!tok->next || (tok->next && tok->next->type != ARGS)))
+		if ((tok->next && tok->next->type != ARGS) || (!tok->next))
 			return (TRUE);
 	if (!ft_strcmp(tok->value, ">") && tok->type == OUTFILE)
 		if (tok->next && tok->next->type != ARGS)
@@ -182,9 +182,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == OUTFILE)
 		{
-			tok = tok->next;
-			if (!tok)
-				return (NULL);
 			if (synthax_error(tok))
 			{
 				write(STDERR_FILENO, "syntax error near unexpected token\n",
@@ -192,6 +189,9 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				ft_free_cmd(&cmd_list);
 				return (NULL);
 			}
+			tok = tok->next;
+			if (!tok)
+				return (NULL);
 			if (!error_flag)
 			{
 				if (tmp->output_file)
@@ -212,10 +212,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == APPEND)
 		{
-			tmp->append = TRUE;
-			tok = tok->next;
-			if (!tok)
-				return (NULL);
 			if (synthax_error(tok))
 			{
 				write(STDERR_FILENO, "syntax error near unexpected token\n",
@@ -223,6 +219,10 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 				ft_free_cmd(&cmd_list);
 				return (NULL);
 			}
+			tmp->append = TRUE;
+			tok = tok->next;
+			if (!tok)
+				return (NULL);
 			if (tmp->output_file)
 			{
 				ft_free(tmp->output_file);
@@ -273,13 +273,6 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 		}
 		else if (tok->type == PIPE)
 		{
-			if (!cmd_list->argv[0])
-			{
-				write(STDERR_FILENO, "syntax error near unexpected token '|'\n",
-					40);
-				ft_free_cmd(&cmd_list);
-				return (NULL);
-			}
 			if (synthax_error(tok))
 			{
 				write(STDERR_FILENO, "syntax error near unexpected token '|'\n",

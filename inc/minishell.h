@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 18:18:29 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 10:09:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-// # define PROMPT "\033[36mminishell$\033[0m "
-# define PROMPT "minishell$ "
-# define HDOC "\033[1;33m>\033[0m "
+# define PROMPT "\033[36mminishell$\033[0m "
+// # define PROMPT "minishell$ "
+# define HDOC "\033[1;33m>\033[1;0m "
 
 typedef struct g_sig	t_g_sig;
 

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 17:17:20 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:59:26 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,11 +113,10 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	else if (WIFEXITED(status))
 		g_global()->exit_status = WEXITSTATUS(status);
 	while (wait(&status) > 0)
-	{
-		if (WIFSIGNALED(status))
-			if (WTERMSIG(status) == SIGINT)
-				write(STDOUT_FILENO, "\n", 1);
-	}
+		;
+	if (WIFSIGNALED(status))
+		if (WTERMSIG(status) == SIGINT)
+			write(STDOUT_FILENO, "\n", 1);
 	ft_free(hdoc_fd);
 	return (g_global()->exit_status);
 }

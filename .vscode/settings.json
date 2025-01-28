@@ -20,7 +20,14 @@
 		"cstdint": "cpp",
 		"typeinfo": "cpp",
 		"minishell.h": "c",
-		"signal.h": "c"
+		"signal.h": "c",
+		"optional": "c",
+		"ostream": "c",
+		"system_error": "c",
+		"array": "c",
+		"functional": "c",
+		"tuple": "c",
+		"utility": "c"
 	},
 	"C_Cpp.errorSquiggles": "disabled"
 }

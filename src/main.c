@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 18:00:11 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 19:27:31 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static void	execute_command(t_shell *shell)
+void	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
 

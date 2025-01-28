@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 17:20:24 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:50:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 	}
 	else
 	{
-		write(STDERR_FILENO, "exit\n", 5);
+		write(STDOUT_FILENO, "exit\n", 5);
 		ft_putstr_fd("exit: too many arguments\n", 2);
 		g_global()->exit_status = 1;
 		return (g_global()->exit_status);

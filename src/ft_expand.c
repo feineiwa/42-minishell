@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 16:33:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/28 19:26:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,40 @@ int	ft_strlen_expand(char *s)
 	return (i);
 }
 
-// char	*format_value(char *s)
-// {
-// 	char	*value;
-// 	int		i;
+char	*format_value(char *s)
+{
+	char	*value;
+	char	spec[1];
+	char	*tmp;
+	int		i;
+	int		j;
 	
-// 	value = ft_strdup("");
-// 	i = 0;
-// 	while (s[i])
-// 	{
-// 		if (s[i + 1] && ft_is_special(s[i + 1]))
-// 		{
-// 			value = ft_substr()
-// 		}
-// 		i++;
-// 	}
-// 	return (value);
-// }
+	value = ft_strdup("");
+	i = 0;
+	j = 0;
+	spec[1] = '\0';
+	while (s[i])
+	{
+		if (ft_is_belong(s[i]))
+		{
+			spec[0] = ft_is_belong(s[i]);
+			tmp = ft_substr(s, j, i - j);
+			value = ft_strjoin_free(value, tmp);
+			tmp = ft_strjoin3(value, "'", spec);
+			ft_free(value);
+			value = ft_strjoin(tmp, "'");
+			ft_free(tmp);
+			i++;
+			j = i;
+			continue ;
+		}
+		i++;
+	}
+	tmp = ft_strjoin(value, s + j);
+	ft_free(value);
+	ft_free(s);
+	return (tmp);
+}
 
 char	*extract_var(char *s, t_shell *shell)
 {
@@ -81,7 +98,7 @@ char	*extract_var(char *s, t_shell *shell)
 		ft_free(key);
 		return (NULL);
 	}
-	// value = format_value(value);
+	value = format_value(value);
 	ft_free(key);
 	return (value);
 }

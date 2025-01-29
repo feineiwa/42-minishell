@@ -6,19 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/27 17:33:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:43:28 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
-
-void	ft_free(void *ptr)
-{
-	if (!ptr)
-		return ;
-	free(ptr);
-	ptr = NULL;
-}
+#include "../../inc/minishell.h"
 
 int	ft_search_equ(char *s)
 {
@@ -88,42 +80,42 @@ char	*ft_get_env_value(t_env *envp, char *key)
 	return (NULL);
 }
 
+static t_env	*add_new_env(char *key, char *value)
+{
+	t_env	*new;
+
+	new = ft_calloc(sizeof(t_env), 1);
+	new->key = key;
+	new->value = value;
+	new->next = NULL;
+	return (new);
+}
+
 static t_env	*populate_env_list(char **envp)
 {
 	t_env	*env_list;
-	t_env	*new_node;
 	t_env	*tmp;
 	char	*key;
-	char	*value;
 	size_t	i;
 	size_t	j;
 
-	i = 0;
+	i = -1;
 	env_list = NULL;
-	while (envp[i])
+	while (envp[++i])
 	{
-		j = 0;
-		j += ft_search_equ(envp[i]);
+		j = ft_search_equ(envp[i]);
 		if (envp[i][j] == '=')
-		{
 			key = ft_substr(envp[i], 0, j);
-			value = ft_strdup(envp[i] + j + 1);
-		}
-		new_node = ft_calloc(sizeof(t_env), 1);
-		new_node->key = key;
-		new_node->value = value;
-		new_node->next = NULL;
 		if (!env_list)
 		{
-			env_list = new_node;
+			env_list = add_new_env(key, ft_strdup(envp[i] + j + 1));
 			tmp = env_list;
 		}
 		else
 		{
-			tmp->next = new_node;
+			tmp->next = add_new_env(key, ft_strdup(envp[i] + j + 1));
 			tmp = tmp->next;
 		}
-		i++;
 	}
 	return (env_list);
 }
@@ -168,22 +160,4 @@ char	**convert_env_to_array(t_env *envp)
 	}
 	arr_envp[i] = NULL;
 	return (arr_envp);
-}
-
-void	ft_free_env(t_env **envp)
-{
-	t_env	*tmp;
-
-	if (!*envp || !envp)
-		return ;
-	while (*envp)
-	{
-		tmp = (*envp)->next;
-		ft_free((*envp)->key);
-		ft_free((*envp)->value);
-		ft_free(*envp);
-		*envp = tmp;
-	}
-	ft_free(*envp);
-	*envp = NULL;
 }

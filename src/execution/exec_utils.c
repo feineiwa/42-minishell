@@ -6,28 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 10:30:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:11:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-void	ft_free_arr(char **arr)
-{
-	int	i;
-
-	i = 0;
-	if (!arr | !*arr)
-		return ;
-	while (arr[i])
-	{
-		ft_free(arr[i]);
-		i++;
-	}
-	ft_free(arr);
-}
-
-char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
+static char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
 {
 	char	*path;
 	char	**paths;
@@ -57,13 +42,10 @@ char	*resolve_cmd_path(t_shell *shell, t_cmd *cmd)
 int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 {
 	pid_t	pid;
-	char	*cmd_path;
-	char	**envp;
-	int		status;
 
 	setup_signal();
 	pid = fork();
-	if (pid == -1)
+	if (pid < 0)
 	{
 		perror("fork in what_cmd");
 		shell->exit_status = 1;
@@ -74,46 +56,10 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd)
 	{
 		g_global()->is_runing = 1;
 		setup_signal();
-		envp = convert_env_to_array(shell->envp);
-		if (!envp)
-			exit(1);
-		if (ft_strchr(cmd->argv[0], '/'))
-		{
-			if (execve(cmd->argv[0], cmd->argv, envp) == -1)
-			{
-				perror(cmd->argv[0]);
-				exit(1);
-			}
-		}
-		cmd_path = resolve_cmd_path(shell, cmd);
-		if (!cmd_path)
-		{
-			ft_free_arr(envp);
-			ft_putstr_fd(cmd->argv[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
-			exit(127);
-		}
-		if (execve(cmd_path, cmd->argv, envp) == -1)
-		{
-			perror(cmd->argv[0]);
-			exit(1);
-		}
-		exit(0);
+		exit(other_cmd_with_pipe(shell, cmd));
 	}
 	else
-	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			g_global()->exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			g_global()->exit_status = 128 + WTERMSIG(status);
-			if (WTERMSIG(status) == SIGQUIT)
-				write(STDOUT_FILENO, "Quit (core dumped)\n", 20);
-			else if (WTERMSIG(status) == SIGINT)
-				ft_putchar_fd('\n', STDOUT_FILENO);
-		}
-	}
+		handler_signal_fork(pid);
 	return (g_global()->exit_status);
 }
 
@@ -131,7 +77,6 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		{
 			perror(cmd->argv[0]);
 			return (1);
-
 		}
 	}
 	cmd_path = resolve_cmd_path(shell, cmd);
@@ -140,7 +85,7 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		ft_free_arr(envp);
 		ft_putstr_fd(cmd->argv[0], 2);
 		ft_putstr_fd(": command not found\n", 2);
-		return(127);
+		return (127);
 	}
 	if (execve(cmd_path, cmd->argv, envp) == -1)
 	{

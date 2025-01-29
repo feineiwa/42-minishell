@@ -6,11 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 17:53:29 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:53:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 static void	save_fds_standart(int *saved_stdin, int *saved_stdout)
 {
@@ -180,7 +180,7 @@ int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	int	input_fd;
 	int	output_fd;
 
-	save_fds_standart(&saved_stdin, &saved_stdout);	
+	save_fds_standart(&saved_stdin, &saved_stdout);
 	input_fd = -1;
 	if (cmd->error_file)
 	{
@@ -200,8 +200,7 @@ int	launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		if (!output_fd)
 			return (1);
 	}
-	what_cmd_with_pipe(shell, cmd, saved_stdin,
-			saved_stdout);
+	what_cmd_with_pipe(shell, cmd, saved_stdin, saved_stdout);
 	if (!retore_fds_standart(input_fd, output_fd, saved_stdin, saved_stdout))
 		return (1);
 	return (g_global()->exit_status);

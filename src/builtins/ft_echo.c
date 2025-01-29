@@ -6,11 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:28 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/27 17:46:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 12:43:19 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 static t_bool	check_new_line(char *str)
 {

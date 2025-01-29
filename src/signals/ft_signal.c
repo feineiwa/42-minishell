@@ -6,11 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 15:22:20 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 18:45:54 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 void	handle_sigint(int sig)
 {
@@ -35,7 +35,7 @@ void	handle_sigquit(int sig)
 
 t_g_sig	*g_global(void)
 {
-	static t_g_sig	value = {0, 0};
+	static t_g_sig	value = {0, 0, NULL};
 
 	return (&value);
 }

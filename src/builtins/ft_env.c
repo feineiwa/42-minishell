@@ -1,35 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pwd.c                                           :+:      :+:    :+:   */
+/*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/07 11:21:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/12 22:50:53 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/13 08:43:12 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/29 12:43:30 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-void ft_getcwd(char *buf, size_t size)
+void	print_env(t_env *envp)
 {
-	if (NULL == getcwd(buf, size))
-		perror("getcwd FAILED");
+	while (envp)
+	{
+		if (envp->value)
+		{
+			ft_putstr_fd(envp->key, 1);
+			ft_putchar_fd('=', 1);
+			ft_putstr_fd(envp->value, 1);
+			ft_putchar_fd('\n', 1);
+		}
+		envp = envp->next;
+	}
 }
 
-int	ft_pwd(void)
+int	ft_env(t_shell *shell, t_cmd *cmd)
 {
-	char	*cwd;
-
-	cwd = getcwd(NULL, 0);
-	if (cwd)
+	if (cmd->argv[1])
 	{
-		printf("%s\n", cwd);
-		free(cwd);
-		return (0);
+		write (STDERR_FILENO, "env: too many arguments\n", 24);
+		return (1);
 	}
-	else
-		perror("pwd");
-	return (1);
+	print_env(shell->envp);
+	return (0);
 }

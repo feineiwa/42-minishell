@@ -1,50 +1,71 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/12/16 11:21:59 by nrasamim          #+#    #+#              #
-#    Updated: 2025/01/28 14:58:53 by frahenin         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME    =   minishell
 
-NAME	=	minishell
+CC      =   gcc
 
-CC		=	gcc
+FLAGS   =   -Wall -Werror -Wextra
 
-FLAG = -Wall -Werror -Wextra
+DIRLIB  =   ./libft/
+FILELIB =   libft.a
+NAMELFT =   $(addprefix $(DIRLIB), $(FILELIB))
 
-DIRLIB	=	./libft/
-FILELIB	=	libft.a
-NAMELFT	=	$(addprefix $(DIRLIB), $(FILELIB))
+SRCS_DIR    =   src/
+OBJS_DIR    =   obj/
+INCLUDE     =   -I ./inc -I ./libft -lreadline
 
-SRC_DIR	=	src/
-OBJ_DIR	=	obj/
-INCLUDE	=	-I ./inc -I ./libft -lreadline
+PARSE_DIR = parsing/
+PARSE_FILES = ft_expand ft_parse parse_utils
 
-FILES	=	main ft_env_utils ft_parse ft_expand ft_free ft_error_parsing parse_utils extra_libft \
-			exec exec_utils ft_cat ft_echo ft_pwd heredoc pipe ft_export ft_env ft_unset ft_cd ft_exit ft_signal
+BUILTINS_DIR = builtins/
+BUILTINS_FILES = ft_cd ft_echo ft_env ft_exit ft_export ft_pwd ft_unset
 
-SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(FILES)))
-OBJS	=	$(addprefix $(OBJ_DIR), $(FILES:=.o))
+EXEC_DIR = execution/
+EXEC_FILES = exec_utils exec heredoc pipe
+
+SIGNAL_DIR = signals/
+SIGNAL_FILES = ft_signal ft_signal_fork
+
+UTILS_DIR = utils/
+UTILS_FILES = extra_libft ft_env_utils ft_free error_utils
+
+SRC_FILES += $(addprefix $(PARSE_DIR), $(PARSE_FILES))
+SRC_FILES += $(addprefix $(BUILTINS_DIR), $(BUILTINS_FILES))
+SRC_FILES += $(addprefix $(EXEC_DIR), $(EXEC_FILES))
+SRC_FILES += $(addprefix $(SIGNAL_DIR), $(SIGNAL_FILES))
+SRC_FILES += $(addprefix $(UTILS_DIR), $(UTILS_FILES))
+SRC_FILES += main
+
+SRCS = $(addprefix $(SRCS_DIR), $(addsuffix .c, $(SRC_FILES)))
+OBJS = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))
+
+OBJSF = .cache_exits
+
+
+####################################################################
 
 all : $(NAME)
 
-$(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)
+$(NAME) : $(OBJSF) $(OBJS)
+	@make -C $(DIRLIB)
+	$(CC) $(FLAGS) $(OBJS) $(NAMELFT) $(INCLUDE) -o $(NAME)
 
-$(NAME) : $(OBJS)
-	make -C $(DIRLIB)
-	$(CC) $(FLAG) $(OBJS) $(NAMELFT) $(INCLUDE) -o $(NAME)
+$(OBJ_SUBDIRS):
+	@mkdir -p $@
 
-$(OBJ_DIR)%.o : $(SRC_DIR)%.c $(OBJ_DIR)
-	$(CC) $(FLAG) $(INCLUDE) -c $< -o $@
+$(OBJS_DIR)%.o : $(SRCS_DIR)%.c | $(OBJ_SUBDIRS)
+	$(CC) $(FLAGS) $(INCLUDE) -c $< -o $@
+
+$(OBJSF):
+	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(OBJS_DIR)$(PARSE_DIR)
+	@mkdir -p $(OBJS_DIR)$(BUILTINS_DIR)
+	@mkdir -p $(OBJS_DIR)$(EXEC_DIR)
+	@mkdir -p $(OBJS_DIR)$(SIGNAL_DIR)
+	@mkdir -p $(OBJS_DIR)$(UTILS_DIR)
 
 clean :
-	@ make clean -C $(DIRLIB)
-	@rm -rf $(OBJ_DIR)
+	@make clean -C $(DIRLIB)
+	@rm -rf $(OBJS_DIR)
+	@rm -rf $(OBJSF)
 
 fclean : clean
 	@make fclean -C $(DIRLIB)
@@ -53,9 +74,9 @@ fclean : clean
 re : fclean all
 
 debug : $(NAME)
-	make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
+	@make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
 run : fclean all
-	@clear ; ./minishell
+	@clear && ./minishell
 
-.PHONY : all clean fclean re
+.PHONY : all clean fclean re run debug

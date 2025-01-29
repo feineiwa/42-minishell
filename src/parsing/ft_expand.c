@@ -6,11 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 19:26:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:26:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 int	ft_strlen_expand(char *s)
 {
@@ -40,32 +40,25 @@ char	*format_value(char *s)
 	char	*tmp;
 	int		i;
 	int		j;
-	
+
 	value = ft_strdup("");
-	i = 0;
+	i = -1;
 	j = 0;
 	spec[1] = '\0';
-	while (s[i])
+	while (s[++i])
 	{
 		if (ft_is_belong(s[i]))
 		{
 			spec[0] = ft_is_belong(s[i]);
-			tmp = ft_substr(s, j, i - j);
-			value = ft_strjoin_free(value, tmp);
+			value = ft_strjoin_free(value, ft_substr(s, j, i - j));
 			tmp = ft_strjoin3(value, "'", spec);
 			ft_free(value);
-			value = ft_strjoin(tmp, "'");
-			ft_free(tmp);
-			i++;
-			j = i;
-			continue ;
+			value = ft_strjoin_s1(tmp, "'");
+			j = i + 1;
 		}
-		i++;
 	}
-	tmp = ft_strjoin(value, s + j);
-	ft_free(value);
-	ft_free(s);
-	return (tmp);
+	value = ft_strjoin_free(value, ft_strdup(s + j));
+	return (ft_free(s), value);
 }
 
 char	*extract_var(char *s, t_shell *shell)
@@ -77,7 +70,7 @@ char	*extract_var(char *s, t_shell *shell)
 
 	if (!s || !shell->envp)
 		return (NULL);
-	i = 0;
+	i = -1;
 	value = NULL;
 	key = NULL;
 	len = ft_strlen_expand(s);
@@ -86,22 +79,16 @@ char	*extract_var(char *s, t_shell *shell)
 	key = malloc(sizeof(char) * (len + 1));
 	if (!key)
 		return (NULL);
-	while (i < len)
-	{
+	while (++i < len)
 		key[i] = s[i];
-		i++;
-	}
 	key[i] = '\0';
 	value = ft_strdup(ft_get_env_value(shell->envp, key));
 	if (!value)
-	{
-		ft_free(key);
-		return (NULL);
-	}
+		return (ft_free(key), NULL);
 	value = format_value(value);
-	ft_free(key);
-	return (value);
+	return (ft_free(key), value);
 }
+
 char	*ft_strjoin_s1(char *s1, char *s2)
 {
 	char	*str;
@@ -158,37 +145,41 @@ t_bool	ft_is_special(char c)
 	return (0);
 }
 
+static t_bool	after_here_condition(char *s, int j)
+{
+	if (!s)
+		return (FALSE);
+	if ((s[j] && s[j] == '<') && (s[j + 1] && s[j + 1] == '<')
+		&& (!ft_is_between(s, j)))
+		return (TRUE);
+	return (FALSE);
+}
+
 int	ft_is_after_here(char *s, int i)
 {
-	int	j;
-	char quote;
+	int		j;
+	char	quote;
 
 	j = 0;
 	while (j <= i)
 	{
-		if ((s[j] && s[j] == '<') && (s[j + 1] && s[j + 1] == '<') && !ft_is_between(s, j))
+		if (after_here_condition(s, j))
 		{
-			j += 2;
-			j += ft_skip_space(s + j);
+			j += 2 + ft_skip_space(s + j + 2);
 			if (ft_is_quote(s[j]))
 			{
-				quote = s[j];
-				j++;
+				quote = s[j++];
 				while (s[j] && s[j] != quote && j < i)
 					j++;
 				if (s[j] == quote)
 					j++;
 			}
 			else
-			{
 				while (s[j] && !ft_isspace(s[j]) && j < i)
 					j++;
-			}
-			if (j == i)
-				return (1);
+			return (j == i);
 		}
-		else
-			j++;
+		j++;
 	}
 	return (0);
 }
@@ -208,11 +199,38 @@ t_bool	ft_is_expanded(char *s, int i)
 	return (FALSE);
 }
 
+static void	expand_status(char *s, int *start, int *i, char **expanded)
+{
+	char	*value;
+
+	value = NULL;
+	*expanded = ft_strjoin_free(*expanded, ft_strndup(s + *start, *i - *start));
+	value = ft_itoa(g_global()->exit_status);
+	if (value)
+		*expanded = ft_strjoin_free(*expanded, value);
+	*i += 2;
+	*start = *i;
+}
+
+static void	expand_variable(char *s, int *start, int *i, char **expanded)
+{
+	char	*value;
+
+	value = NULL;
+	*expanded = ft_strjoin_free(*expanded, ft_strndup(s + *start, *i - *start));
+	value = extract_var(s + *i, g_global()->shell);
+	if (value)
+		*expanded = ft_strjoin_free(*expanded, value);
+	else
+		*expanded = ft_strjoin_s1(*expanded, "");
+	*i += ft_strlen_expand(s + *i);
+	*start = *i;
+}
+
 char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 {
 	int		i;
 	char	*expanded;
-	char	*value;
 	int		start;
 
 	if (!shell->envp || !s)
@@ -220,79 +238,45 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	i = 0;
 	expanded = ft_strdup("");
 	start = 0;
-	value = 0;
+	g_global()->shell = shell;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || s[i + 1] == '_')))
-		{
-			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			value = extract_var(s + i, shell);
-			if (value)
-				expanded = ft_strjoin_free(expanded, value);
-			else
-				expanded = ft_strjoin_s1(expanded, "");
-			i += ft_strlen_expand(s + i);
-			start = i;
-		}
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) \
+			|| s[i + 1] == '_')))
+			expand_variable(s, &start, &i, &expanded);
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
-		{
-			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			value = ft_itoa(shell->exit_status);
-			if (value)
-				expanded = ft_strjoin_free(expanded, value);
-			i += 2;
-			start = i;
-		}
+			expand_status(s, &start, &i, &expanded);
 		else
 			i++;
 	}
-	expanded = ft_strjoin_free(expanded, ft_strdup(s + start));
-	return (expanded);
+	return (expanded = ft_strjoin_free(expanded, ft_strdup(s + start)));
 }
 
 char	*ft_expand(t_shell *shell, char *s)
 {
 	int		i;
 	char	*expanded;
-	char	*value;
 	int		start;
 
 	if (!shell->envp || !s)
 		return (NULL);
-	i = 0;
 	expanded = ft_strdup("");
+	i = 0;
 	start = 0;
 	while (s[i])
 	{
 		if (s[i] == '$' && (!ft_is_between(s, i)) && ft_is_quote(s[i + 1]))
 		{
-			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			i++;
-			start = i;
+			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i
+						- start));
+			start = ++i;
 		}
 		else if (s[i] == '$' && s[i + 1] == '?' && !ft_is_after_here(s, i))
-		{
-			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			value = ft_itoa(g_global()->exit_status);
-			if (value)
-				expanded = ft_strjoin_free(expanded, value);
-			i += 2;
-			start = i;
-		}
+			expand_status(s, &start, &i, &expanded);
 		else if (ft_is_expanded(s, i))
-		{
-			expanded = ft_strjoin_free(expanded, ft_strndup(s + start, i - start));
-			value = extract_var(s + i, shell);
-			if (value)
-				expanded = ft_strjoin_free(expanded, value);
-			else
-				expanded = ft_strjoin_s1(expanded, "");
-			i += ft_strlen_expand(s + i);
-			start = i;
-		}
+			expand_variable(s, &start, &i, &expanded);
 		else
 			i++;
 	}
-	expanded = ft_strjoin_free(expanded, ft_strdup(s + start));
-	return (expanded);
+	return (ft_strjoin_free(expanded, ft_strdup(s + start)));
 }

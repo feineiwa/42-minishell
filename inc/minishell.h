@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 11:47:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 18:49:50 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 # include "../libft/libft.h"
 # include <errno.h>
 # include <fcntl.h>
-# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
@@ -30,6 +30,8 @@
 # define HDOC "\033[1;33m>\033[1;0m "
 
 typedef struct g_sig	t_g_sig;
+typedef struct s_shell	t_shell;
+
 
 typedef enum e_bool
 {
@@ -86,14 +88,16 @@ struct					g_sig
 {
 	int					is_runing;
 	int					exit_status;
+	t_shell				*shell;
+	
 };
 
-typedef struct s_shell
+struct s_shell
 {
 	t_env				*envp;
 	t_cmd				*cmd;
 	int					exit_status;
-}						t_shell;
+};
 
 void					ft_free(void *ptr);
 
@@ -116,8 +120,6 @@ char					*ft_expand_for_hdoc(t_shell *shell, char *s);
 // PARSE UTILS
 int						count_quotes(char *input);
 
-void					panic(char *s);
-int						ft_fork(void);
 int						ft_isspace(char c);
 int						ft_is_between(char *str, int index);
 int						ft_skip_space(char *str);
@@ -140,6 +142,7 @@ void					ft_free_cmd(t_cmd **cmd);
 void					ft_free_env(t_env **envp);
 void					ft_free_all(t_shell *shell);
 void					ft_free_arr(char **arr);
+void					ft_free_pipe(int *pipefd, int *hdoc_fd);
 
 // extra_libft
 void					*ft_realloc(void *ptr, size_t old_size,
@@ -161,10 +164,8 @@ int						handle_heredoc(t_cmd *cmd, t_shell *shell);
 int						*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell);
 int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
-char					*resolve_cmd_path(t_shell *shell, t_cmd *cmd);
 
 // BUILTINS
-int						ft_cat(char *filename);
 int						ft_echo(char **args);
 int						ft_pwd(void);
 int						ft_export(t_shell *shell, t_cmd *cmd);
@@ -175,9 +176,13 @@ int						ft_exit(t_shell *shell, char **argv, int stdin,
 int						ft_cd(t_cmd *cmd, t_env *envp);
 
 // SIGNALS
+int						handler_signal_pipe(pid_t pid);
+void					handler_signal_fork(pid_t pid);
 void					handle_sigint(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);
 void					ignore_sig(void);
+
+void					print_err(char *s1, char *s2, char *s3, int fd);
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/28 19:27:31 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 15:55:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-void	execute_command(t_shell *shell)
+static void	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
 
@@ -24,46 +24,47 @@ void	execute_command(t_shell *shell)
 		g_global()->exit_status = config_with_pipe(shell, temp);
 }
 
-int	main(int ac, char **av, char **envp)
+static void	prompt_loop(t_shell *shell)
 {
-	t_shell				shell;
-	char				*input;
+	char	*input;
 
-	(void)ac;
-	(void)av;
 	input = NULL;
-	shell = init_shell(envp);
-	if (!shell.envp)
-	{
-		perror("env error");
-		exit(EXIT_FAILURE);
-	}
 	while (42)
 	{
 		g_global()->is_runing = 0;
 		setup_signal();
 		input = readline(PROMPT);
-		if (input == NULL)
-		{
-			ft_putstr_fd("exit\n", STDOUT_FILENO);
+		if (!input)
 			break ;
-		}
 		if (input && *input)
 		{
 			add_history(input);
-			shell.cmd = parsing(&shell, input);
-			if (!shell.cmd)
-			{
+			shell->cmd = parsing(shell, input);
+			if (!shell->cmd)
 				g_global()->exit_status = 1;
-				ft_free(input);
-				continue ;
+			else
+			{
+				execute_command(shell);
+				ft_free_cmd(&shell->cmd);
 			}
-			execute_command(&shell);
-			ft_free_cmd(&shell.cmd);
+			ft_free(input);
 		}
-		ft_free(input);
 	}
 	rl_clear_history();
-	ft_free_env(&shell.envp);
-	return (g_global()->exit_status);
+}
+
+int	main(int ac, char **av, char **envp)
+{
+	t_shell	shell;
+
+	(void)av;
+	if (ac != 1)
+		return (print_err("just write ./minishell to run the program\n", NULL,
+				NULL, 2), 1);
+	shell = init_shell(envp);
+	if (!shell.envp)
+		return (print_err("error env\n", NULL, NULL, 2), 1);
+	prompt_loop(&shell);
+	ft_putstr_fd("exit\n", STDOUT_FILENO);
+	return (ft_free_env(&shell.envp), g_global()->exit_status);
 }

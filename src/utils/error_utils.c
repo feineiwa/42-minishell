@@ -1,28 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_unset.c                                         :+:      :+:    :+:   */
+/*   error_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 09:39:28 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/13 10:06:13 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/29 14:36:34 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/29 17:24:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-int	ft_unset(t_shell *shell, t_cmd *cmd)
+void	print_err(char *s1, char *s2, char *s3, int fd)
+{
+	if (s1)
+		ft_putstr_fd(s1, fd);
+	if (s2)
+		ft_putstr_fd(s2, fd);
+	if (s3)
+		ft_putstr_fd(s3, fd);
+}
+
+void	ft_free_pipe(int *pipefd, int *hdoc_fd)
+{
+	close(pipefd[0]);
+	close(pipefd[1]);
+	ft_free(hdoc_fd);
+	ft_free(pipefd);
+}
+
+void	ft_free_arr(char **arr)
 {
 	int	i;
 
-	if (!shell || !cmd)
-		return (1);
-	i = 1;
-	while (cmd->argv[i])
+	i = 0;
+	if (!arr | !*arr)
+		return ;
+	while (arr[i])
 	{
-		ft_unset_env(&shell->envp, cmd->argv[i]);
+		ft_free(arr[i]);
 		i++;
 	}
-	return (0);
+	ft_free(arr);
 }

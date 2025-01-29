@@ -6,11 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/15 07:47:15 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:52:40 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 void	print_export(t_shell *shell)
 {
@@ -22,7 +22,7 @@ void	print_export(t_shell *shell)
 
 	i = shell->envp;
 	while (i)
-	{	
+	{
 		j = i->next;
 		while (j)
 		{
@@ -53,7 +53,6 @@ void	print_export(t_shell *shell)
 			printf("declare -x %s\n", tmp->key);
 		tmp = tmp->next;
 	}
-	
 }
 
 void	ft_add_env(t_env **envp, char *arg)
@@ -75,13 +74,15 @@ void	ft_add_env(t_env **envp, char *arg)
 	current = *envp;
 	while (current)
 	{
-		if (!ft_strcmp(current->key, key))
+		if (!ft_strcmp(current->key, key) && arg[i] == '=')
 		{
 			ft_free(current->value);
 			current->value = ft_strdup(arg + i + 1);
 			ft_free(key);
 			return ;
 		}
+		else if (!ft_strcmp(current->key, key) && arg[i] != '=')
+			return ;
 		current = current->next;
 	}
 	new_node = ft_calloc(sizeof(t_env), 1);
@@ -121,6 +122,6 @@ int	ft_export(t_shell *shell, t_cmd *cmd)
 	if (!cmd->argv[i])
 		print_export(shell);
 	while (cmd->argv[i])
-		ft_add_env(&shell->envp,cmd->argv[i++]);
+		ft_add_env(&shell->envp, cmd->argv[i++]);
 	return (status);
 }

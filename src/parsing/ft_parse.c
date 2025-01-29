@@ -6,26 +6,33 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/28 19:27:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:40:03 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
-int	ft_fork(void)
+static int	skip_quotes(char *tok, char *arg, int *i, int *j)
 {
-	int	pid;
+	char	quote;
 
-	pid = fork();
-	if (pid == -1)
-		panic("fork");
-	return (pid);
+	quote = ft_is_quote(tok[*i]);
+	(*i)++;
+	while (tok[*i] && quote)
+	{
+		if (ft_is_quote(tok[*i]) == quote)
+		{
+			(*i)++;
+			return (1);
+		}
+		arg[(*j)++] = tok[(*i)++];
+	}
+	return (0);
 }
 
 char	*ft_get_arg(t_shell *shell, char *tok)
 {
 	char	*arg;
-	char	quote;
 	int		i;
 	int		j;
 
@@ -36,27 +43,10 @@ char	*ft_get_arg(t_shell *shell, char *tok)
 		return (NULL);
 	i = 0;
 	j = 0;
-	quote = 0;
 	while (tok[i])
 	{
-		if (ft_is_quote(tok[i]))
-		{
-			quote = ft_is_quote(tok[i]);
-			i++;
-			while (tok[i] && quote)
-			{
-				if (ft_is_quote(tok[i]) == quote)
-				{
-					quote = 0;
-					i++;
-					continue ;
-				}
-				arg[j++] = tok[i++];
-			}
-			if (tok[i] == '\0')
-				break ;
+		if (ft_is_quote(tok[i]) && skip_quotes(tok, arg, &i, &j))
 			continue ;
-		}
 		arg[j++] = tok[i++];
 	}
 	arg[j] = 0;
@@ -303,16 +293,27 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	return (cmd_list);
 }
 
+t_token	*add_new_token(char *s)
+{
+	t_token	*new_tok;
+
+	new_tok = (t_token *)malloc(sizeof(t_token));
+	if (!new_tok)
+		return (NULL);
+	new_tok->value = s;
+	new_tok->next = NULL;
+	new_tok->type = assign_type(s);
+	return (new_tok);
+}
+
 t_token	*lexer_input(char *input)
 {
 	t_token	*tok;
-	t_token	*new_tok;
 	t_token	*tmp;
 	char	*token;
 
 	if (!input)
 		return (NULL);
-	new_tok = NULL;
 	tok = NULL;
 	token = NULL;
 	while (1)
@@ -320,20 +321,14 @@ t_token	*lexer_input(char *input)
 		token = ft_strtok_quoted(input);
 		if (!token)
 			break ;
-		new_tok = (t_token *)malloc(sizeof(t_token));
-		if (!new_tok)
-			return (NULL);
-		new_tok->value = token;
-		new_tok->next = NULL;
-		new_tok->type = assign_type(token);
 		if (!tok)
 		{
-			tok = new_tok;
+			tok = add_new_token(token);
 			tmp = tok;
 		}
 		else
 		{
-			tmp->next = new_tok;
+			tmp->next = add_new_token(token);
 			tmp = tmp->next;
 		}
 	}
@@ -351,22 +346,16 @@ t_cmd	*parsing(t_shell *shell, char *input)
 		write(STDERR_FILENO, "Error: the quotes should be close\n", 35);
 		return (NULL);
 	}
+	g_global()->shell = shell;
 	expand = ft_expand(shell, input);
 	if (!expand)
 		return (NULL);
 	tok = lexer_input(expand);
 	if (!tok)
-	{
-		ft_free(expand);
-		return (NULL);
-	}
+		return (ft_free(expand), NULL);
 	ft_free(expand);
 	shell->cmd = parse_into_cmd(shell, tok);
 	if (!shell->cmd)
-	{
-		ft_free_token(tok);
-		return (NULL);
-	}
-	ft_free_token(tok);
-	return (shell->cmd);
+		return (ft_free_token(tok), NULL);
+	return (ft_free_token(tok), shell->cmd);
 }

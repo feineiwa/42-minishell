@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   example.c                                          :+:      :+:    :+:   */
+/*   ft_unset.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/30 09:53:26 by frahenin          #+#    #+#             */
-/*   Updated: 2024/12/31 11:54:03 by frahenin         ###   ########.fr       */
+/*   Created: 2025/01/13 09:39:28 by frahenin          #+#    #+#             */
+/*   Updated: 2025/01/29 12:43:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include "../../inc/minishell.h"
 
-int	main(int ac, char **av)
+int	ft_unset(t_shell *shell, t_cmd *cmd)
 {
-	(void)ac;
-	int status;
+	int	i;
 
-	if (fork() == 0)
-		execvp(av[1], &av[1]);
-	wait(&status);
+	if (!shell || !cmd)
+		return (1);
+	i = 1;
+	while (cmd->argv[i])
+	{
+		ft_unset_env(&shell->envp, cmd->argv[i]);
+		i++;
+	}
 	return (0);
 }

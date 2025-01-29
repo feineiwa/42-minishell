@@ -46,12 +46,9 @@ all : $(NAME)
 
 $(NAME) : $(OBJSF) $(OBJS)
 	@make -C $(DIRLIB)
-	$(CC) $(FLAGS) $(OBJS) $(NAMELFT) $(INCLUDE) -o $(NAME)
+	$(CC) $(FLAGS) $(OBJS) $(NAMELFT) $(INCLUDE) -o $@
 
-$(OBJ_SUBDIRS):
-	@mkdir -p $@
-
-$(OBJS_DIR)%.o : $(SRCS_DIR)%.c | $(OBJ_SUBDIRS)
+$(OBJS_DIR)%.o : $(SRCS_DIR)%.c
 	$(CC) $(FLAGS) $(INCLUDE) -c $< -o $@
 
 $(OBJSF):
@@ -61,6 +58,7 @@ $(OBJSF):
 	@mkdir -p $(OBJS_DIR)$(EXEC_DIR)
 	@mkdir -p $(OBJS_DIR)$(SIGNAL_DIR)
 	@mkdir -p $(OBJS_DIR)$(UTILS_DIR)
+	@touch $(OBJSF)
 
 clean :
 	@make clean -C $(DIRLIB)

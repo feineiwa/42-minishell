@@ -64,8 +64,8 @@ all: $(NAME)
 
 
 ${NAME} : ${OBJS}
-	@$(AR) ${NAME} ${OBJS}
-	@ranlib $(NAME)
+	@$(AR) $@ $?
+	@ranlib $@
 	@echo "$(GREEN)libft compiled!$(DEF_COLOR)"
 	
 $(OBJS_DIR)%.o : %.c | $(OBJSF)
@@ -80,6 +80,7 @@ $(OBJSF) :
 	@mkdir -p $(OBJS_DIR)$(FTTO_DIR)
 	@mkdir -p $(OBJS_DIR)$(FTSTR_DIR)
 	@mkdir -p $(OBJS_DIR)$(FTLST_DIR)
+	@touch $(OBJSF)
 
 clean:
 	@${RM} $(OBJS_DIR)

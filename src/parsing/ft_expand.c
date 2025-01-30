@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 19:26:29 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:44:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,24 @@ char	*format_value(char *s)
 		if (ft_is_belong(s[i]))
 		{
 			spec[0] = ft_is_belong(s[i]);
+			value = ft_strjoin_free(value, ft_substr(s, j, i - j));
+			tmp = ft_strjoin3(value, "'", spec);
+			ft_free(value);
+			value = ft_strjoin_s1(tmp, "'");
+			j = i + 1;
+		}
+		else if (s[i] == '\'')
+		{
+			spec[0] = s[i];
+			value = ft_strjoin_free(value, ft_substr(s, j, i - j));
+			tmp = ft_strjoin3(value, "\"", spec);
+			ft_free(value);
+			value = ft_strjoin_s1(tmp, "\"");
+			j = i + 1;
+		}
+		else if (s[i] == '"')
+		{
+			spec[0] = s[i];
 			value = ft_strjoin_free(value, ft_substr(s, j, i - j));
 			tmp = ft_strjoin3(value, "'", spec);
 			ft_free(value);
@@ -212,6 +230,18 @@ static void	expand_status(char *s, int *start, int *i, char **expanded)
 	*start = *i;
 }
 
+static char	*add_double_quotes(char *s)
+{
+	char	*value;
+
+	value = NULL;
+	value = ft_strjoin3("\"", s, "\"");
+	if (!value)
+		return (NULL);
+	ft_free(s);
+	return (value);
+}
+
 static void	expand_variable(char *s, int *start, int *i, char **expanded)
 {
 	char	*value;
@@ -219,6 +249,8 @@ static void	expand_variable(char *s, int *start, int *i, char **expanded)
 	value = NULL;
 	*expanded = ft_strjoin_free(*expanded, ft_strndup(s + *start, *i - *start));
 	value = extract_var(s + *i, g_global()->shell);
+	if (ft_is_between(s, *i) == '"')
+		value = add_double_quotes(value);
 	if (value)
 		*expanded = ft_strjoin_free(*expanded, value);
 	else
@@ -241,8 +273,8 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	g_global()->shell = shell;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) \
-			|| s[i + 1] == '_')))
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || s[i
+					+ 1] == '_')))
 			expand_variable(s, &start, &i, &expanded);
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
 			expand_status(s, &start, &i, &expanded);

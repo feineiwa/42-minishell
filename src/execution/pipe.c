@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/29 16:05:35 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:46:26 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *pipefd,
 		*input_fd = hdoc_fd;
 	if (!update_std_fds(cmd, pipefd, *input_fd))
 		exit(1);
-	g_global()->exit_status = launch_cmd_with_pipe(shell, cmd);
+	g_global()->exit_status = launch_cmd(shell, cmd, 1);
 	if (!cmd->argv[0])
 	{
 		close(pipefd[1]);

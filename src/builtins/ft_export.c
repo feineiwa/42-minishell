@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 16:52:40 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:10:47 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,31 @@ void	print_export(t_shell *shell)
 	}
 }
 
-void	ft_add_env(t_env **envp, char *arg)
+int	ft_search_equ_add_env(char *s)
+{
+	size_t	i;
+
+	if (!s)
+		return (-1);
+	i = 0;
+	if ((!ft_isalpha(s[i]) && s[i] != '_'))
+	{
+		print_err("export: ", s, ": not a valid indentifier\n", 2);
+		return (-1);
+	}
+	while (s[i] && s[i] != '=')
+	{
+		if (!ft_isalnum(s[i]) && s[i] != '_')
+		{
+			print_err("export: ", s, ": not a valid indentifier\n", 2);
+			return (-1);
+		}
+		i++;
+	}
+	return (i);
+}
+
+int	ft_add_env(t_env **envp, char *arg)
 {
 	int		i;
 	char	*key;
@@ -65,12 +89,12 @@ void	ft_add_env(t_env **envp, char *arg)
 
 	i = 0;
 	key = NULL;
-	i = ft_search_equ(arg);
+	i = ft_search_equ_add_env(arg);
 	if (i < 0)
-		return ;
+		return (1);
 	key = ft_substr(arg, 0, i);
 	if (!key)
-		return ;
+		return (1);
 	current = *envp;
 	while (current)
 	{
@@ -79,15 +103,15 @@ void	ft_add_env(t_env **envp, char *arg)
 			ft_free(current->value);
 			current->value = ft_strdup(arg + i + 1);
 			ft_free(key);
-			return ;
+			return (1);
 		}
 		else if (!ft_strcmp(current->key, key) && arg[i] != '=')
-			return ;
+			return (1);
 		current = current->next;
 	}
 	new_node = ft_calloc(sizeof(t_env), 1);
 	if (!new_node)
-		return ;
+		return (1);
 	if (arg[i] == '=')
 	{
 		new_node->key = key;
@@ -110,18 +134,20 @@ void	ft_add_env(t_env **envp, char *arg)
 		last = ft_get_last_env(*envp);
 		last->next = new_node;
 	}
+	return (0);
 }
 
 int	ft_export(t_shell *shell, t_cmd *cmd)
 {
 	int	i;
-	int	status;
 
 	i = 1;
-	status = 0;
 	if (!cmd->argv[i])
 		print_export(shell);
 	while (cmd->argv[i])
-		ft_add_env(&shell->envp, cmd->argv[i++]);
-	return (status);
+	{
+		if (ft_add_env(&shell->envp, cmd->argv[i++]))
+			return (1);
+	}
+	return (0);
 }

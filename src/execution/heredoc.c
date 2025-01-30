@@ -6,22 +6,58 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/29 14:53:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:48:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
+static void	read_heredoc(t_hdoc *hdoc, t_shell *shell, int pipe_fd[2])
 {
 	char	*content;
+	char	*expand;
+
+	while (42)
+	{
+		content = readline(HDOC);
+		if (content == NULL)
+		{
+			ft_putendl_fd("warning: here-document delimited by end-of-file", 2);
+			break ;
+		}
+		if (!ft_strcmp(content, hdoc->del))
+		{
+			ft_free(content);
+			break ;
+		}
+		if (hdoc->expanded)
+		{
+			expand = ft_expand_for_hdoc(shell, content);
+			ft_free(content);
+			content = expand;
+		}
+		close(pipe_fd[0]);
+		if (hdoc->next)
+		{
+			ft_free(content);
+			continue ;
+		}
+		else
+		{
+			write(pipe_fd[1], content, ft_strlen(content));
+			write(pipe_fd[1], "\n", 1);
+			ft_free(content);
+		}
+	}
+}
+
+static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
+{
 	int		pipe_fd[2];
 	pid_t	pid;
-	char	*expand;
-	int		in_fd;
 	int		status;
 
-	if (pipe(pipe_fd) == -1)
+	if (pipe(pipe_fd) < 0)
 	{
 		perror("pipe");
 		return (-1);
@@ -39,71 +75,16 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 		close(pipe_fd[0]);
 		while (hdoc)
 		{
-			while (42)
-			{
-				content = readline(HDOC);
-				if (content == NULL)
-				{
-					ft_putendl_fd("warning: here-document delimited by end-of-file",
-						2);
-					break ;
-				}
-				if (!ft_strcmp(content, hdoc->del))
-				{
-					ft_free(content);
-					break ;
-				}
-				if (hdoc->expanded)
-				{
-					expand = ft_expand_for_hdoc(shell, content);
-					ft_free(content);
-					content = expand;
-				}
-				close(pipe_fd[0]);
-				if (hdoc->next)
-				{
-					ft_free(content);
-					continue ;
-				}
-				else
-				{
-					write(pipe_fd[1], content, ft_strlen(content));
-					write(pipe_fd[1], "\n", 1);
-					ft_free(content);
-				}
-			}
+			read_heredoc(hdoc, shell, pipe_fd);
 			hdoc = hdoc->next;
 		}
 		exit(0);
 	}
 	else
 	{
-		close(pipe_fd[1]);
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-		{
-			g_global()->exit_status = WEXITSTATUS(status);
-			if (cmd->input_file)
-			{
-				close(pipe_fd[0]);
-				if ((in_fd = open(cmd->input_file, O_RDONLY) < 0))
-				{
-					g_global()->exit_status = 1;
-					return (-1);
-				}
-				close(in_fd);
-			}
-		}
-		else if (WIFSIGNALED(status))
-		{
-			g_global()->exit_status = 128 + WTERMSIG(status);
-			if (WTERMSIG(status) == SIGINT)
-			{
-				close(pipe_fd[0]);
-				write (STDOUT_FILENO, "\n", 1);
-				return (-2);
-			}
-		}
+		status = handler_signal_hdoc(pipe_fd, pid, cmd);
+		if (status < 0)
+			return (status);
 	}
 	return (pipe_fd[0]);
 }

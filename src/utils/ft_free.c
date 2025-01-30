@@ -6,19 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 16:43:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 14:54:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-void	ft_free(void *ptr)
-{
-	if (!ptr)
-		return ;
-	free(ptr);
-	ptr = NULL;
-}
 
 void	ft_free_token(t_token *tok)
 {
@@ -102,11 +94,4 @@ void	ft_free_env(t_env **envp)
 	}
 	ft_free(*envp);
 	*envp = NULL;
-}
-
-void	ft_free_all(t_shell *shell)
-{
-	rl_clear_history();
-	ft_free_cmd(&shell->cmd);
-	ft_free_env(&shell->envp);
 }

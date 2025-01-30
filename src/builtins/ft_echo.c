@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:28 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/29 12:43:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 12:48:30 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ static t_bool	check_new_line(char *str)
 	if (str[i] && str[i] == '-')
 	{
 		++i;
-		while (str[i] && str[i] == 'n')
+		if (str[i] != 'n')
+			return (FALSE);
+		while (str[i] == 'n')
 			i++;
 		if (str[i] == '\0')
 			return (TRUE);

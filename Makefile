@@ -19,13 +19,13 @@ BUILTINS_DIR = builtins/
 BUILTINS_FILES = ft_cd ft_echo ft_env ft_exit ft_export ft_pwd ft_unset
 
 EXEC_DIR = execution/
-EXEC_FILES = exec_utils exec heredoc pipe
+EXEC_FILES = exec_utils exec heredoc pipe redirection
 
 SIGNAL_DIR = signals/
 SIGNAL_FILES = ft_signal ft_signal_fork
 
 UTILS_DIR = utils/
-UTILS_FILES = extra_libft ft_env_utils ft_free error_utils
+UTILS_FILES = extra_libft ft_env_utils ft_free ft_free_utils error_utils
 
 SRC_FILES += $(addprefix $(PARSE_DIR), $(PARSE_FILES))
 SRC_FILES += $(addprefix $(BUILTINS_DIR), $(BUILTINS_FILES))
@@ -73,6 +73,9 @@ re : fclean all
 
 debug : $(NAME)
 	@make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
+
+VAL: 
+	valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
 
 run : fclean all
 	@clear && ./minishell

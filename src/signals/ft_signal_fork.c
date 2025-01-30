@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:24:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/29 16:18:03 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:22:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,29 @@ void	handler_signal_fork(pid_t pid)
 		else if (WTERMSIG(status) == SIGINT)
 			ft_putchar_fd('\n', STDOUT_FILENO);
 	}
+}
+
+int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd)
+{
+	int	status;
+
+	close(pipe_fd[1]);
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+	{
+		g_global()->exit_status = WEXITSTATUS(status);
+		if (cmd->error_file)
+			return (close(pipe_fd[0]), -1);
+	}
+	else if (WIFSIGNALED(status))
+	{
+		g_global()->exit_status = 128 + WTERMSIG(status);
+		if (WTERMSIG(status) == SIGINT)
+		{
+			close(pipe_fd[0]);
+			write(STDOUT_FILENO, "\n", 1);
+			return (-2);
+		}
+	}
+	return (0);
 }

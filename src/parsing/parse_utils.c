@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:16:31 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 12:44:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 09:14:47 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,23 @@ int	ft_is_belong(char c)
 	return (0);
 }
 
+static void	skip_quotes_for_strlen_quote(char *s, int *i, int *len, char *quote)
+{
+	while (s[*i] && *quote)
+	{
+		if (ft_is_quote(s[*i]) == *quote)
+		{
+			*quote = 0;
+			(*i)++;
+			continue ;
+		}
+		if (s[*i] == '\0')
+			break ;
+		(*len)++;
+		(*i)++;
+	}
+}
+
 int	ft_strlen_skip_quote(char *s)
 {
 	int		i;
@@ -66,19 +83,7 @@ int	ft_strlen_skip_quote(char *s)
 		{
 			quote = ft_is_quote(s[i]);
 			i++;
-			while (s[i] && quote)
-			{
-				if (ft_is_quote(s[i]) == quote)
-				{
-					quote = 0;
-					i++;
-					continue ;
-				}
-				len++;
-				i++;
-			}
-			if (s[i] == '\0')
-				break ;
+			skip_quotes_for_strlen_quote(s, &i, &len, &quote);
 			continue ;
 		}
 		i++;
@@ -94,10 +99,76 @@ int	ft_is_quote(char c)
 	return (0);
 }
 
+static int	skip_quotes_strtok(char *saved_str, size_t *index, int *i,
+		char *quote)
+{
+	if (ft_is_quote(saved_str[*index + *i]))
+	{
+		*quote = ft_is_quote(saved_str[*index + *i]);
+		(*i)++;
+		while (saved_str[*index + *i] && *quote)
+		{
+			if (ft_is_quote(saved_str[*index + *i]) == *quote)
+			{
+				*quote = 0;
+			}
+			(*i)++;
+		}
+		return (1);
+	}
+	return (0);
+}
+
+static char	*handle_first_case(char *saved_str, size_t *index, int *i,
+		char *quote)
+{
+	int		j;
+	char	*token;
+
+	j = *i;
+	token = NULL;
+	while (saved_str[*index + j])
+	{
+		if ((ft_is_belong(saved_str[*index + j]) || ft_isspace(saved_str[*index
+					+ j])) && !ft_is_between(saved_str, *index + j))
+			break ;
+		if (skip_quotes_strtok(saved_str, index, &j, quote))
+			continue ;
+		j++;
+	}
+	token = ft_strndup(saved_str + *index, j);
+	*index += j;
+	return (token);
+}
+
+static char	*handle_second_case(char *saved_str, size_t *index, int *i)
+{
+	int		j;
+	char	*token;
+
+	j = *i;
+	token = NULL;
+	if (ft_is_belong(saved_str[*index + j]) == '|')
+	{
+		j++;
+		token = ft_strndup(saved_str + *index, j);
+		*index += j;
+		return (token);
+	}
+	while (ft_is_belong(saved_str[*index + j]))
+	{
+		if (saved_str[*index + j] == '|')
+			break ;
+		j++;
+	}
+	token = ft_strndup(saved_str + *index, j);
+	*index += j;
+	return (token);
+}
+
 char	*ft_strtok_quoted(char *str)
 {
 	static char		*saved_str = NULL;
-	char			*token;
 	static size_t	index = 0;
 	char			quote;
 	int				i;
@@ -108,7 +179,6 @@ char	*ft_strtok_quoted(char *str)
 		return (NULL);
 	i = 0;
 	quote = 0;
-	token = NULL;
 	index += ft_skip_space(saved_str + index);
 	if (!saved_str[index])
 	{
@@ -118,50 +188,10 @@ char	*ft_strtok_quoted(char *str)
 	}
 	i = 0;
 	if (!(ft_is_belong(saved_str[index + i])))
-	{
-		while (saved_str[index + i])
-		{
-			if ((ft_is_belong(saved_str[index + i])
-					|| ft_isspace(saved_str[index + i]))
-				&& !ft_is_between(saved_str, index + i))
-				break ;
-			if (ft_is_quote(saved_str[index + i]))
-			{
-				quote = ft_is_quote(saved_str[index + i]);
-				i++;
-				while (saved_str[index + i] && quote)
-				{
-					if (ft_is_quote(saved_str[index + i]) == quote)
-						quote = 0;
-					i++;
-				}
-				continue ;
-			}
-			i++;
-		}
-		token = ft_strndup(saved_str + index, i);
-		index += i;
-	}
+		return (handle_first_case(saved_str, &index, &i, &quote));
 	else
-	{
-		if (ft_is_belong(saved_str[index + i]) == '|')
-		{
-			i++;
-			token = ft_strndup(saved_str + index, i);
-			index += i;
-			return (token);
-		}
-		while (ft_is_belong(saved_str[index + i]))
-		{
-			if (saved_str[index + i] == '|')
-				break ;
-			i++;
-		}
-		token = ft_strndup(saved_str + index, i);
-		index += i;
-		return (token);
-	}
-	return (token);
+		return (handle_second_case(saved_str, &index, &i));
+	return (NULL);
 }
 
 t_tok_type	assign_type(char *s)

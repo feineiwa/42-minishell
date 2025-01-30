@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/29 18:49:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:46:57 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,12 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[36mminishell$\033[0m "
+# define PROMPT "\033[1;36mminishell$\033[1;0m "
 // # define PROMPT "minishell$ "
 # define HDOC "\033[1;33m>\033[1;0m "
 
 typedef struct g_sig	t_g_sig;
 typedef struct s_shell	t_shell;
-
 
 typedef enum e_bool
 {
@@ -89,10 +88,9 @@ struct					g_sig
 	int					is_runing;
 	int					exit_status;
 	t_shell				*shell;
-	
 };
 
-struct s_shell
+struct					s_shell
 {
 	t_env				*envp;
 	t_cmd				*cmd;
@@ -104,7 +102,7 @@ void					ft_free(void *ptr);
 // ENV
 char					*ft_get_env_value(t_env *envp, char *key);
 void					print_env(t_env *envp);
-void					ft_add_env(t_env **envp, char *arg);
+int						ft_add_env(t_env **envp, char *arg);
 t_env					*ft_get_last_env(t_env *envp);
 t_shell					init_shell(char **envp);
 char					*ft_strndup(char *str, size_t n);
@@ -153,17 +151,20 @@ char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
-int						launch_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
-int						launch_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
+int						launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe);
 int						config_with_pipe(t_shell *shell, t_cmd *cmd);
 void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
+int						handler_input_redirection(char *input_file);
+int						handler_output_redirection(t_cmd *cmd, int input_fd);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell);
 int						*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell);
 int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
+t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
+							int *output_fd);
 
 // BUILTINS
 int						ft_echo(char **args);
@@ -178,6 +179,8 @@ int						ft_cd(t_cmd *cmd, t_env *envp);
 // SIGNALS
 int						handler_signal_pipe(pid_t pid);
 void					handler_signal_fork(pid_t pid);
+int						handler_signal_hdoc(int *pipe_fd, pid_t pid,
+							t_cmd *cmd);
 void					handle_sigint(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);

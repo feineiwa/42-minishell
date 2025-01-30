@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 14:36:34 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 17:24:29 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:06:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	ft_free_pipe(int *pipefd, int *hdoc_fd)
 	close(pipefd[0]);
 	close(pipefd[1]);
 	ft_free(hdoc_fd);
-	ft_free(pipefd);
 }
 
 void	ft_free_arr(char **arr)

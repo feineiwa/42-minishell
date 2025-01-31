@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:16:31 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 09:14:47 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:08:28 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,8 @@ static char	*handle_first_case(char *saved_str, size_t *index, int *i,
 	token = NULL;
 	while (saved_str[*index + j])
 	{
-		if ((ft_is_belong(saved_str[*index + j]) || ft_isspace(saved_str[*index
-					+ j])) && !ft_is_between(saved_str, *index + j))
+		if ((ft_is_belong(saved_str[*index + j]) || ft_isspace(\
+			saved_str[*index + j])) && !ft_is_between(saved_str, *index + j))
 			break ;
 		if (skip_quotes_strtok(saved_str, index, &j, quote))
 			continue ;

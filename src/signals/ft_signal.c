@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 10:43:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:46:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,21 +38,6 @@ t_g_sig	*g_global(void)
 	static t_g_sig	value = {0, 0, NULL};
 
 	return (&value);
-}
-
-void	ignore_sig(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	sa_int.sa_flags = 0;
-	sa_quit.sa_flags = 0;
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_handler = SIG_IGN;
-	sa_quit.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 void	setup_signal(void)

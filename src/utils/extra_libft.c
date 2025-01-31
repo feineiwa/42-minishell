@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/29 12:44:20 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:09:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	ft_isspace(char c)
 int	ft_cmdsize(t_cmd *cmd)
 {
 	t_cmd	*tmp;
-	int	size;
+	int		size;
 
 	tmp = cmd;
 	size = 0;

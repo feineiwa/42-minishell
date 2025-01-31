@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 18:28:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:07:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,12 @@ static t_cmd	*init_cmd(t_cmd *cmd)
 	return (cmd);
 }
 
+void	print_synthax_error(t_cmd **cmd_list)
+{
+	write(STDERR_FILENO, "syntax error near unexpected token\n", 36);
+	ft_free_cmd(cmd_list);
+}
+
 static t_bool	synthax_error(t_token *tok)
 {
 	if (!tok)
@@ -123,16 +129,13 @@ static int	handle_argument(t_cmd **tmp, t_shell *shell, t_token **tok)
 	return (1);
 }
 
-static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
-		t_cmd *cmd_list)
+static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag, \
+	t_cmd *cmd_list)
 {
 	int	fd;
 
 	if (synthax_error(*tok))
-	{
-		write(STDERR_FILENO, "syntax error near unexpected *token\n", 36);
-		return (ft_free_cmd(&cmd_list), 0);
-	}
+		return (print_synthax_error(&cmd_list), 0);
 	(*tok) = (*tok)->next;
 	if (!(*tok))
 		return (0);
@@ -144,7 +147,8 @@ static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->input_file = NULL;
 		}
 		(*tmp)->input_file = ft_get_arg(g_global()->shell, (*tok)->value);
-		if ((fd = open((*tmp)->input_file, O_RDONLY)) < 0)
+		fd = open((*tmp)->input_file, O_RDONLY);
+		if (fd < 0)
 		{
 			(*tmp)->error_file = ft_strdup((*tmp)->input_file);
 			(*tmp)->flag_err = 1;
@@ -161,11 +165,7 @@ int	handle_output_file(t_cmd **tmp, t_token **tok, int *error_flag,
 	int	fd;
 
 	if (synthax_error(*tok))
-	{
-		write(STDERR_FILENO, "syntax error near unexpected token\n", 36);
-		ft_free_cmd(&cmd_list);
-		return (0);
-	}
+		return (print_synthax_error(&cmd_list), 0);
 	(*tok) = (*tok)->next;
 	if (!(*tok))
 		return (0);
@@ -177,8 +177,8 @@ int	handle_output_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->output_file = NULL;
 		}
 		(*tmp)->output_file = ft_get_arg(g_global()->shell, (*tok)->value);
-		if ((fd = open((*tmp)->output_file, O_CREAT | O_WRONLY | O_TRUNC,
-					0644)) < 0)
+		fd = open((*tmp)->output_file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		if (fd < 0)
 		{
 			(*tmp)->error_file = ft_strdup((*tmp)->output_file);
 			(*tmp)->flag_err = 2;
@@ -195,11 +195,7 @@ int	handle_append_file(t_cmd **tmp, t_token **tok, int *error_flag,
 	int	fd;
 
 	if (synthax_error(*tok))
-	{
-		write(STDERR_FILENO, "syntax error near unexpected token\n", 36);
-		ft_free_cmd(&cmd_list);
-		return (0);
-	}
+		return (print_synthax_error(&cmd_list), 0);
 	(*tmp)->append = TRUE;
 	(*tok) = (*tok)->next;
 	if (!(*tok))
@@ -212,29 +208,32 @@ int	handle_append_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->output_file = NULL;
 		}
 		(*tmp)->output_file = ft_get_arg(g_global()->shell, (*tok)->value);
-		if ((fd = open((*tmp)->output_file, O_WRONLY | O_CREAT | O_APPEND,
-					0644)) < 0)
+		fd = open((*tmp)->output_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd < 0)
 		{
 			(*tmp)->error_file = ft_strdup((*tmp)->output_file);
 			(*tmp)->flag_err = 3;
 			*error_flag = 1;
 		}
 	}
-	close(fd);
-	return (1);
+	return (close(fd), 1);
+}
+
+t_hdoc	*get_last_hdoc(t_hdoc *first)
+{
+	if (!first)
+		return (NULL);
+	while (first->next)
+		first = first->next;
+	return (first);
 }
 
 int	handle_heredoc_parsing(t_cmd **tmp, t_token **tok, t_cmd *cmd_list)
 {
 	t_hdoc	*new_hdoc;
-	t_hdoc	*last;
 
 	if (synthax_error(*tok))
-	{
-		write(STDERR_FILENO, "syntax error near unexpected *token\n", 36);
-		ft_free_cmd(&cmd_list);
-		return (0);
-	}
+		return (print_synthax_error(&cmd_list), 0);
 	(*tok) = (*tok)->next;
 	if (!(*tok))
 		return (0);
@@ -252,12 +251,7 @@ int	handle_heredoc_parsing(t_cmd **tmp, t_token **tok, t_cmd *cmd_list)
 	if (!(*tmp)->hdoc)
 		(*tmp)->hdoc = new_hdoc;
 	else
-	{
-		last = (*tmp)->hdoc;
-		while (last->next)
-			last = last->next;
-		last->next = new_hdoc;
-	}
+		get_last_hdoc((*tmp)->hdoc)->next = new_hdoc;
 	return (1);
 }
 
@@ -283,42 +277,49 @@ int	handle_pipeline(t_cmd **tmp, t_token **tok, int *error_flag,
 	return (1);
 }
 
+int	cmd_valid(t_cmd **tmp, t_token **tok, int *error_flag, t_cmd *cmd_list)
+{
+	int	ret;
+
+	ret = 1;
+	if ((*tok)->type == ARGS)
+		ret = handle_argument(tmp, g_global()->shell, tok);
+	else if ((*tok)->type == INFILE)
+		ret = handle_input_file(tmp, tok, error_flag, cmd_list);
+	else if ((*tok)->type == OUTFILE)
+		ret = handle_output_file(tmp, tok, error_flag, cmd_list);
+	else if ((*tok)->type == APPEND)
+		ret = handle_append_file(tmp, tok, error_flag, cmd_list);
+	else if ((*tok)->type == HEREDOC)
+		ret = handle_heredoc_parsing(tmp, tok, cmd_list);
+	else if ((*tok)->type == PIPE)
+		ret = handle_pipeline(tmp, tok, error_flag, cmd_list);
+	if (ret == 0)
+		return (0);
+	return (1);
+}
+
 t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 {
 	t_cmd	*tmp;
 	t_cmd	*cmd_list;
 	int		error_flag;
-	int		ret;
 
 	if (!tok || !shell)
 		return (NULL);
+	g_global()->shell = shell;
 	tmp = init_cmd(NULL);
 	if (!tmp)
 		return (NULL);
 	cmd_list = tmp;
 	error_flag = 0;
-	ret = 1;
 	while (tok)
 	{
-		if (tok->type == ARGS)
-			ret = handle_argument(&tmp, shell, &tok);
-		else if (tok->type == INFILE)
-			ret = handle_input_file(&tmp, &tok, &error_flag, cmd_list);
-		else if (tok->type == OUTFILE)
-			ret = handle_output_file(&tmp, &tok, &error_flag, cmd_list);
-		else if (tok->type == APPEND)
-			ret = handle_append_file(&tmp, &tok, &error_flag, cmd_list);
-		else if (tok->type == HEREDOC)
-			ret = handle_heredoc_parsing(&tmp, &tok, cmd_list);
-		else if (tok->type == PIPE)
-			ret = handle_pipeline(&tmp, &tok, &error_flag, cmd_list);
+		if (tok->type == NONE)
+			return (print_synthax_error(&cmd_list), NULL);
 		else
-		{
-			write(STDOUT_FILENO, "syntax error near unexpected token\n", 36);
-			return (ft_free_cmd(&cmd_list), NULL);
-		}
-		if (!ret)
-			return (NULL);
+			if (!cmd_valid(&tmp, &tok, &error_flag, cmd_list))
+				return (NULL);
 		tok = tok->next;
 	}
 	return (cmd_list);

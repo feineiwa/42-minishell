@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 17:48:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:09:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,13 @@ t_env	*ft_get_last_env(t_env *envp)
 	return (envp);
 }
 
+void	ft_free_one_env(t_env *tmp)
+{
+	ft_free(tmp->key);
+	ft_free(tmp->value);
+	ft_free(tmp);
+}
+
 void	ft_unset_env(t_env **envp, char *key)
 {
 	t_env	*to_free;
@@ -40,14 +47,11 @@ void	ft_unset_env(t_env **envp, char *key)
 
 	if (!key)
 		return ;
-	to_free = NULL;
 	tmp = *envp;
 	if (!strcmp(tmp->key, key))
 	{
 		*envp = (*envp)->next;
-		ft_free(tmp->key);
-		ft_free(tmp->value);
-		ft_free(tmp);
+		ft_free_one_env(tmp);
 	}
 	else
 	{
@@ -57,9 +61,7 @@ void	ft_unset_env(t_env **envp, char *key)
 			{
 				to_free = tmp->next;
 				tmp->next = tmp->next->next;
-				ft_free(to_free->key);
-				ft_free(to_free->value);
-				ft_free(to_free);
+				ft_free_one_env(to_free);
 				return ;
 			}
 			tmp = tmp->next;

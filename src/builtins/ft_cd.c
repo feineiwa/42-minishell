@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 11:22:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 15:26:22 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 06:00:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,18 +74,29 @@ static int	change_directory(char *path, t_env *envp)
 int	ft_cd(t_cmd *cmd, t_env *envp)
 {
 	char	*path;
+	char	*path_to_free;
 
+	path_to_free = NULL;
 	if (cmd->argc > 2)
 		return (write(STDERR_FILENO, "minishell: cd: too many arguments\n", 35),
 			1);
-	if (!cmd->argv[1] || !ft_strcmp(cmd->argv[1], "~"))
+	if (!cmd->argv[1])
 		path = ft_get_env_value(envp, "$HOME");
-	else if (!ft_strcmp(cmd->argv[1], "-"))
-		path = ft_get_env_value(envp, "$OLDPWD");
+	else if (cmd->argv[1][0] == '~')
+		path_to_free = ft_strjoin(ft_get_env_value(envp, "$HOME"), cmd->argv[1] + 1);
+	else if (cmd->argv[1][0] == '-')
+		path_to_free = ft_strjoin(ft_get_env_value(envp, "$OLDPWD"), cmd->argv[1] + 1);
 	else
 		path = cmd->argv[1];
-	if (change_directory(path, envp))
-		return (1);
+	if (path_to_free)
+	{
+		if (change_directory(path_to_free, envp))
+			return (1);
+		ft_free(path_to_free);
+	}
+	else
+		if (change_directory(path, envp))
+			return (1);
 	if (cmd->argv[1] && !ft_strcmp(cmd->argv[1], "-"))
 		ft_pwd();
 	return (0);

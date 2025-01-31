@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/30 17:48:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 18:55:18 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ static void	read_heredoc(t_hdoc *hdoc, t_shell *shell, int pipe_fd[2])
 			ft_free(content);
 			content = expand;
 		}
-		close(pipe_fd[0]);
 		if (hdoc->next)
 		{
 			ft_free(content);
@@ -51,7 +50,8 @@ static void	read_heredoc(t_hdoc *hdoc, t_shell *shell, int pipe_fd[2])
 	}
 }
 
-static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
+static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell,
+		int std_fds[2])
 {
 	int		pipe_fd[2];
 	pid_t	pid;
@@ -78,10 +78,14 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 			read_heredoc(hdoc, shell, pipe_fd);
 			hdoc = hdoc->next;
 		}
+		close(pipe_fd[1]);
+		retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
+		ft_free_all(shell);
 		exit(0);
 	}
 	else
 	{
+		close(pipe_fd[1]);
 		status = handler_signal_hdoc(pipe_fd, pid, cmd);
 		if (status < 0)
 			return (status);
@@ -89,24 +93,24 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, t_shell *shell)
 	return (pipe_fd[0]);
 }
 
-int	handle_heredoc(t_cmd *cmd, t_shell *shell)
+int	handle_heredoc(t_cmd *cmd, t_shell *shell, int std_fds[2])
 {
 	int	inputfd;
 
 	inputfd = -1;
-	inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, shell);
+	inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, shell, std_fds);
 	return (inputfd);
 }
 
-int	*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell)
+int	handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell, int std_fds[2])
 {
 	int		i;
-	int		*hdoc_fd;
 	t_cmd	*tmp;
+	int		hdoc_ret;
 
-	hdoc_fd = malloc(sizeof(int) * ft_cmdsize(cmd));
-	if (!hdoc_fd)
-		return (NULL);
+	g_global()->hdoc_fd = malloc(sizeof(int) * ft_cmdsize(cmd));
+	if (!g_global()->hdoc_fd)
+		return (1);
 	tmp = cmd;
 	i = 0;
 	while (tmp)
@@ -114,16 +118,16 @@ int	*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell)
 		g_global()->is_runing = 2;
 		setup_signal();
 		if (tmp->hdoc && tmp->hdoc->del)
-			hdoc_fd[i] = handle_heredoc(tmp, shell);
-		else
-			hdoc_fd[i] = -1;
-		if (hdoc_fd[i] == -2)
 		{
-			ft_free(hdoc_fd);
-			return (NULL);
+			hdoc_ret = handle_heredoc(tmp, shell, std_fds);
+			g_global()->hdoc_fd[i] = hdoc_ret;
 		}
+		else
+			g_global()->hdoc_fd[i] = -1;
+		if (g_global()->hdoc_fd[i] == -2)
+			return (1);
 		i++;
 		tmp = tmp->next;
 	}
-	return (hdoc_fd);
+	return (0);
 }

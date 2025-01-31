@@ -2,7 +2,7 @@ NAME    =   minishell
 
 CC      =   gcc
 
-FLAGS   =   -Wall -Werror -Wextra
+FLAGS   =   -Wall -Werror -Wextra -g
 
 DIRLIB  =   ./libft/
 FILELIB =   libft.a

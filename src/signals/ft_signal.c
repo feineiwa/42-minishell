@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 21:46:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 18:00:36 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	handle_sigquit(int sig)
 
 t_g_sig	*g_global(void)
 {
-	static t_g_sig	value = {0, 0, NULL};
+	static t_g_sig	value = {0, 0, {-1, -1}, NULL, NULL};
 
 	return (&value);
 }

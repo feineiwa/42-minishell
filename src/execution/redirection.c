@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:05:55 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/30 14:50:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 17:21:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ int	handler_input_redirection(char *input_file)
 		close(fd);
 		return (-1);
 	}
-	return (fd);
+	close(fd);
+	return (1);
 }
 
 int	handler_output_redirection(t_cmd *cmd, int input_fd)
@@ -57,6 +58,7 @@ int	handler_output_redirection(t_cmd *cmd, int input_fd)
 			close(input_fd);
 		return (-1);
 	}
+	close(fd);
 	return (fd);
 }
 
@@ -70,6 +72,7 @@ t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 			perror(cmd->error_file);
 			return (FALSE);
 		}
+		close(*input_fd);
 	}
 	else if (cmd->flag_err == 2)
 	{
@@ -89,6 +92,7 @@ t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 			return (FALSE);
 		}
 	}
+	close(*output_fd);
 	close(*input_fd);
 	return (TRUE);
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/30 14:14:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 18:08:10 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@ static void	execute_command(t_shell *shell)
 	t_cmd	*temp;
 
 	g_global()->is_runing = 2;
+	g_global()->hdoc_fd = NULL;
+	g_global()->pipfd[0] = -1;
+	g_global()->pipfd[1] = -1;
 	temp = shell->cmd;
 	if (temp && !temp->next)
 		g_global()->exit_status = launch_cmd(shell, temp, 0);

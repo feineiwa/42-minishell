@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 22:09:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 09:14:22 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,13 @@ char	*ft_get_env_value(t_env *envp, char *key)
 	return (NULL);
 }
 
-static t_env	*add_new_env(char *key, char *value)
+t_env	*add_new_env(char *key, char *value)
 {
 	t_env	*new;
 
 	new = ft_calloc(sizeof(t_env), 1);
+	if (!new)
+		return (NULL);
 	new->key = key;
 	new->value = value;
 	new->next = NULL;

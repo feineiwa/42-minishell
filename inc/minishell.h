@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/30 17:46:57 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/01/31 18:01:59 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,11 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define PROMPT "\033[1;36mminishell$\033[1;0m "
-// # define PROMPT "minishell$ "
+// # define PROMPT "\033[1;36mminishell$\033[1;0m "
+# define PROMPT "minishell$ "
 # define HDOC "\033[1;33m>\033[1;0m "
 
-typedef struct g_sig	t_g_sig;
+typedef struct s_sig	t_g_sig;
 typedef struct s_shell	t_shell;
 
 typedef enum e_bool
@@ -83,10 +83,12 @@ typedef struct s_cmd
 	struct s_cmd		*next;
 }						t_cmd;
 
-struct					g_sig
+struct					s_sig
 {
 	int					is_runing;
 	int					exit_status;
+	int					pipfd[2];
+	int					*hdoc_fd;
 	t_shell				*shell;
 };
 
@@ -110,6 +112,7 @@ int						ft_strcmp(char *s1, char *s2);
 char					**convert_env_to_array(t_env *envp);
 void					ft_unset_env(t_env **envp, char *key);
 int						ft_search_equ(char *s);
+t_env					*add_new_env(char *key, char *value);
 
 // PARSING
 t_cmd					*parsing(t_shell *shell, char *input);
@@ -140,7 +143,7 @@ void					ft_free_cmd(t_cmd **cmd);
 void					ft_free_env(t_env **envp);
 void					ft_free_all(t_shell *shell);
 void					ft_free_arr(char **arr);
-void					ft_free_pipe(int *pipefd, int *hdoc_fd);
+void					ft_free_pipe(int *pipefd);
 
 // extra_libft
 void					*ft_realloc(void *ptr, size_t old_size,
@@ -151,6 +154,7 @@ char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
+
 int						launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe);
 int						config_with_pipe(t_shell *shell, t_cmd *cmd);
 void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
@@ -159,12 +163,17 @@ void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 int						handler_input_redirection(char *input_file);
 int						handler_output_redirection(t_cmd *cmd, int input_fd);
-int						handle_heredoc(t_cmd *cmd, t_shell *shell);
-int						*handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell);
-int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd);
+int						handle_heredoc(t_cmd *cmd, t_shell *shell,
+							int std_fds[2]);
+int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
+							int std_fds[2]);
+int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
+							int stdin, int stdout);
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
 							int *output_fd);
+t_bool					retore_fds_standart(int input_fd, int output_fd,
+							int *stdin, int *stdout);
 
 // BUILTINS
 int						ft_echo(char **args);
@@ -184,7 +193,6 @@ int						handler_signal_hdoc(int *pipe_fd, pid_t pid,
 void					handle_sigint(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);
-void					ignore_sig(void);
 
 void					print_err(char *s1, char *s2, char *s3, int fd);
 

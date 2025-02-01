@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/31 18:45:48 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 17:20:50 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,22 +48,14 @@ t_bool	retore_fds_standart(int input_fd, int output_fd, int *stdin,
 	return (TRUE);
 }
 
-static int	setup_redirections(t_cmd *cmd, int *input_fd, int *output_fd)
+static int	setup_redirections(t_cmd *cmd, int *in_fd, int *out_fd)
 {
-	if (cmd->error_file && !handler_error_flag(cmd, input_fd, output_fd))
+	if (cmd->error_file && !handler_error_flag(cmd, in_fd, out_fd))
 		return (1);
 	if (cmd->input_file)
-	{
-		*input_fd = handler_input_redirection(cmd->input_file);
-		if (!*input_fd)
-			return (1);
-	}
+		*in_fd = handler_input_redirection(cmd->input_file);
 	if (cmd->output_file)
-	{
-		*output_fd = handler_output_redirection(cmd, *input_fd);
-		if (!*output_fd)
-			return (1);
-	}
+		*out_fd = handler_output_redirection(cmd);
 	return (0);
 }
 
@@ -71,15 +63,17 @@ int	setup_heredoc(t_cmd *cmd, int use_pipe, int *in_fd, int std_fds[2])
 {
 	if (cmd->hdoc && !use_pipe)
 	{
-		*in_fd = handle_heredoc(cmd, g_global()->shell, std_fds);
+		*in_fd = handle_heredoc(cmd, g_global()->shell, std_fds, use_pipe);
 		if (*in_fd == -2)
 			return (g_global()->exit_status);
 		if (*in_fd != -1 && dup2(*in_fd, STDIN_FILENO) < 0)
 		{
 			perror("minishell: dup2 input");
-			return (close(*in_fd), 1);
+			close(*in_fd);
+			return (1);
 		}
-		close(*in_fd);
+		if (*in_fd != -1)
+			close(*in_fd);
 	}
 	return (0);
 }

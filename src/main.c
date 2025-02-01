@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/31 18:08:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 14:01:41 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ static void	prompt_loop(t_shell *shell)
 				execute_command(shell);
 				ft_free_cmd(&shell->cmd);
 			}
-			ft_free(input);
 		}
 	}
 	rl_clear_history();

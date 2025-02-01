@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:24:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/30 15:22:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 18:05:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	handler_signal_fork(pid_t pid)
 	}
 }
 
-int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd)
+int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd, int std_fds[2])
 {
 	int	status;
 
@@ -71,6 +71,7 @@ int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd)
 		if (WTERMSIG(status) == SIGINT)
 		{
 			close(pipe_fd[0]);
+			retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
 			write(STDOUT_FILENO, "\n", 1);
 			return (-2);
 		}

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/31 18:01:59 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 18:04:40 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "../libft/libft.h"
 # include <errno.h>
 # include <fcntl.h>
+# include <limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
@@ -96,10 +97,10 @@ struct					s_shell
 {
 	t_env				*envp;
 	t_cmd				*cmd;
-	int					exit_status;
 };
 
 void					ft_free(void *ptr);
+char					*ft_getcwd(char *s);
 
 // ENV
 char					*ft_get_env_value(t_env *envp, char *key);
@@ -111,6 +112,7 @@ char					*ft_strndup(char *str, size_t n);
 int						ft_strcmp(char *s1, char *s2);
 char					**convert_env_to_array(t_env *envp);
 void					ft_unset_env(t_env **envp, char *key);
+void					ft_swap_env(t_env *i, t_env *j, t_env *tmp);
 int						ft_search_equ(char *s);
 t_env					*add_new_env(char *key, char *value);
 
@@ -154,7 +156,6 @@ char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 
 // EXEC
-
 int						launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe);
 int						config_with_pipe(t_shell *shell, t_cmd *cmd);
 void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
@@ -162,9 +163,9 @@ void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 int						handler_input_redirection(char *input_file);
-int						handler_output_redirection(t_cmd *cmd, int input_fd);
+int						handler_output_redirection(t_cmd *cmd);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell,
-							int std_fds[2]);
+							int std_fds[2], int use_pipe);
 int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
 							int std_fds[2]);
 int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
@@ -188,11 +189,13 @@ int						ft_cd(t_cmd *cmd, t_env *envp);
 // SIGNALS
 int						handler_signal_pipe(pid_t pid);
 void					handler_signal_fork(pid_t pid);
-int						handler_signal_hdoc(int *pipe_fd, pid_t pid,
-							t_cmd *cmd);
+int						handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd,
+							int std_fds[2]);
 void					handle_sigint(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);
+void					setup_signal_for_hdoc(void);
+void					close_hdoc_fd_inherited_from_parent(void);
 
 void					print_err(char *s1, char *s2, char *s3, int fd);
 

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/31 17:31:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 18:41:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 	if (pid < 0)
 	{
 		perror("fork in what_cmd");
-		shell->exit_status = 1;
 		g_global()->is_runing = 0;
 		return (1);
 	}
@@ -58,8 +57,10 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 		setup_signal();
 		g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
 		ft_free_all(shell);
-		close(stdin);
-		close(stdout);
+		if (stdin != -1)
+			close(stdin);
+		if (stdin != -1)
+			close(stdout);
 		exit(g_global()->exit_status);
 	}
 	else
@@ -79,10 +80,11 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	{
 		if (execve(cmd->argv[0], cmd->argv, envp) == -1)
 		{
-			perror(cmd->argv[0]);
-			return (1);
+			ft_free_arr(envp);
+			return (perror(cmd->argv[0]), 1);
 		}
 	}
+	// if (ft_strcmp(cmd->argv, )) a suivre
 	cmd_path = resolve_cmd_path(shell, cmd);
 	if (!cmd_path)
 	{
@@ -93,9 +95,12 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	}
 	if (execve(cmd_path, cmd->argv, envp) == -1)
 	{
-		perror(cmd->argv[0]);
-		return (1);
+		ft_free_arr(envp);
+		ft_free(cmd_path);
+		return (perror(cmd->argv[0]), 1);
 	}
+	ft_free_arr(envp);
+	ft_free(cmd_path);
 	return (0);
 }
 

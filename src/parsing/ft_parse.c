@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 22:07:11 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 18:20:26 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,8 @@ static int	handle_argument(t_cmd **tmp, t_shell *shell, t_token **tok)
 	return (1);
 }
 
-static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag, \
-	t_cmd *cmd_list)
+static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
+		t_cmd *cmd_list)
 {
 	int	fd;
 
@@ -317,9 +317,8 @@ t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	{
 		if (tok->type == NONE)
 			return (print_synthax_error(&cmd_list), NULL);
-		else
-			if (!cmd_valid(&tmp, &tok, &error_flag, cmd_list))
-				return (NULL);
+		else if (!cmd_valid(&tmp, &tok, &error_flag, cmd_list))
+			return (NULL);
 		tok = tok->next;
 	}
 	return (cmd_list);
@@ -374,14 +373,17 @@ t_cmd	*parsing(t_shell *shell, char *input)
 
 	tok = NULL;
 	if (count_quotes(input))
-	{
-		write(STDERR_FILENO, "Error: the quotes should be close\n", 35);
-		return (NULL);
-	}
+		return (print_err("Error: the quotes should be close\n", NULL, NULL, 2),
+			NULL);
 	g_global()->shell = shell;
 	expand = ft_expand(shell, input);
 	if (!expand)
-		return (NULL);
+		return (ft_free(input), NULL);
+	if (input)
+	{
+		ft_free(input);
+		input = NULL;
+	}
 	tok = lexer_input(expand);
 	if (!tok)
 		return (ft_free(expand), NULL);

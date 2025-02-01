@@ -6,31 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/31 10:14:20 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 17:21:48 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-void	ft_swap_env(t_env *i, t_env *j, t_env *tmp)
-{
-	char	*tmp_key;
-	char	*tmp_value;
-
-	while (tmp)
-	{
-		if (ft_strcmp(i->key, j->key) < 0)
-		{
-			tmp_key = i->key;
-			i->key = j->key;
-			j->key = tmp_key;
-			tmp_value = i->value;
-			i->value = j->value;
-			j->value = tmp_value;
-		}
-		tmp = tmp->next;
-	}
-}
 
 void	print_export(t_shell *shell)
 {

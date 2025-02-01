@@ -25,7 +25,7 @@ SIGNAL_DIR = signals/
 SIGNAL_FILES = ft_signal ft_signal_fork
 
 UTILS_DIR = utils/
-UTILS_FILES = extra_libft ft_env_utils ft_free ft_free_utils error_utils
+UTILS_FILES = extra_libft extra_libft2 ft_env_utils ft_env_utils2 ft_free ft_free_utils error_utils
 
 SRC_FILES += $(addprefix $(PARSE_DIR), $(PARSE_FILES))
 SRC_FILES += $(addprefix $(BUILTINS_DIR), $(BUILTINS_FILES))

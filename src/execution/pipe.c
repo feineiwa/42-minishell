@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/01/31 19:28:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 15:04:35 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,7 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
 	exit(g_global()->exit_status);
 }
 
-static void	parent_process(int *input_fd, int hdoc_fd,
-		t_cmd *cmd)
+static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
 {
 	close(g_global()->pipfd[1]);
 	if (*input_fd != -1 && *input_fd != hdoc_fd)
@@ -67,7 +66,6 @@ static void	parent_process(int *input_fd, int hdoc_fd,
 		*input_fd = -1;
 	if (hdoc_fd != -1)
 		close(hdoc_fd);
-	close(g_global()->pipfd[0]);
 }
 
 static int	create_pipe_and_fork(pid_t *pid)
@@ -98,7 +96,7 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	if (handle_heredoc_with_pipe(cmd, shell, std_fds))
 		return (g_global()->exit_status);
 	setup_signal();
-	i = 0;
+	i = -1;
 	input_fd = -1;
 	while (cmd)
 	{
@@ -107,12 +105,10 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		if (cmd->next && !g_global()->pipfd)
 			return (1);
 		if (pid == 0)
-			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[i]);
+			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[++i]);
 		else
-			parent_process(&input_fd, g_global()->hdoc_fd[i],
-				cmd);
+			parent_process(&input_fd, g_global()->hdoc_fd[++i], cmd);
 		cmd = cmd->next;
-		i++;
 	}
 	return (ft_free_pipe(g_global()->pipfd), handler_signal_pipe(pid));
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 09:50:41 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/31 09:14:22 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/01 15:19:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,88 +80,4 @@ char	*ft_get_env_value(t_env *envp, char *key)
 		envp = envp->next;
 	}
 	return (NULL);
-}
-
-t_env	*add_new_env(char *key, char *value)
-{
-	t_env	*new;
-
-	new = ft_calloc(sizeof(t_env), 1);
-	if (!new)
-		return (NULL);
-	new->key = key;
-	new->value = value;
-	new->next = NULL;
-	return (new);
-}
-
-static t_env	*populate_env_list(char **envp)
-{
-	t_env	*env_list;
-	t_env	*tmp;
-	char	*key;
-	size_t	i;
-	size_t	j;
-
-	i = -1;
-	env_list = NULL;
-	while (envp[++i])
-	{
-		j = ft_search_equ(envp[i]);
-		if (envp[i][j] == '=')
-			key = ft_substr(envp[i], 0, j);
-		if (!env_list)
-		{
-			env_list = add_new_env(key, ft_strdup(envp[i] + j + 1));
-			tmp = env_list;
-		}
-		else
-		{
-			tmp->next = add_new_env(key, ft_strdup(envp[i] + j + 1));
-			tmp = tmp->next;
-		}
-	}
-	return (env_list);
-}
-
-t_shell	init_shell(char **envp)
-{
-	t_shell	shell;
-
-	shell.envp = populate_env_list(envp);
-	if (!shell.envp)
-	{
-		shell.cmd = NULL;
-		return (shell);
-	}
-	return (shell);
-}
-
-char	**convert_env_to_array(t_env *envp)
-{
-	t_env	*tmp;
-	size_t	len;
-	char	**arr_envp;
-	size_t	i;
-
-	len = 0;
-	tmp = envp;
-	while (tmp)
-	{
-		len++;
-		tmp = tmp->next;
-	}
-	arr_envp = malloc(sizeof(char *) * (len + 1));
-	if (!arr_envp)
-		return (NULL);
-	i = 0;
-	tmp = envp;
-	while (tmp)
-	{
-		arr_envp[i] = ft_strjoin3(tmp->key, "=", tmp->value);
-		i++;
-		tmp = tmp->next;
-	}
-	arr_envp[i] = NULL;
-	return (arr_envp);
 }

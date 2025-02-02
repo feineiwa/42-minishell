@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 18:06:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 16:58:03 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,20 +21,22 @@ static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
 	(void)pid;
 	while (42)
 	{
+		content = NULL;
 		content = readline(HDOC);
+		if (content == NULL)
+		{
+			ft_putendl_fd("warning: here-document delimited by end-of-file", 2);
+			break ;
+		}
 		if (g_global()->is_runing == SIGINT)
 		{
 			ft_free(content);
+			content = NULL;
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
 			retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
 			ft_free_all(g_global()->shell);
 			exit(130);
-		}
-		if (content == NULL && g_global()->is_runing != SIGINT)
-		{
-			ft_putendl_fd("warning: here-document delimited by end-of-file", 2);
-			break ;
 		}
 		if (!ft_strcmp(content, hdoc->del))
 		{
@@ -82,8 +84,9 @@ void	handle_sigint_for_hdoc(int sig)
 	if (sig == SIGINT)
 	{
 		g_global()->is_runing = SIGINT;
-		write(1, "\n", 1);
 		close(0);
+		close(1);
+		close(2);
 	}
 	else
 		g_global()->is_runing = 3;
@@ -141,8 +144,7 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, int std_fds[2],
 	}
 	else
 	{
-		close(pipe_fd[1]);
-		status = handler_signal_hdoc(pipe_fd, pid, cmd, std_fds);
+		status = handler_signal_hdoc(pipe_fd, pid, cmd, std_fds, use_pipe);
 		if (status < 0)
 			return (status);
 	}
@@ -198,7 +200,11 @@ int	handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell, int std_fds[2])
 		else
 			g_global()->hdoc_fd[i] = -1;
 		if (g_global()->hdoc_fd[i] == -2)
+		{
+			ft_free_cmd(&shell->cmd);
+			ft_free(g_global()->hdoc_fd);
 			return (1);
+		}
 		i++;
 		tmp = tmp->next;
 	}

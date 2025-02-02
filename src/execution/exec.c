@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 17:20:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 16:55:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ int	setup_heredoc(t_cmd *cmd, int use_pipe, int *in_fd, int std_fds[2])
 		if (*in_fd != -1 && dup2(*in_fd, STDIN_FILENO) < 0)
 		{
 			perror("minishell: dup2 input");
-			close(*in_fd);
 			return (1);
 		}
 		if (*in_fd != -1)
@@ -86,6 +85,7 @@ int	launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe)
 
 	in_fd = -1;
 	out_fd = -1;
+	g_global()->shell = shell;
 	save_fds_standart(&sa_std[0], &sa_std[1]);
 	g_global()->exit_status = setup_heredoc(cmd, use_pipe, &in_fd, sa_std);
 	if (g_global()->exit_status)

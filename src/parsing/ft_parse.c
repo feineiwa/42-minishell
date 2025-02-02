@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/01 18:20:26 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 16:13:58 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,8 +373,11 @@ t_cmd	*parsing(t_shell *shell, char *input)
 
 	tok = NULL;
 	if (count_quotes(input))
+	{
+		ft_free(input);
 		return (print_err("Error: the quotes should be close\n", NULL, NULL, 2),
 			NULL);
+	}
 	g_global()->shell = shell;
 	expand = ft_expand(shell, input);
 	if (!expand)

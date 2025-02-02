@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 18:04:40 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 19:02:01 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
@@ -175,6 +176,7 @@ t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
 							int *output_fd);
 t_bool					retore_fds_standart(int input_fd, int output_fd,
 							int *stdin, int *stdout);
+char					*resolve_cmd_path(t_shell *shell, char *cmd);
 
 // BUILTINS
 int						ft_echo(char **args);
@@ -190,7 +192,7 @@ int						ft_cd(t_cmd *cmd, t_env *envp);
 int						handler_signal_pipe(pid_t pid);
 void					handler_signal_fork(pid_t pid);
 int						handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd,
-							int std_fds[2]);
+							int std_fds[2], int use_pipe);
 void					handle_sigint(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);

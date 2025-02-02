@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 14:01:41 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 16:55:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ static void	execute_command(t_shell *shell)
 	g_global()->hdoc_fd = NULL;
 	g_global()->pipfd[0] = -1;
 	g_global()->pipfd[1] = -1;
+	g_global()->shell = shell;
 	temp = shell->cmd;
 	if (temp && !temp->next)
 		g_global()->exit_status = launch_cmd(shell, temp, 0);
@@ -31,9 +32,9 @@ static void	prompt_loop(t_shell *shell)
 {
 	char	*input;
 
-	input = NULL;
 	while (42)
 	{
+		input = NULL;
 		g_global()->is_runing = 0;
 		setup_signal();
 		input = readline(PROMPT);
@@ -48,7 +49,8 @@ static void	prompt_loop(t_shell *shell)
 			else
 			{
 				execute_command(shell);
-				ft_free_cmd(&shell->cmd);
+				if (shell->cmd)
+					ft_free_cmd(&shell->cmd);
 			}
 		}
 	}

@@ -6,11 +6,36 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 15:04:35 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 16:57:18 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void	close_unused_hdoc_fd(int hdoc_fd)
+{
+	t_cmd	*tmp;
+	int		j;
+
+	tmp = g_global()->shell->cmd;
+	j = 0;
+	while (tmp)
+	{
+		if (g_global()->hdoc_fd[j] == hdoc_fd)
+		{
+			j++;
+			tmp = tmp->next;
+			continue ;
+		}
+		if (g_global()->hdoc_fd[j] != -1)
+		{
+			close(g_global()->hdoc_fd[j]);
+			g_global()->hdoc_fd[j] = -1;
+		}
+		j++;
+		tmp = tmp->next;
+	}
+}
 
 static t_bool	update_std_fds(t_cmd *cmd, int fd)
 {
@@ -43,6 +68,7 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
 	close(g_global()->pipfd[0]);
 	if (cmd->hdoc && cmd->hdoc->del)
 		*input_fd = hdoc_fd;
+	close_unused_hdoc_fd(hdoc_fd);
 	if (!update_std_fds(cmd, *input_fd))
 	{
 		ft_free_all(shell);
@@ -52,6 +78,7 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
 	if (!cmd->argv[0])
 		close(g_global()->pipfd[1]);
 	ft_free_all(shell);
+	close(g_global()->pipfd[1]);
 	exit(g_global()->exit_status);
 }
 
@@ -66,6 +93,7 @@ static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
 		*input_fd = -1;
 	if (hdoc_fd != -1)
 		close(hdoc_fd);
+	// close(g_global()->pipfd[0]);
 }
 
 static int	create_pipe_and_fork(pid_t *pid)
@@ -93,10 +121,11 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 
 	std_fds[0] = -1;
 	std_fds[1] = -1;
+	g_global()->shell = shell;
+	setup_signal();
 	if (handle_heredoc_with_pipe(cmd, shell, std_fds))
 		return (g_global()->exit_status);
-	setup_signal();
-	i = -1;
+	i = 0;
 	input_fd = -1;
 	while (cmd)
 	{
@@ -105,10 +134,11 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 		if (cmd->next && !g_global()->pipfd)
 			return (1);
 		if (pid == 0)
-			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[++i]);
+			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[i]);
 		else
-			parent_process(&input_fd, g_global()->hdoc_fd[++i], cmd);
+			parent_process(&input_fd, g_global()->hdoc_fd[i], cmd);
 		cmd = cmd->next;
+		i++;
 	}
 	return (ft_free_pipe(g_global()->pipfd), handler_signal_pipe(pid));
 }

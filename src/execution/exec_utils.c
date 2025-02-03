@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/02 19:23:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 22:35:57 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,18 +157,11 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 {
 	char	*cmd_path;
 	char	**envp;
+	struct stat	file_stat;
 
 	g_global()->exit_status = handle_dot_cmd(shell, cmd);
-	(void)cmd_path;
-	(void)envp;
 	if (g_global()->exit_status)
 		return (g_global()->exit_status);
-	if (!ft_strcmp(cmd->argv[0], ".."))
-	{
-		ft_putstr_fd(cmd->argv[0], 2);
-		ft_putstr_fd(": command not found\n", 2);
-		return (127);
-	}
 	if (!ft_strcmp(cmd->argv[0], ""))
 	{
 		ft_putstr_fd("''", 2);
@@ -185,8 +178,30 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 			ft_free_arr(envp);
 			return (perror(cmd->argv[0]), 127);
 		}
+		if (stat(cmd->argv[0], &file_stat) == -1)
+		{
+			ft_free_arr(envp);
+			perror(cmd->argv[0]);
+			return (1);
+		}
+		if (S_ISDIR(file_stat.st_mode))
+		{
+			ft_free_arr(envp);
+			return (print_err(cmd->argv[0], ": Is a directory\n", NULL, 2), 126);
+		}
+		if (access(cmd->argv[0], X_OK) == 0)
+		{
+			if (execve(cmd->argv[0], cmd->argv, envp) == -1)
+			{
+				ft_free_arr(envp);
+				return (perror(cmd->argv[0]), 127);
+			}
+		}
 		else
-			cmd_path = ft_strdup(cmd->argv[0]);
+		{
+			ft_free_arr(envp);
+			return (perror(cmd->argv[0]), 126);
+		}
 	}
 	else
 		cmd_path = resolve_cmd_path(shell, cmd->argv[0]);
@@ -197,17 +212,33 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 		ft_putstr_fd(": command not found\n", 2);
 		return (127);
 	}
-	if (access(cmd_path, F_OK) == -1)
+	if (stat(cmd_path, &file_stat) == -1)
 	{
 		ft_free_arr(envp);
 		ft_free(cmd_path);
-		return (perror(cmd_path), 127);
+		perror(cmd->argv[0]);
+		return (1);
 	}
-	if (execve(cmd_path, cmd->argv, envp) == -1)
+	if (S_ISDIR(file_stat.st_mode))
 	{
 		ft_free_arr(envp);
 		ft_free(cmd_path);
 		return (print_err(cmd->argv[0], ": Is a directory\n", NULL, 2), 126);
+	}
+	if (access(cmd_path, X_OK) == 0)
+	{
+		if (execve(cmd_path, cmd->argv, envp) == -1)
+		{
+			ft_free_arr(envp);
+			ft_free(cmd_path);
+			return (perror(cmd_path), 127);
+		}
+		else
+		{
+			ft_free_arr(envp);
+			ft_free(cmd_path);
+			return (perror(cmd->argv[0]), 126);
+		}
 	}
 	ft_free_arr(envp);
 	ft_free(cmd_path);

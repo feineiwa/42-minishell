@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 11:22:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/01 15:55:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 23:28:07 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,10 @@
 static int	update_pwd(t_env *envp, char *path)
 {
 	char	*pwd_update;
-	char	*tmp;
 
-	tmp = ft_strjoin3(ft_get_env_value(envp, "$PWD"), "/", path);
-	pwd_update = ft_strjoin("PWD=", tmp);
-	ft_free(tmp);
+	pwd_update = ft_strjoin("PWD=", path);
 	if (!pwd_update)
-	{
-		perror(pwd_update);
 		return (1);
-	}
 	ft_add_env(&envp, pwd_update);
 	ft_free(pwd_update);
 	return (0);
@@ -48,6 +42,7 @@ int	update_oldpwd(t_env *envp, char *old_pwd)
 static int	change_directory(char *path, t_env *envp)
 {
 	char	*old_pwd;
+	char	*pwd;
 
 	old_pwd = ft_getcwd("$PWD");
 	if (!old_pwd)
@@ -60,9 +55,15 @@ static int	change_directory(char *path, t_env *envp)
 		perror(path);
 		return (1);
 	}
-	if (update_oldpwd(envp, old_pwd) || update_pwd(envp, path))
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+	{
+		perror("getcwd");
 		return (1);
-	return (0);
+	}
+	if (update_oldpwd(envp, old_pwd) || update_pwd(envp, pwd))
+		return (ft_free(pwd), 1);
+	return (ft_free(pwd), 0);
 }
 
 int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path, char **path_to_free)
@@ -72,11 +73,6 @@ int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path, char **path_to_free)
 	else if (cmd->argv[1][0] == '~')
 		*path_to_free = ft_strjoin(ft_get_env_value(envp, "$HOME"), cmd->argv[1]
 				+ 1);
-	else if (cmd->argv[1][0] == '.' && cmd->argv[1][1] == '.')
-	{
-		*path_to_free = ft_strjoin(ft_get_env_value(envp, "$OLDPWD"),
-				cmd->argv[1] + 2);
-	}
 	else if (cmd->argv[1][0] == '-')
 	{
 		if (cmd->argv[1][1])

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/02 19:02:01 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/02 20:57:02 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void					ft_free_cmd(t_cmd **cmd);
 void					ft_free_env(t_env **envp);
 void					ft_free_all(t_shell *shell);
 void					ft_free_arr(char **arr);
-void					ft_free_pipe(int *pipefd);
+void					ft_free_pipe(int pipefd[2]);
 
 // extra_libft
 void					*ft_realloc(void *ptr, size_t old_size,

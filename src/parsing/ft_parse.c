@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/02 16:13:58 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 18:20:57 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -383,10 +383,7 @@ t_cmd	*parsing(t_shell *shell, char *input)
 	if (!expand)
 		return (ft_free(input), NULL);
 	if (input)
-	{
 		ft_free(input);
-		input = NULL;
-	}
 	tok = lexer_input(expand);
 	if (!tok)
 		return (ft_free(expand), NULL);

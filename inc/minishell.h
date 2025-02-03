@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/02 20:57:02 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 16:53:41 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,8 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-// # define PROMPT "\033[1;36mminishell$\033[1;0m "
 # define PROMPT "minishell$ "
-# define HDOC "\033[1;33m>\033[1;0m "
+# define HDOC "> "
 
 typedef struct s_sig	t_g_sig;
 typedef struct s_shell	t_shell;
@@ -155,6 +154,7 @@ char					*ft_strjoin3(char *s1, char *s2, char *s3);
 char					*ft_strjoin_free(char *s1, char *s2);
 char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
+int						is_only_dot_or_slash(char *s);
 
 // EXEC
 int						launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe);
@@ -169,6 +169,10 @@ int						handle_heredoc(t_cmd *cmd, t_shell *shell,
 							int std_fds[2], int use_pipe);
 int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
 							int std_fds[2]);
+int						handle_dot_cmd(t_shell *shell, t_cmd *cmd);
+void					handle_ctrl_c(char *content, int pipe_fd[2],
+							int std_fds[2], pid_t pid);
+void					close_unused_hdoc_fd(int hdoc_fd);
 int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
@@ -177,6 +181,17 @@ t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
 t_bool					retore_fds_standart(int input_fd, int output_fd,
 							int *stdin, int *stdout);
 char					*resolve_cmd_path(t_shell *shell, char *cmd);
+int						check_file(char *cmd_path, struct stat *file_stat);
+int						check_syntax_path(t_cmd *cmd, char **cmd_path,
+							t_shell *shell, struct stat *file_stat);
+int						check_execution(char *real_cmd, t_cmd *cmd, char **envp,
+							struct stat *file_stat);
+int						is_special_case(t_cmd *cmd, t_shell *shell);
+char					*expand_content_if_needed(char *content, t_hdoc *hdoc);
+void					write_content_to_pipe(char *content, int pipe_fd[2]);
+int						init_global_hdoc_fd(t_cmd *cmd);
+int						handle_single_heredoc(t_cmd *tmp, t_shell *shell,
+							int std_fds[2], int i);
 
 // BUILTINS
 int						ft_echo(char **args);
@@ -194,6 +209,7 @@ void					handler_signal_fork(pid_t pid);
 int						handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd,
 							int std_fds[2], int use_pipe);
 void					handle_sigint(int sig);
+void					handle_sigint_for_hdoc(int sig);
 t_g_sig					*g_global(void);
 void					setup_signal(void);
 void					setup_signal_for_hdoc(void);

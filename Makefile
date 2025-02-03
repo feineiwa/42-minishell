@@ -19,7 +19,7 @@ BUILTINS_DIR = builtins/
 BUILTINS_FILES = ft_cd ft_echo ft_env ft_exit ft_export ft_pwd ft_unset
 
 EXEC_DIR = execution/
-EXEC_FILES = exec_utils exec heredoc pipe redirection
+EXEC_FILES = exec_utils exec_utils2 exec heredoc hdoc_utils hdoc_utils2 pipe redirection
 
 SIGNAL_DIR = signals/
 SIGNAL_FILES = ft_signal ft_signal_fork
@@ -75,7 +75,7 @@ debug : $(NAME)
 	@make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
 VAL: 
-	valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
+	valgrind --track-fds=yes --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
 
 run : fclean all
 	@clear && ./minishell

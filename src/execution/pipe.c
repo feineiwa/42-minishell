@@ -6,36 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/02 16:57:18 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 17:44:32 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
-
-void	close_unused_hdoc_fd(int hdoc_fd)
-{
-	t_cmd	*tmp;
-	int		j;
-
-	tmp = g_global()->shell->cmd;
-	j = 0;
-	while (tmp)
-	{
-		if (g_global()->hdoc_fd[j] == hdoc_fd)
-		{
-			j++;
-			tmp = tmp->next;
-			continue ;
-		}
-		if (g_global()->hdoc_fd[j] != -1)
-		{
-			close(g_global()->hdoc_fd[j]);
-			g_global()->hdoc_fd[j] = -1;
-		}
-		j++;
-		tmp = tmp->next;
-	}
-}
 
 static t_bool	update_std_fds(t_cmd *cmd, int fd)
 {
@@ -68,7 +43,8 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
 	close(g_global()->pipfd[0]);
 	if (cmd->hdoc && cmd->hdoc->del)
 		*input_fd = hdoc_fd;
-	close_unused_hdoc_fd(hdoc_fd);
+	if (hdoc_fd != -1)
+		close_unused_hdoc_fd(hdoc_fd);
 	if (!update_std_fds(cmd, *input_fd))
 	{
 		ft_free_all(shell);
@@ -93,7 +69,6 @@ static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
 		*input_fd = -1;
 	if (hdoc_fd != -1)
 		close(hdoc_fd);
-	// close(g_global()->pipfd[0]);
 }
 
 static int	create_pipe_and_fork(pid_t *pid)
@@ -129,9 +104,7 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd)
 	input_fd = -1;
 	while (cmd)
 	{
-		if (create_pipe_and_fork(&pid))
-			return (1);
-		if (cmd->next && !g_global()->pipfd)
+		if (create_pipe_and_fork(&pid) || (cmd->next && !g_global()->pipfd))
 			return (1);
 		if (pid == 0)
 			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[i]);

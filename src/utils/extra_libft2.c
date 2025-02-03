@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 15:16:38 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/01 15:17:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 16:53:52 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,17 @@ char	*ft_strjoin3(char *s1, char *s2, char *s3)
 		str[j++] = s3[i++];
 	str[j] = 0;
 	return (str);
+}
+
+int	is_only_dot_or_slash(char *s)
+{
+	if (!s)
+		return (1);
+	while (*s)
+	{
+		if (*s != '.' && *s != '/')
+			return (0);
+		s++;
+	}
+	return (1);
 }

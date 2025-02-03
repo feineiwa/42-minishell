@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 22:01:37 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 18:46:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ char	*format_value(char *s)
 	i = -1;
 	j = 0;
 	spec[1] = '\0';
+	if (!s)
+		return (value);
 	while (s[++i])
 	{
 		if (ft_is_belong(s[i]))
@@ -110,7 +112,6 @@ char	*extract_var(char *s, t_shell *shell)
 	value = ft_strdup(ft_get_env_value(shell->envp, key));
 	if (!value)
 		return (ft_free(key), NULL);
-	value = format_value(value);
 	return (ft_free(key), value);
 }
 
@@ -237,18 +238,6 @@ static void	expand_status(char *s, int *start, int *i, char **expanded)
 	*start = *i;
 }
 
-static char	*add_double_quotes(char *s)
-{
-	char	*value;
-
-	value = NULL;
-	value = ft_strjoin3("\"", s, "\"");
-	if (!value)
-		return (NULL);
-	ft_free(s);
-	return (value);
-}
-
 static void	expand_variable(char *s, int *start, int *i, char **expanded)
 {
 	char	*value;
@@ -256,8 +245,8 @@ static void	expand_variable(char *s, int *start, int *i, char **expanded)
 	value = NULL;
 	*expanded = ft_strjoin_free(*expanded, ft_strndup(s + *start, *i - *start));
 	value = extract_var(s + *i, g_global()->shell);
-	if (ft_is_between(s, *i) == '"')
-		value = add_double_quotes(value);
+	if ((ft_is_between(s, *i) != '"'))
+		value = format_value(value);
 	if (value)
 		*expanded = ft_strjoin_free(*expanded, value);
 	else
@@ -280,8 +269,8 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	g_global()->shell = shell;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) \
-			|| s[i + 1] == '_')))
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || s[i
+					+ 1] == '_')))
 			expand_variable(s, &start, &i, &expanded);
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
 			expand_status(s, &start, &i, &expanded);

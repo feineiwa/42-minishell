@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/01/30 14:54:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:46:35 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,8 @@ void	ft_free_cmd(t_cmd **cmd)
 {
 	t_cmd	*next;
 
+	if (!*cmd)
+		return ;
 	while (*cmd)
 	{
 		next = (*cmd)->next;

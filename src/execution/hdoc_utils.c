@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:05 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 16:19:12 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:46:35 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,10 @@ void	close_hdoc_fd_inherited_from_parent(void)
 	while (tmp)
 	{
 		if (g_global()->hdoc_fd[i] != -1)
+		{
 			close(g_global()->hdoc_fd[i]);
+			g_global()->hdoc_fd[i] = -1;
+		}
 		i++;
 		tmp = tmp->next;
 	}
@@ -60,7 +63,10 @@ void	handle_ctrl_c(char *content, int pipe_fd[2], int std_fds[2], pid_t pid)
 		ft_free(content);
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
-		retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
+		close(std_fds[0]);
+		close(std_fds[1]);
+		if (g_global()->use_pipe)
+			close_hdoc_fd_inherited_from_parent();
 		ft_free_all(g_global()->shell);
 		signal(SIGINT, SIG_DFL);
 		kill(pid, SIGINT);

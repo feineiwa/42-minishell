@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/03 23:31:24 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 14:10:08 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,8 @@ static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->flag_err = 1;
 			*error_flag = 1;
 		}
-		close(fd);
+		else
+			close(fd);
 	}
 	return (1);
 }
@@ -184,7 +185,8 @@ int	handle_output_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->flag_err = 2;
 			*error_flag = 1;
 		}
-		close(fd);
+		else
+			close(fd);
 	}
 	return (1);
 }
@@ -215,8 +217,10 @@ int	handle_append_file(t_cmd **tmp, t_token **tok, int *error_flag,
 			(*tmp)->flag_err = 3;
 			*error_flag = 1;
 		}
+		else
+			close(fd);
 	}
-	return (close(fd), 1);
+	return (1);
 }
 
 t_hdoc	*get_last_hdoc(t_hdoc *first)
@@ -378,15 +382,16 @@ t_cmd	*parsing(t_shell *shell, char *input)
 	if (count_quotes(input))
 	{
 		ft_free(input);
-		return (print_err("Error: the quotes should be close\n", NULL, NULL, 2),
-			NULL);
+		return (ft_putstr_fd("Error: Unmatched quotes detected\n", 2), NULL);
 	}
 	g_global()->shell = shell;
 	expand = ft_expand(shell, input);
 	if (!expand)
+	{
+		g_global()->exit_status = 0;
 		return (ft_free(input), NULL);
-	if (input)
-		ft_free(input);
+	}
+	ft_free(input);
 	tok = lexer_input(expand);
 	if (!tok)
 		return (ft_free(expand), NULL);

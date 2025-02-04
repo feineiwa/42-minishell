@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 23:59:52 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:32:51 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ struct					s_sig
 	int					exit_status;
 	int					pipfd[2];
 	int					*hdoc_fd;
+	int					use_pipe;
 	t_shell				*shell;
 };
 
@@ -138,6 +139,18 @@ t_cmd					*parse_into_cmd(t_shell *shell, t_token *tok);
 // expand;
 char					*extract_var(char *s, t_shell *shell);
 char					*ft_expand(t_shell *shell, char *s);
+char					*add_double_quotes(char *s);
+char					*ft_expand_for_hdoc(t_shell *shell, char *s);
+int						ft_strlen_expand(char *s);
+int						ft_is_after_here(char *s, int i);
+int						ft_is_after_equal(char *s, int i);
+void					format_value_for_quotes(char *s, int *i, int *j,
+							char **value);
+void					ft_is_quote_after_equal(char *s, int *i, int *j);
+char					*format_value(char *s);
+char					*extract_var(char *s, t_shell *shell);
+t_bool					ft_is_special(char c);
+t_bool					ft_is_expanded(char *s, int i);
 
 // ft_free
 void					ft_free_token(t_token *tok);
@@ -157,8 +170,9 @@ int						ft_cmdsize(t_cmd *cmd);
 int						is_only_dot_or_slash(char *s);
 
 // EXEC
-int						launch_cmd(t_shell *shell, t_cmd *cmd, int use_pipe);
-int						config_with_pipe(t_shell *shell, t_cmd *cmd);
+int						launch_cmd(t_shell *shell, t_cmd *cmd, int sa_std[2]);
+int						config_with_pipe(t_shell *shell, t_cmd *cmd,
+							int sa_stds[2]);
 void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
@@ -166,7 +180,7 @@ void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
 int						handler_input_redirection(char *input_file);
 int						handler_output_redirection(t_cmd *cmd);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell,
-							int std_fds[2], int use_pipe);
+							int std_fds[2]);
 int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
 							int std_fds[2]);
 int						handle_dot_cmd(t_shell *shell, t_cmd *cmd);
@@ -178,8 +192,6 @@ int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
 t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
 							int *output_fd);
-t_bool					retore_fds_standart(int input_fd, int output_fd,
-							int *stdin, int *stdout);
 char					*resolve_cmd_path(t_shell *shell, char *cmd);
 int						is_special_case(t_cmd *cmd, t_shell *shell);
 char					*expand_content_if_needed(char *content, t_hdoc *hdoc);
@@ -187,6 +199,13 @@ void					write_content_to_pipe(char *content, int pipe_fd[2]);
 int						init_global_hdoc_fd(t_cmd *cmd);
 int						handle_single_heredoc(t_cmd *tmp, t_shell *shell,
 							int std_fds[2], int i);
+int						handle_relatif_cmd(t_shell *shell, t_cmd *cmd,
+							char **envp);
+int						handle_absolute_cmd(t_cmd *cmd, char **envp);
+int						check_execution(char **envp, char *cmd_path,
+							t_cmd *cmd);
+t_bool					retore_fds_standart(int input_fd, int output_fd,
+							int stdin, int stdout);
 
 // BUILTINS
 int						ft_echo(char **args);
@@ -202,7 +221,7 @@ int						ft_cd(t_cmd *cmd, t_env *envp);
 int						handler_signal_pipe(pid_t pid);
 void					handler_signal_fork(pid_t pid);
 int						handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd,
-							int std_fds[2], int use_pipe);
+							int std_fds[2]);
 void					handle_sigint(int sig);
 void					handle_sigint_for_hdoc(int sig);
 t_g_sig					*g_global(void);
@@ -211,5 +230,7 @@ void					setup_signal_for_hdoc(void);
 void					close_hdoc_fd_inherited_from_parent(void);
 
 void					print_err(char *s1, char *s2, char *s3, int fd);
+
+void					save_fds_standart(int *saved_stdin, int *saved_stdout);
 
 #endif

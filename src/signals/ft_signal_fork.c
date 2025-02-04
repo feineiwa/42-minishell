@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:24:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 00:00:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 18:08:20 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@ int	handler_signal_pipe(pid_t pid)
 {
 	int	status;
 
-	close(g_global()->pipfd[0]);
 	waitpid(pid, &status, 0);
+	close(g_global()->pipfd[0]);
+	close(g_global()->pipfd[1]);
 	if (WIFSIGNALED(status))
 	{
 		g_global()->exit_status = 128 + WTERMSIG(status);
@@ -54,11 +55,11 @@ void	handler_signal_fork(pid_t pid)
 	}
 }
 
-int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd, int std_fds[2],
-		int use_pipe)
+int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd, int std_fds[2])
 {
 	int	status;
 
+	(void)std_fds;
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
@@ -73,38 +74,10 @@ int	handler_signal_hdoc(int *pipe_fd, pid_t pid, t_cmd *cmd, int std_fds[2],
 		if (WTERMSIG(status) == SIGINT)
 		{
 			close(pipe_fd[0]);
-			if (use_pipe)
+			if (g_global()->use_pipe)
 				close_hdoc_fd_inherited_from_parent();
-			retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
 			return (write(STDOUT_FILENO, "\n", 1), -2);
 		}
 	}
-	return (0);
-}
-
-void	handle_sigint_for_hdoc(int sig)
-{
-	if (sig == SIGINT)
-	{
-		g_global()->is_runing = SIGINT;
-		close(0);
-		close(1);
-		close(2);
-	}
-	else
-		g_global()->is_runing = 3;
-}
-
-void	setup_signal_for_hdoc(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	sa_int.sa_flags = 0;
-	sa_quit.sa_flags = 0;
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_handler = &handle_sigint_for_hdoc;
-	sa_quit.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa_int, NULL);
+	return (pipe_fd[0]);
 }

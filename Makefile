@@ -13,13 +13,13 @@ OBJS_DIR    =   obj/
 INCLUDE     =   -I ./inc -I ./libft -lreadline
 
 PARSE_DIR = parsing/
-PARSE_FILES = ft_expand ft_parse parse_utils
+PARSE_FILES = ft_expand ft_expand2 ft_expand3 ft_parse parse_utils parse_utils2
 
 BUILTINS_DIR = builtins/
 BUILTINS_FILES = ft_cd ft_echo ft_env ft_exit ft_export ft_pwd ft_unset
 
 EXEC_DIR = execution/
-EXEC_FILES = exec_utils exec_utils2 exec heredoc hdoc_utils hdoc_utils2 pipe redirection
+EXEC_FILES = exec exec_utils exec_utils2 utils_other_cmd heredoc hdoc_utils pipe redirection
 
 SIGNAL_DIR = signals/
 SIGNAL_FILES = ft_signal ft_signal_fork
@@ -74,7 +74,7 @@ re : fclean all
 debug : $(NAME)
 	@make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
-VAL: 
+val: 
 	valgrind --track-fds=yes --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
 
 run : fclean all

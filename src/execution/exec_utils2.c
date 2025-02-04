@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:53:35 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 22:37:19 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 14:48:17 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,11 @@ int	abs_path_for_dot_cmd(t_cmd *cmd)
 	return (0);
 }
 
-
 int	relatif_path_for_dot_cmd(t_shell *shell, t_cmd *cmd)
 {
 	struct stat	file_stat;
 	char		*cmd_path;
-	
+
 	cmd_path = resolve_cmd_path(shell, cmd->argv[1]);
 	if (cmd_path)
 	{

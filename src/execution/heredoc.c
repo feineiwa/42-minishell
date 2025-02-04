@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 17:18:13 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 18:40:18 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
 
 	while (42)
 	{
+		content = NULL;
 		content = readline(HDOC);
 		handle_ctrl_c(content, pipe_fd, std_fds, pid);
 		if (content == NULL)
@@ -42,38 +43,40 @@ static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
 	}
 }
 
-static void	child_process_for_hdoc(t_hdoc *hdoc, int pipe_fd[2], int std_fds[2],
-		int use_pipe)
+static void	child_process_for_hdoc(t_hdoc *hdoc, int pipe_fd[2], pid_t pid,
+		int std_fds[2])
 {
 	g_global()->is_runing = 3;
 	setup_signal_for_hdoc();
 	close(pipe_fd[0]);
-	if (use_pipe)
+	if (g_global()->use_pipe)
 		close_hdoc_fd_inherited_from_parent();
 	while (hdoc)
 	{
-		read_heredoc(hdoc, getpid(), pipe_fd, std_fds);
+		read_heredoc(hdoc, pid, pipe_fd, std_fds);
 		hdoc = hdoc->next;
 	}
 	close(pipe_fd[1]);
-	retore_fds_standart(-1, -1, &std_fds[0], &std_fds[1]);
+	close(std_fds[0]);
+	close(std_fds[1]);
 	ft_free_all(g_global()->shell);
 	exit(0);
 }
 
 static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, int std_fds[2],
-		int use_pipe)
+		t_shell *shell)
 {
 	int		pipe_fd[2];
 	int		status;
 	pid_t	pid;
 
+	setup_signal();
+	g_global()->shell = shell;
 	if (pipe(pipe_fd) < 0)
 	{
 		perror("pipe");
 		return (-1);
 	}
-	setup_signal();
 	pid = fork();
 	if (pid < 0)
 	{
@@ -81,23 +84,56 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, int std_fds[2],
 		return (-1);
 	}
 	else if (pid == 0)
-		child_process_for_hdoc(hdoc, pipe_fd, std_fds, use_pipe);
+		child_process_for_hdoc(hdoc, pipe_fd, pid, std_fds);
 	else
 	{
-		status = handler_signal_hdoc(pipe_fd, pid, cmd, std_fds, use_pipe);
+		status = handler_signal_hdoc(pipe_fd, pid, cmd, std_fds);
 		if (status < 0)
 			return (status);
 	}
 	return (pipe_fd[0]);
 }
 
-int	handle_heredoc(t_cmd *cmd, t_shell *shell, int std_fds[2], int use_pipe)
+int	handle_single_heredoc(t_cmd *tmp, t_shell *shell, int std_fds[2], int i)
+{
+	int	hdoc_ret;
+
+	g_global()->shell = shell;
+	hdoc_ret = -1;
+	if (tmp->hdoc && tmp->hdoc->del)
+	{
+		hdoc_ret = handle_heredoc(tmp, shell, std_fds);
+		g_global()->hdoc_fd[i] = hdoc_ret;
+	}
+	else
+		g_global()->hdoc_fd[i] = -1;
+	return (hdoc_ret);
+}
+
+int	init_global_hdoc_fd(t_cmd *cmd)
+{
+	int	i;
+
+	i = 0;
+	g_global()->hdoc_fd = malloc(sizeof(int) * ft_cmdsize(cmd));
+	if (!g_global()->hdoc_fd)
+		return (0);
+	while (cmd)
+	{
+		g_global()->hdoc_fd[i] = -1;
+		i++;
+		cmd = cmd->next;
+	}
+	return (1);
+}
+
+int	handle_heredoc(t_cmd *cmd, t_shell *shell, int std_fds[2])
 {
 	int	inputfd;
 
 	inputfd = -1;
 	g_global()->shell = shell;
-	inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, std_fds, use_pipe);
+	inputfd = between_heredoc_and_cmd(cmd->hdoc, cmd, std_fds, shell);
 	return (inputfd);
 }
 
@@ -106,20 +142,15 @@ int	handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell, int std_fds[2])
 	int		i;
 	t_cmd	*tmp;
 
-	if (!init_global_hdoc_fd(cmd))
-		return (1);
 	i = 0;
 	tmp = cmd;
+	g_global()->shell = shell;
 	while (tmp)
 	{
 		g_global()->is_runing = 2;
 		setup_signal();
 		if (handle_single_heredoc(tmp, shell, std_fds, i) == -2)
-		{
-			ft_free_cmd(&shell->cmd);
-			ft_free(g_global()->hdoc_fd);
 			return (1);
-		}
 		i++;
 		tmp = tmp->next;
 	}

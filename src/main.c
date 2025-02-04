@@ -6,26 +6,60 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 23:58:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 19:44:36 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static void	execute_command(t_shell *shell)
+static void	init_global(t_shell *shell)
 {
-	t_cmd	*temp;
-
 	g_global()->is_runing = 2;
 	g_global()->hdoc_fd = NULL;
 	g_global()->pipfd[0] = -1;
 	g_global()->pipfd[1] = -1;
 	g_global()->shell = shell;
+}
+
+static void	restore_standard(int sa_std[2])
+{
+	if (sa_std[0] != -1)
+	{
+		if (dup2(sa_std[0], STDIN_FILENO) < 0)
+			perror("dup2");
+		close(sa_std[0]);
+	}
+	if (sa_std[1] != -1)
+	{
+		if (dup2(sa_std[1], STDIN_FILENO) < 0)
+			perror("dup2");
+		close(sa_std[1]);
+	}
+}
+
+static void	execute_command(t_shell *shell)
+{
+	t_cmd	*temp;
+	int		sa_std[2];
+
+	init_global(shell);
+	save_fds_standart(&sa_std[0], &sa_std[1]);
 	temp = shell->cmd;
 	if (temp && !temp->next)
-		g_global()->exit_status = launch_cmd(shell, temp, 0);
+	{
+		g_global()->use_pipe = 0;
+		g_global()->exit_status = launch_cmd(shell, temp, sa_std);
+		restore_standard(sa_std);
+	}
 	else if (temp->next)
-		g_global()->exit_status = config_with_pipe(shell, temp);
+	{
+		g_global()->use_pipe = 1;
+		init_global_hdoc_fd(shell->cmd);
+		g_global()->exit_status = config_with_pipe(shell, temp, sa_std);
+		if (g_global()->hdoc_fd)
+			ft_free(g_global()->hdoc_fd);
+		restore_standard(sa_std);
+	}
 }
 
 static void	prompt_loop(t_shell *shell)

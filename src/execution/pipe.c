@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 23:51:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 19:31:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static t_bool	update_std_fds(t_cmd *cmd, int fd)
+t_bool	update_std_fds(t_cmd *cmd, int fd)
 {
 	if (fd != -1)
 	{
@@ -35,30 +35,38 @@ static t_bool	update_std_fds(t_cmd *cmd, int fd)
 	return (TRUE);
 }
 
-static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
-		int hdoc_fd)
+void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd, int hdoc_fd,
+		int sa_std[2])
 {
+	g_global()->use_pipe = TRUE;
 	g_global()->is_runing = 1;
 	setup_signal();
 	close(g_global()->pipfd[0]);
 	if (cmd->hdoc && cmd->hdoc->del)
+	{
+		if (*input_fd != -1)
+			close(*input_fd);
 		*input_fd = hdoc_fd;
-	if (hdoc_fd != -1)
-		close_unused_hdoc_fd(hdoc_fd);
+	}
 	if (!update_std_fds(cmd, *input_fd))
 	{
+		close(g_global()->pipfd[1]);
+		close_hdoc_fd_inherited_from_parent();
+		close(sa_std[0]);
+		close(sa_std[1]);
 		ft_free_all(shell);
 		exit(1);
 	}
-	g_global()->exit_status = launch_cmd(shell, cmd, TRUE);
-	if (!cmd->argv[0])
-		close(g_global()->pipfd[1]);
-	ft_free_all(shell);
+	g_global()->exit_status = launch_cmd(shell, cmd, sa_std);
+	close_hdoc_fd_inherited_from_parent();
 	close(g_global()->pipfd[1]);
+	close(sa_std[0]);
+	close(sa_std[1]);
+	ft_free_all(shell);
 	exit(g_global()->exit_status);
 }
 
-static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
+void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
 {
 	close(g_global()->pipfd[1]);
 	if (*input_fd != -1 && *input_fd != hdoc_fd)
@@ -71,7 +79,7 @@ static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
 		close(hdoc_fd);
 }
 
-static int	create_pipe_and_fork(pid_t *pid)
+int	create_pipe_and_fork(pid_t *pid)
 {
 	if (pipe((g_global()->pipfd)) < 0)
 	{
@@ -87,31 +95,46 @@ static int	create_pipe_and_fork(pid_t *pid)
 	return (0);
 }
 
-int	config_with_pipe(t_shell *shell, t_cmd *cmd)
+int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 {
 	int		i;
 	int		input_fd;
 	pid_t	pid;
-	int		std_fds[2];
 
-	std_fds[0] = -1;
-	std_fds[1] = -1;
 	g_global()->shell = shell;
 	setup_signal();
-	if (handle_heredoc_with_pipe(cmd, shell, std_fds))
+	if (handle_heredoc_with_pipe(cmd, shell, sa_std))
+	{
+		dup2(sa_std[0], STDIN_FILENO);
+		close(sa_std[0]);
+		dup2(sa_std[1], STDOUT_FILENO);
+		close(sa_std[0]);
 		return (g_global()->exit_status);
+	}
 	i = 0;
 	input_fd = -1;
 	while (cmd)
 	{
-		if (create_pipe_and_fork(&pid) || (cmd->next && !g_global()->pipfd))
+		if ((cmd->next && !g_global()->pipfd) || create_pipe_and_fork(&pid))
+		{
+			dup2(sa_std[0], STDIN_FILENO);
+			close(sa_std[0]);
+			dup2(sa_std[1], STDOUT_FILENO);
+			close(sa_std[0]);
 			return (1);
+		}
 		if (pid == 0)
-			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[i]);
+			child_process(shell, cmd, &input_fd, g_global()->hdoc_fd[i],
+				sa_std);
 		else
 			parent_process(&input_fd, g_global()->hdoc_fd[i], cmd);
 		cmd = cmd->next;
 		i++;
 	}
-	return (ft_free_pipe(g_global()->pipfd), handler_signal_pipe(pid));
+	handler_signal_pipe(pid);
+	dup2(sa_std[0], STDIN_FILENO);
+	close(sa_std[0]);
+	dup2(sa_std[1], STDOUT_FILENO);
+	close(sa_std[0]);
+	return (0);
 }

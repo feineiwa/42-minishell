@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 20:09:52 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 22:12:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ void					ft_free_cmd(t_cmd **cmd);
 void					ft_free_env(t_env **envp);
 void					ft_free_all(t_shell *shell);
 void					ft_free_arr(char **arr);
-void					ft_free_pipe(int pipefd[2]);
+// void					ft_free_pipe(int pipefd[2]);
 
 // extra_libft
 void					*ft_realloc(void *ptr, size_t old_size,
@@ -174,10 +174,8 @@ void					close_saved_std(int sa_std[2]);
 int						launch_cmd(t_shell *shell, t_cmd *cmd, int sa_std[2]);
 int						config_with_pipe(t_shell *shell, t_cmd *cmd,
 							int sa_stds[2]);
-void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
-							int stdin, int stdout);
-void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
-							int stdin, int stdout);
+void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout);
+void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout);
 int						handler_input_redirection(char *input_file, int *in_fd);
 int						handler_output_redirection(t_cmd *cmd, int *out_fd);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell,
@@ -211,8 +209,8 @@ int						ft_pwd(void);
 int						ft_export(t_shell *shell, t_cmd *cmd);
 int						ft_env(t_shell *shell, t_cmd *cmd);
 int						ft_unset(t_shell *shell, t_cmd *cmd);
-int						ft_exit(t_shell *shell, char **argv, int stdin,
-							int stdout);
+int						ft_exit(t_shell *shell, char **argv, int sa_stdin,
+							int sa_stdout);
 int						ft_cd(t_cmd *cmd, t_env *envp);
 
 // SIGNALS
@@ -230,5 +228,6 @@ void					close_hdoc_fd_inherited_from_parent(void);
 void					print_err(char *s1, char *s2, char *s3, int fd);
 
 void					save_fds_standart(int *saved_stdin, int *saved_stdout);
+void					restore_standard(int sa_std[2]);
 
 #endif

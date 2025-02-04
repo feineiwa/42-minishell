@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 19:57:24 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:14:01 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void	init_global(t_shell *shell)
 	g_global()->shell = shell;
 }
 
-static void	restore_standard(int sa_std[2])
+void	restore_standard(int sa_std[2])
 {
 	if (sa_std[0] != -1)
 	{

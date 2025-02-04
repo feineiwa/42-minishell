@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 16:39:53 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 22:29:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	*resolve_cmd_path(t_shell *shell, char *cmd)
 	return (NULL);
 }
 
-int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
+int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
 {
 	pid_t	pid;
 
@@ -57,10 +57,10 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 		setup_signal();
 		g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
 		ft_free_all(shell);
-		if (stdin != -1)
-			close(stdin);
-		if (stdout != -1)
-			close(stdout);
+		// if (sa_stdin != -1)
+		// 	close(sa_stdin);
+		// if (sa_stdout != -1)
+		// 	close(sa_stdout);
 		exit(g_global()->exit_status);
 	}
 	else
@@ -92,7 +92,7 @@ int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
 	return (0);
 }
 
-void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
+void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
 {
 	if (!cmd->argv[0])
 		return ;
@@ -110,13 +110,13 @@ void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 	else if (!ft_strcmp("cd", cmd->argv[0]))
 		g_global()->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
-		g_global()->exit_status = ft_exit(shell, cmd->argv, stdin, stdout);
+		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin, sa_stdout);
 	else
-		g_global()->exit_status = other_cmd_without_pipe(shell, cmd, stdin,
-				stdout);
+		g_global()->exit_status = other_cmd_without_pipe(shell, cmd, sa_stdin,
+				sa_stdin);
 }
 
-void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
+void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
 {
 	if (!cmd->argv[0])
 		return ;
@@ -134,7 +134,7 @@ void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int stdin, int stdout)
 	else if (!ft_strcmp("cd", cmd->argv[0]))
 		g_global()->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
-		g_global()->exit_status = ft_exit(shell, cmd->argv, stdin, stdout);
+		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin, sa_stdout);
 	else
 		g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 14:10:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:57:57 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,13 @@ static int	handle_argument(t_cmd **tmp, t_shell *shell, t_token **tok)
 	return (1);
 }
 
+void	set_error_file(t_cmd **tmp, char *file, int flag, int *error_flag)
+{
+	(*tmp)->error_file = ft_strdup(file);
+	(*tmp)->flag_err = flag;
+	*error_flag = 1;
+}
+
 static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
 		t_cmd *cmd_list)
 {
@@ -149,11 +156,7 @@ static int	handle_input_file(t_cmd **tmp, t_token **tok, int *error_flag,
 		(*tmp)->input_file = ft_get_arg(g_global()->shell, (*tok)->value);
 		fd = open((*tmp)->input_file, O_RDONLY);
 		if (fd < 0)
-		{
-			(*tmp)->error_file = ft_strdup((*tmp)->input_file);
-			(*tmp)->flag_err = 1;
-			*error_flag = 1;
-		}
+			set_error_file(tmp, (*tmp)->input_file, 1, error_flag);
 		else
 			close(fd);
 	}
@@ -180,11 +183,7 @@ int	handle_output_file(t_cmd **tmp, t_token **tok, int *error_flag,
 		(*tmp)->output_file = ft_get_arg(g_global()->shell, (*tok)->value);
 		fd = open((*tmp)->output_file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 		if (fd < 0)
-		{
-			(*tmp)->error_file = ft_strdup((*tmp)->output_file);
-			(*tmp)->flag_err = 2;
-			*error_flag = 1;
-		}
+			set_error_file(tmp, (*tmp)->output_file, 2, error_flag);
 		else
 			close(fd);
 	}
@@ -212,11 +211,7 @@ int	handle_append_file(t_cmd **tmp, t_token **tok, int *error_flag,
 		(*tmp)->output_file = ft_get_arg(g_global()->shell, (*tok)->value);
 		fd = open((*tmp)->output_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (fd < 0)
-		{
-			(*tmp)->error_file = ft_strdup((*tmp)->output_file);
-			(*tmp)->flag_err = 3;
-			*error_flag = 1;
-		}
+			set_error_file(tmp, (*tmp)->output_file, 3, error_flag);
 		else
 			close(fd);
 	}

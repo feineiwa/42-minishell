@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 14:36:34 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 18:07:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:04:57 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,6 @@ void	print_err(char *s1, char *s2, char *s3, int fd)
 	if (s3)
 		ft_putstr_fd(s3, fd);
 }
-
-// void	ft_free_pipe(int pipefd[2])
-// {
-// 	// close(pipefd[0]);
-// 	// close(pipefd[1]);
-// 	ft_free(g_global()->hdoc_fd);
-// }
 
 void	ft_free_arr(char **arr)
 {

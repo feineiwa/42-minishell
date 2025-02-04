@@ -1,3 +1,0 @@
-ft_putstr_fd("pipe_fd is ", 2);
-ft_putnbr_fd(pipe_fd[0], 2);
-ft_putstr_fd("\n", 2);

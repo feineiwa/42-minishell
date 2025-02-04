@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:05:55 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 20:11:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:57:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,11 @@ t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)
 	}
 	else if (cmd->flag_err == 2)
 	{
-		*input_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (*input_fd < 0)
+		*output_fd = open(cmd->error_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (*output_fd < 0)
 			return (perror(cmd->error_file), FALSE);
 		else
-			close(*input_fd);
+			close(*output_fd);
 	}
 	else if (cmd->flag_err == 3)
 	{

@@ -6,20 +6,19 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 18:40:18 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:11:53 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
 static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
-		int std_fds[2])
+	int std_fds[2])
 {
 	char	*content;
 
 	while (42)
 	{
-		content = NULL;
 		content = readline(HDOC);
 		handle_ctrl_c(content, pipe_fd, std_fds, pid);
 		if (content == NULL)
@@ -73,16 +72,10 @@ static int	between_heredoc_and_cmd(t_hdoc *hdoc, t_cmd *cmd, int std_fds[2],
 	setup_signal();
 	g_global()->shell = shell;
 	if (pipe(pipe_fd) < 0)
-	{
-		perror("pipe");
-		return (-1);
-	}
+		return (perror("pipe"), -1);
 	pid = fork();
 	if (pid < 0)
-	{
-		perror("fork");
-		return (-1);
-	}
+		return (perror("fork"), -1);
 	else if (pid == 0)
 		child_process_for_hdoc(hdoc, pipe_fd, pid, std_fds);
 	else

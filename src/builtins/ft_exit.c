@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 19:53:59 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 22:14:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,12 @@ static t_bool	ft_is_number(char *s)
 	return (TRUE);
 }
 
-static void	exit_not_number(int stdin, int stdout, t_shell *shell, char **argv)
+static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell, char **argv)
 {
-	if (stdin != -1)
-		close(stdin);
-	if (stdout != -1)
-		close(stdout);
+	if (sa_stdin != -1)
+		close(sa_stdin);
+	if (sa_stdout != -1)
+		close(sa_stdout);
 	write(STDOUT_FILENO, "exit\n", 5);
 	ft_putstr_fd(argv[1], 2);
 	ft_putstr_fd(": numeric argument required\n", 2);
@@ -71,17 +71,17 @@ long	ft_atol(char *str)
 	return (res * sign);
 }
 
-static void	exit_number(int stdin, int stdout, t_shell *shell, char **argv)
+static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell, char **argv)
 {
 	long	nbr;
 
 	nbr = ft_atol(argv[1]);
 	if (nbr > INT_MAX || nbr < INT_MIN)
-		exit_not_number(stdin, stdout, shell, argv);
-	if (stdin != -1)
-		close(stdin);
-	if (stdout != -1)
-		close(stdout);
+		exit_not_number(sa_stdin, sa_stdout, shell, argv);
+	if (sa_stdin != -1)
+		close(sa_stdin);
+	if (sa_stdout != -1)
+		close(sa_stdout);
 	g_global()->exit_status = nbr % 256;
 	if (g_global()->use_pipe == 0)
 		write(STDOUT_FILENO, "exit\n", 5);
@@ -89,23 +89,23 @@ static void	exit_number(int stdin, int stdout, t_shell *shell, char **argv)
 	exit(g_global()->exit_status);
 }
 
-int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
+int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 {
 	if (!argv[1])
 	{
-		if (stdin != -1)
-			close(stdin);
-		if (stdout != -1)
-			close(stdout);
+		if (sa_stdin != -1)
+			close(sa_stdin);
+		if (sa_stdout != -1)
+			close(sa_stdout);
 		ft_free_all(shell);
 		if (g_global()->use_pipe == 0)
 			write(STDOUT_FILENO, "exit\n", 5);
 		exit(g_global()->exit_status);
 	}
 	if (!ft_is_number(argv[1]))
-		exit_not_number(stdin, stdout, shell, argv);
+		exit_not_number(sa_stdin, sa_stdout, shell, argv);
 	if (ft_is_number(argv[1]) && !argv[2])
-		exit_number(stdin, stdout, shell, argv);
+		exit_number(sa_stdin, sa_stdout, shell, argv);
 	else
 	{
 		if (g_global()->use_pipe == 0)

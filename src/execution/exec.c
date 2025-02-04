@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 20:10:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 22:16:38 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	setup_redirections(t_cmd *cmd, int *in_fd, int *out_fd)
 	}
 	if (cmd->output_file)
 	{
-		if (handler_output_redirection(cmd, in_fd))
+		if (handler_output_redirection(cmd, out_fd))
 			return (1);
 	}
 	return (0);

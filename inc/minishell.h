@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:32:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 20:09:52 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ char					*ft_strjoin_free(char *s1, char *s2);
 char					*ft_strjoin_s1(char *s1, char *s2);
 int						ft_cmdsize(t_cmd *cmd);
 int						is_only_dot_or_slash(char *s);
+void					close_saved_std(int sa_std[2]);
 
 // EXEC
 int						launch_cmd(t_shell *shell, t_cmd *cmd, int sa_std[2]);
@@ -177,8 +178,8 @@ void					what_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 void					what_cmd_with_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
-int						handler_input_redirection(char *input_file);
-int						handler_output_redirection(t_cmd *cmd);
+int						handler_input_redirection(char *input_file, int *in_fd);
+int						handler_output_redirection(t_cmd *cmd, int *out_fd);
 int						handle_heredoc(t_cmd *cmd, t_shell *shell,
 							int std_fds[2]);
 int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
@@ -186,7 +187,6 @@ int						handle_heredoc_with_pipe(t_cmd *cmd, t_shell *shell,
 int						handle_dot_cmd(t_shell *shell, t_cmd *cmd);
 void					handle_ctrl_c(char *content, int pipe_fd[2],
 							int std_fds[2], pid_t pid);
-void					close_unused_hdoc_fd(int hdoc_fd);
 int						other_cmd_without_pipe(t_shell *shell, t_cmd *cmd,
 							int stdin, int stdout);
 int						other_cmd_with_pipe(t_shell *shell, t_cmd *cmd);
@@ -204,8 +204,6 @@ int						handle_relatif_cmd(t_shell *shell, t_cmd *cmd,
 int						handle_absolute_cmd(t_cmd *cmd, char **envp);
 int						check_execution(char **envp, char *cmd_path,
 							t_cmd *cmd);
-t_bool					retore_fds_standart(int input_fd, int output_fd,
-							int stdin, int stdout);
 
 // BUILTINS
 int						ft_echo(char **args);

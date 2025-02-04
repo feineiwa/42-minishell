@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 14:50:31 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 19:53:59 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,8 @@ static void	exit_number(int stdin, int stdout, t_shell *shell, char **argv)
 	if (stdout != -1)
 		close(stdout);
 	g_global()->exit_status = nbr % 256;
-	write(STDOUT_FILENO, "exit\n", 5);
+	if (g_global()->use_pipe == 0)
+		write(STDOUT_FILENO, "exit\n", 5);
 	ft_free_all(shell);
 	exit(g_global()->exit_status);
 }
@@ -97,7 +98,8 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		if (stdout != -1)
 			close(stdout);
 		ft_free_all(shell);
-		write(STDOUT_FILENO, "exit\n", 5);
+		if (g_global()->use_pipe == 0)
+			write(STDOUT_FILENO, "exit\n", 5);
 		exit(g_global()->exit_status);
 	}
 	if (!ft_is_number(argv[1]))
@@ -106,7 +108,8 @@ int	ft_exit(t_shell *shell, char **argv, int stdin, int stdout)
 		exit_number(stdin, stdout, shell, argv);
 	else
 	{
-		write(STDOUT_FILENO, "exit\n", 5);
+		if (g_global()->use_pipe == 0)
+			write(STDOUT_FILENO, "exit\n", 5);
 		ft_putstr_fd("exit: too many arguments\n", 2);
 		g_global()->exit_status = 1;
 		return (g_global()->exit_status);

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 19:44:36 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 19:57:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,14 @@ static void	restore_standard(int sa_std[2])
 	}
 }
 
+void	close_saved_std(int sa_std[2])
+{
+	if (sa_std[0] != -1)
+		close(sa_std[0]);
+	if (sa_std[1] != -1)
+		close(sa_std[1]);
+}
+
 static void	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
@@ -58,7 +66,7 @@ static void	execute_command(t_shell *shell)
 		g_global()->exit_status = config_with_pipe(shell, temp, sa_std);
 		if (g_global()->hdoc_fd)
 			ft_free(g_global()->hdoc_fd);
-		restore_standard(sa_std);
+		close_saved_std(sa_std);
 	}
 }
 

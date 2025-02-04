@@ -6,36 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:05 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:46:35 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 20:11:31 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-void	close_unused_hdoc_fd(int hdoc_fd)
-{
-	t_cmd	*tmp;
-	int		j;
-
-	tmp = g_global()->shell->cmd;
-	j = 0;
-	while (tmp)
-	{
-		if (g_global()->hdoc_fd[j] == hdoc_fd)
-		{
-			j++;
-			tmp = tmp->next;
-			continue ;
-		}
-		if (g_global()->hdoc_fd[j] != -1)
-		{
-			close(g_global()->hdoc_fd[j]);
-			g_global()->hdoc_fd[j] = -1;
-		}
-		j++;
-		tmp = tmp->next;
-	}
-}
 
 void	close_hdoc_fd_inherited_from_parent(void)
 {
@@ -61,10 +36,10 @@ void	handle_ctrl_c(char *content, int pipe_fd[2], int std_fds[2], pid_t pid)
 	if (g_global()->is_runing == SIGINT)
 	{
 		ft_free(content);
+		content = NULL;
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
-		close(std_fds[0]);
-		close(std_fds[1]);
+		close_saved_std(std_fds);
 		if (g_global()->use_pipe)
 			close_hdoc_fd_inherited_from_parent();
 		ft_free_all(g_global()->shell);

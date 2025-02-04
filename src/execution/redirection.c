@@ -6,54 +6,59 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:05:55 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 14:44:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/04 20:11:42 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int	handler_input_redirection(char *input_file)
+int	handler_input_redirection(char *input_file, int *in_fd)
 {
-	int	fd;
-
-	fd = -1;
-	fd = open(input_file, O_RDONLY);
-	if (fd < 0)
+	*in_fd = open(input_file, O_RDONLY);
+	if (*in_fd < 0)
 	{
 		perror(input_file);
-		return (-1);
+		return (1);
 	}
-	if (dup2(fd, STDIN_FILENO) < 0)
+	if (*in_fd != -1)
 	{
-		perror(input_file);
-		return (-1);
+		if (dup2(*in_fd, STDIN_FILENO) < 0)
+		{
+			perror("dup2 input");
+			return (1);
+		}
+		close(*in_fd);
+		*in_fd = -1;
 	}
-	return (fd);
+	return (0);
 }
 
-int	handler_output_redirection(t_cmd *cmd)
+int	handler_output_redirection(t_cmd *cmd, int *out_fd)
 {
-	int	fd;
 	int	flags;
 
-	fd = -1;
 	flags = O_WRONLY | O_CREAT;
 	if (cmd->append)
 		flags |= O_APPEND;
 	else
 		flags |= O_TRUNC;
-	fd = open(cmd->output_file, flags, 0644);
-	if (fd < 0)
+	*out_fd = open(cmd->output_file, flags, 0644);
+	if (*out_fd < 0)
 	{
 		perror("minishell: output_file");
-		return (-1);
+		return (1);
 	}
-	if (dup2(fd, STDOUT_FILENO) < 0)
+	if (*out_fd != -1)
 	{
-		perror("minishell: dup2 output");
-		return (-1);
+		if (dup2(*out_fd, STDOUT_FILENO) < 0)
+		{
+			perror("dup2 input");
+			return (1);
+		}
+		close(*out_fd);
+		*out_fd = -1;
 	}
-	return (fd);
+	return (0);
 }
 
 t_bool	handler_error_flag(t_cmd *cmd, int *input_fd, int *output_fd)

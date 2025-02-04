@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/03 18:46:44 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:40:12 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ char	*format_value(char *s)
 {
 	char	*value;
 	char	spec[1];
-	char	*tmp;
 	int		i;
 	int		j;
 
@@ -77,8 +76,7 @@ char	*format_value(char *s)
 		{
 			spec[0] = ft_is_belong(s[i]);
 			value = ft_strjoin_free(value, ft_substr(s, j, i - j));
-			tmp = ft_strjoin3("'", spec, "'");
-			value = ft_strjoin_free(value, tmp);
+			value = ft_strjoin_free(value, ft_strjoin3("'", spec, "'"));
 			j = i + 1;
 		}
 		else if (s[i] == '\'' || s[i] == '"')

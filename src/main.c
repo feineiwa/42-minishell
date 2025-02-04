@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 18:12:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:58:43 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	prompt_loop(t_shell *shell)
 			add_history(input);
 			shell->cmd = parsing(shell, input);
 			if (!shell->cmd)
-				g_global()->exit_status = 1;
+				g_global()->exit_status = g_global()->exit_status;
 			else
 			{
 				execute_command(shell);

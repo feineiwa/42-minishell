@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/03 18:20:57 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:31:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,10 @@ int	cmd_valid(t_cmd **tmp, t_token **tok, int *error_flag, t_cmd *cmd_list)
 	else if ((*tok)->type == PIPE)
 		ret = handle_pipeline(tmp, tok, error_flag, cmd_list);
 	if (ret == 0)
+	{
+		g_global()->exit_status = 2;
 		return (0);
+	}
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:22:10 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 16:53:41 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:59:52 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,11 +181,6 @@ t_bool					handler_error_flag(t_cmd *cmd, int *input_fd,
 t_bool					retore_fds_standart(int input_fd, int output_fd,
 							int *stdin, int *stdout);
 char					*resolve_cmd_path(t_shell *shell, char *cmd);
-int						check_file(char *cmd_path, struct stat *file_stat);
-int						check_syntax_path(t_cmd *cmd, char **cmd_path,
-							t_shell *shell, struct stat *file_stat);
-int						check_execution(char *real_cmd, t_cmd *cmd, char **envp,
-							struct stat *file_stat);
 int						is_special_case(t_cmd *cmd, t_shell *shell);
 char					*expand_content_if_needed(char *content, t_hdoc *hdoc);
 void					write_content_to_pipe(char *content, int pipe_fd[2]);

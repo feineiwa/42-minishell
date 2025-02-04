@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/03 17:44:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:51:00 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void	child_process(t_shell *shell, t_cmd *cmd, int *input_fd,
 		ft_free_all(shell);
 		exit(1);
 	}
-	g_global()->exit_status = launch_cmd(shell, cmd, 1);
+	g_global()->exit_status = launch_cmd(shell, cmd, TRUE);
 	if (!cmd->argv[0])
 		close(g_global()->pipfd[1]);
 	ft_free_all(shell);

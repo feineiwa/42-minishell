@@ -6,37 +6,30 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 11:22:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/02 23:28:07 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 13:45:56 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-static int	update_pwd(t_env *envp, char *path)
+static int	change_directory_second(char *path, t_env *envp)
 {
-	char	*pwd_update;
+	char	*old_pwd;
 
-	pwd_update = ft_strjoin("PWD=", path);
-	if (!pwd_update)
-		return (1);
-	ft_add_env(&envp, pwd_update);
-	ft_free(pwd_update);
-	return (0);
-}
-
-int	update_oldpwd(t_env *envp, char *old_pwd)
-{
-	char	*old_pwd_update;
-
-	old_pwd_update = ft_strjoin("OLDPWD=", old_pwd);
-	if (!old_pwd_update)
+	old_pwd = getcwd(NULL, 0);
+	if (!old_pwd)
 	{
-		perror(old_pwd_update);
+		perror("pwd");
 		return (1);
 	}
-	ft_add_env(&envp, old_pwd_update);
-	ft_free(old_pwd_update);
-	return (0);
+	if (chdir(path) == -1)
+	{
+		perror(path);
+		return (ft_free(old_pwd), 1);
+	}
+	if (update_oldpwd(envp, old_pwd))
+		return (ft_free(old_pwd), 1);
+	return (ft_free(old_pwd), 0);
 }
 
 static int	change_directory(char *path, t_env *envp)
@@ -46,27 +39,28 @@ static int	change_directory(char *path, t_env *envp)
 
 	old_pwd = ft_getcwd("$PWD");
 	if (!old_pwd)
-	{
-		perror("getcwd");
-		return (1);
-	}
+		return (change_directory_second(path, envp));
 	if (chdir(path) == -1)
 	{
 		perror(path);
 		return (1);
 	}
-	pwd = getcwd(NULL, 0);
-	if (!pwd)
+	if (old_pwd)
 	{
-		perror("getcwd");
-		return (1);
+		pwd = getcwd(NULL, 0);
+		if (!pwd)
+		{
+			perror("getcwd");
+			return (1);
+		}
+		if (update_oldpwd(envp, old_pwd) || update_pwd(envp, pwd))
+			return (ft_free(pwd), 1);
 	}
-	if (update_oldpwd(envp, old_pwd) || update_pwd(envp, pwd))
-		return (ft_free(pwd), 1);
 	return (ft_free(pwd), 0);
 }
 
-int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path, char **path_to_free)
+static int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path,
+		char **path_to_free)
 {
 	if (!cmd->argv[1])
 		*path = ft_get_env_value(envp, "$HOME");
@@ -79,6 +73,8 @@ int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path, char **path_to_free)
 			return (print_err("cd: ", cmd->argv[1], ": invalid option\n", 2),
 				2);
 		*path = ft_get_env_value(envp, "$OLDPWD");
+		if (!*path)
+			return (ft_putstr_fd("minishell: cd: OLDPWD not set\n", 2), 1);
 	}
 	else
 		*path = cmd->argv[1];
@@ -89,13 +85,16 @@ int	ft_cd(t_cmd *cmd, t_env *envp)
 {
 	char	*path;
 	char	*path_to_free;
+	int		ret;
 
 	path_to_free = NULL;
+	ret = 0;
 	if (cmd->argc > 2)
 		return (write(STDERR_FILENO, "minishell: cd: too many arguments\n", 35),
 			1);
-	if (ft_get_path_value(cmd, envp, &path, &path_to_free))
-		return (2);
+	ret = ft_get_path_value(cmd, envp, &path, &path_to_free);
+	if (ret)
+		return (ret);
 	if (path_to_free)
 	{
 		if (change_directory(path_to_free, envp))

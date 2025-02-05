@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:51:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:51:18 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,28 @@ void	ft_free(void *ptr)
 		return ;
 	free(ptr);
 	ptr = NULL;
+}
+
+void	ft_free_one_env(t_env *tmp)
+{
+	ft_free(tmp->key);
+	ft_free(tmp->value);
+	ft_free(tmp);
+}
+
+void	ft_free_arr(char **arr)
+{
+	int	i;
+
+	i = 0;
+	if (!arr | !*arr)
+		return ;
+	while (arr[i])
+	{
+		ft_free(arr[i]);
+		i++;
+	}
+	ft_free(arr);
 }
 
 void	ft_free_all(t_shell *shell)

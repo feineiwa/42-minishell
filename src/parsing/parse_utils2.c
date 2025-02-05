@@ -6,50 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:13:21 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:14:10 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 13:54:11 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
-
-int	ft_is_between(char *str, int index)
-{
-	int		i;
-	char	quote;
-	int		open;
-	int		close;
-
-	i = 0;
-	open = 0;
-	close = 0;
-	while (str[i])
-	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			open = i;
-			quote = str[i++];
-			while (str[i] && str[i] != quote)
-				i++;
-			if (str[i] == quote)
-				close = i;
-			if (index >= open && index <= close)
-				return (quote);
-		}
-		i++;
-	}
-	return (0);
-}
-
-int	ft_is_belong(char c)
-{
-	if (c == '>')
-		return (c);
-	else if (c == '<')
-		return (c);
-	else if (c == '|')
-		return (c);
-	return (0);
-}
+#include "../../inc/minishell.h"
 
 static void	skip_quotes_for_strlen_quote(char *s, int *i, int *len, char *quote)
 {
@@ -92,9 +53,77 @@ int	ft_strlen_skip_quote(char *s)
 	return (len);
 }
 
-int	ft_is_quote(char c)
+int	skip_quotes(char *tok, char *arg, int *i, int *j)
 {
-	if (c == 39 || c == 34)
-		return (c);
+	char	quote;
+
+	quote = ft_is_quote(tok[*i]);
+	(*i)++;
+	while (tok[*i] && quote)
+	{
+		if (ft_is_quote(tok[*i]) == quote)
+		{
+			(*i)++;
+			return (1);
+		}
+		arg[(*j)++] = tok[(*i)++];
+	}
+	return (0);
+}
+
+int	ft_is_between(char *str, int index)
+{
+	int		i;
+	char	quote;
+	int		open;
+	int		close;
+
+	i = 0;
+	open = 0;
+	close = 0;
+	while (str[i])
+	{
+		if (str[i] == '"' || str[i] == '\'')
+		{
+			open = i;
+			quote = str[i++];
+			while (str[i] && str[i] != quote)
+				i++;
+			if (str[i] == quote)
+				close = i;
+			if (index >= open && index <= close)
+				return (quote);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int	count_quotes(char *input)
+{
+	size_t	i;
+	char	quote;
+
+	if (!input)
+		return (0);
+	quote = 0;
+	i = 0;
+	while (input[i])
+	{
+		if (ft_is_quote(input[i]))
+		{
+			quote = ft_is_quote(input[i++]);
+			while (input[i] && quote)
+			{
+				if (ft_is_quote(input[i]) == quote)
+					quote = 0;
+				i++;
+			}
+			continue ;
+		}
+		i++;
+	}
+	if (quote)
+		return ((g_global()->exit_status = 1), 1);
 	return (0);
 }

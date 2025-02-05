@@ -6,13 +6,20 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 16:18:05 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	handle_sigint(int sig)
+t_g_sig	*g_global(void)
+{
+	static t_g_sig	value = {0, 0, {-1, -1}, NULL, 0, NULL};
+
+	return (&value);
+}
+
+static void	handle_sigint(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -22,22 +29,6 @@ void	handle_sigint(int sig)
 		rl_replace_line("", 0);
 		rl_redisplay();
 	}
-}
-
-void	handle_sigquit(int sig)
-{
-	if (sig == SIGQUIT)
-	{
-		write(1, "Quit (core dumped)", 19);
-		exit(131);
-	}
-}
-
-t_g_sig	*g_global(void)
-{
-	static t_g_sig	value = {0, 0, {-1, -1}, NULL, 0, NULL};
-
-	return (&value);
 }
 
 void	setup_signal(void)
@@ -68,7 +59,7 @@ void	setup_signal(void)
 	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
-void	handle_sigint_for_hdoc(int sig)
+static void	handle_sigint_for_hdoc(int sig)
 {
 	if (sig == SIGINT)
 	{

@@ -6,11 +6,31 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 15:16:38 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:24:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+char	*ft_strndup(char *str, size_t n)
+{
+	char	*s;
+	size_t	i;
+
+	if (!str)
+		return (NULL);
+	s = malloc(sizeof(char) * n + 1);
+	if (!s)
+		return (NULL);
+	i = 0;
+	while (i < n)
+	{
+		s[i] = str[i];
+		i++;
+	}
+	s[i] = 0;
+	return (s);
+}
 
 void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 {
@@ -55,19 +75,6 @@ char	*ft_strjoin3(char *s1, char *s2, char *s3)
 		str[j++] = s3[i++];
 	str[j] = 0;
 	return (str);
-}
-
-int	is_only_dot_or_slash(char *s)
-{
-	if (!s)
-		return (1);
-	while (*s)
-	{
-		if (*s != '.' && *s != '/')
-			return (0);
-		s++;
-	}
-	return (1);
 }
 
 char	*ft_strjoin_s1(char *s1, char *s2)

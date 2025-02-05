@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 06:35:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:11:28 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,36 +19,6 @@ static void	init_global(t_shell *shell)
 	g_global()->pipfd[0] = -1;
 	g_global()->pipfd[1] = -1;
 	g_global()->shell = shell;
-}
-
-void	restore_standard(int sa_std[2])
-{
-	if (sa_std[0] != -1)
-	{
-		if (dup2(sa_std[0], STDIN_FILENO) < 0)
-			perror("dup2");
-		close(sa_std[0]);
-	}
-	if (sa_std[1] != -1)
-	{
-		if (dup2(sa_std[1], STDOUT_FILENO) < 0)
-			perror("dup2");
-		close(sa_std[1]);
-	}
-}
-
-void	close_saved_std(int sa_std[2])
-{
-	if (sa_std[0] != -1)
-	{
-		close(sa_std[0]);
-		sa_std[0] = -1;
-	}
-	if (sa_std[1] != -1)
-	{
-		close(sa_std[1]);
-		sa_std[1] = -1;
-	}
 }
 
 static void	execute_command(t_shell *shell)

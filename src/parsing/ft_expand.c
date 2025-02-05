@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 17:40:52 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:43:40 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,18 +47,6 @@ static void	expand_variable(char *s, int *start, int *i, char **expanded)
 	*start = *i;
 }
 
-char	*add_double_quotes(char *s)
-{
-	char	*value;
-
-	value = NULL;
-	value = ft_strjoin3("\"", s, "\"");
-	if (!value)
-		return (NULL);
-	ft_free(s);
-	return (value);
-}
-
 char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 {
 	int		i;
@@ -73,8 +61,8 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	g_global()->shell = shell;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || s[i
-					+ 1] == '_')))
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) \
+			|| s[i + 1] == '_')))
 			expand_variable(s, &start, &i, &expanded);
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
 			expand_status(s, &start, &i, &expanded);

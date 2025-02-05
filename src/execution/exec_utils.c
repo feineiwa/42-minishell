@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 06:20:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:49:20 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,37 @@ char	*resolve_cmd_path(t_shell *shell, char *cmd)
 	return (NULL);
 }
 
-int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
+static int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
+{
+	char	**envp;
+
+	g_global()->exit_status = handle_dot_cmd(shell, cmd);
+	if (g_global()->exit_status)
+		return (g_global()->exit_status);
+	if (!ft_strcmp(cmd->argv[0], ".."))
+	{
+		ft_putstr_fd(cmd->argv[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
+		return (127);
+	}
+	if (!ft_strcmp(cmd->argv[0], ""))
+	{
+		ft_putstr_fd("''", 2);
+		ft_putstr_fd(": command not found\n", 2);
+		return (127);
+	}
+	envp = convert_env_to_array(shell->envp);
+	if (!envp)
+		return (1);
+	if (ft_strchr(cmd->argv[0], '/'))
+		return (handle_absolute_cmd(cmd, envp));
+	else
+		return (handle_relatif_cmd(shell, cmd, envp));
+	return (ft_free_arr(envp), 0);
+}
+
+static int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin,
+		int sa_stdout)
 {
 	pid_t	pid;
 	int		sa_std[2];
@@ -68,31 +98,8 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdo
 	return (g_global()->exit_status);
 }
 
-int	other_cmd_with_pipe(t_shell *shell, t_cmd *cmd)
-{
-	char	**envp;
-
-	g_global()->exit_status = handle_dot_cmd(shell, cmd);
-	if (g_global()->exit_status)
-		return (g_global()->exit_status);
-	if (!ft_strcmp(cmd->argv[0], ""))
-	{
-		ft_putstr_fd("''", 2);
-		ft_putstr_fd(": command not found\n", 2);
-		return (127);
-	}
-	envp = convert_env_to_array(shell->envp);
-	if (!envp)
-		return (1);
-	if (ft_strchr(cmd->argv[0], '/'))
-		return (handle_absolute_cmd(cmd, envp));
-	else
-		return (handle_relatif_cmd(shell, cmd, envp));
-	ft_free_arr(envp);
-	return (0);
-}
-
-void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
+void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin,
+		int sa_stdout)
 {
 	if (!cmd->argv[0])
 		return ;
@@ -110,13 +117,15 @@ void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdo
 	else if (!ft_strcmp("cd", cmd->argv[0]))
 		g_global()->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
-		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin, sa_stdout);
+		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin,
+			sa_stdout);
 	else
 		g_global()->exit_status = other_cmd_without_pipe(shell, cmd, sa_stdin,
-				sa_stdout);
+			sa_stdout);
 }
 
-void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
+void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin,
+		int sa_stdout)
 {
 	if (!cmd->argv[0])
 		return ;
@@ -134,7 +143,8 @@ void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
 	else if (!ft_strcmp("cd", cmd->argv[0]))
 		g_global()->exit_status = ft_cd(cmd, shell->envp);
 	else if (!ft_strcmp("exit", cmd->argv[0]))
-		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin, sa_stdout);
+		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin,
+			sa_stdout);
 	else
 		g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
 }

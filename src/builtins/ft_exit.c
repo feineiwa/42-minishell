@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 22:14:34 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:11:55 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ static t_bool	ft_is_number(char *s)
 	return (TRUE);
 }
 
-static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell, char **argv)
+static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
+		char **argv)
 {
 	if (sa_stdin != -1)
 		close(sa_stdin);
@@ -46,7 +47,7 @@ static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell, char **
 	exit(g_global()->exit_status);
 }
 
-long	ft_atol(char *str)
+static long	ft_atol(char *str)
 {
 	int		i;
 	int		sign;
@@ -71,7 +72,8 @@ long	ft_atol(char *str)
 	return (res * sign);
 }
 
-static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell, char **argv)
+static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell,
+		char **argv)
 {
 	long	nbr;
 
@@ -114,5 +116,5 @@ int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 		g_global()->exit_status = 1;
 		return (g_global()->exit_status);
 	}
-	return (0);
+	return (g_global()->exit_status);
 }

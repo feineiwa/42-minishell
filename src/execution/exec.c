@@ -6,19 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 06:20:17 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:38:51 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	save_fds_standart(int *saved_stdin, int *saved_stdout)
-{
-	*saved_stdin = dup(STDIN_FILENO);
-	*saved_stdout = dup(STDOUT_FILENO);
-}
-
-int	setup_redirections(t_cmd *cmd, int *in_fd, int *out_fd)
+static int	setup_redirections(t_cmd *cmd, int *in_fd, int *out_fd)
 {
 	if (cmd->error_file)
 	{
@@ -38,7 +32,7 @@ int	setup_redirections(t_cmd *cmd, int *in_fd, int *out_fd)
 	return (0);
 }
 
-int	setup_heredoc(t_cmd *cmd, int *in_fd, int std_fds[2])
+static int	setup_heredoc(t_cmd *cmd, int *in_fd, int std_fds[2])
 {
 	if (cmd->hdoc && !g_global()->use_pipe)
 	{
@@ -68,11 +62,8 @@ int	launch_cmd(t_shell *shell, t_cmd *cmd, int sa_std[2])
 	out_fd = -1;
 	g_global()->shell = shell;
 	if (g_global()->use_pipe == 0)
-	{
-		g_global()->exit_status = setup_heredoc(cmd, &in_fd, sa_std);
-		if (g_global()->exit_status)
+		if (setup_heredoc(cmd, &in_fd, sa_std))
 			return (g_global()->exit_status);
-	}
 	if (setup_redirections(cmd, &in_fd, &out_fd))
 		return (1);
 	if (g_global()->use_pipe)

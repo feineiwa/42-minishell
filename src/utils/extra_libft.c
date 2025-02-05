@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:56:42 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/04 17:24:50 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,23 @@ int	ft_isspace(char c)
 	return ((c == 32 || (c >= 7 && c <= 13)));
 }
 
-int	ft_cmdsize(t_cmd *cmd)
+int	ft_is_quote(char c)
 {
-	t_cmd	*tmp;
-	int		size;
+	if (c == 39 || c == 34)
+		return (c);
+	return (0);
+}
 
-	tmp = cmd;
-	size = 0;
-	if (!tmp)
-		return (0);
-	while (tmp)
-	{
-		size++;
-		tmp = tmp->next;
-	}
-	return (size);
+int	ft_search_equ(char *s)
+{
+	size_t	i;
+
+	if (!s)
+		return (-1);
+	i = 0;
+	while (s[i] && s[i] != '=')
+		i++;
+	return (i);
 }
 
 int	ft_skip_space(char *str)
@@ -44,26 +46,6 @@ int	ft_skip_space(char *str)
 	while (str[i] && ft_isspace(str[i]))
 		i++;
 	return (i);
-}
-
-char	*ft_strndup(char *str, size_t n)
-{
-	char	*s;
-	size_t	i;
-
-	if (!str)
-		return (NULL);
-	s = malloc(sizeof(char) * n + 1);
-	if (!s)
-		return (NULL);
-	i = 0;
-	while (i < n)
-	{
-		s[i] = str[i];
-		i++;
-	}
-	s[i] = 0;
-	return (s);
 }
 
 int	ft_strcmp(char *s1, char *s2)

@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 08:29:09 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/03 18:20:57 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:29 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	print_export(t_shell *shell)
+static void	print_export(t_shell *shell)
 {
 	t_env	*tmp;
 	t_env	*i;
@@ -41,7 +41,7 @@ void	print_export(t_shell *shell)
 	}
 }
 
-int	ft_search_equ_add_env(char *s)
+static int	ft_search_equ_add_env(char *s)
 {
 	size_t	i;
 
@@ -65,7 +65,7 @@ int	ft_search_equ_add_env(char *s)
 	return (i);
 }
 
-int	ft_replace_value(t_env **envp, char *arg, int i, char *key)
+static int	ft_replace_value(t_env **envp, char *arg, int i, char *key)
 {
 	t_env	*current;
 

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:27:08 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 17:33:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	ft_strlen_expand(char *s)
 	return (i);
 }
 
-void	format_value_for_quotes(char *s, int *i, int *j, char **value)
+static void	format_value_for_quotes(char *s, int *i, int *j, char **value)
 {
 	char	spec[1];
 	char	*tmp;
@@ -111,13 +111,4 @@ char	*extract_var(char *s, t_shell *shell)
 	if (!value)
 		return (ft_free(key), NULL);
 	return (ft_free(key), value);
-}
-
-t_bool	ft_is_special(char c)
-{
-	if (c == '\'')
-		return (1);
-	else if (c == '"')
-		return (1);
-	return (0);
 }

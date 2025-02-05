@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 21:17:58 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 06:35:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 	g_global()->shell = shell;
 	setup_signal();
 	if (handle_heredoc_with_pipe(cmd, shell, sa_std))
-		return (restore_standard(sa_std), g_global()->exit_status);
+		return (g_global()->exit_status);
 	i = 0;
 	input_fd = -1;
 	while (cmd)
@@ -117,7 +117,5 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 		cmd = cmd->next;
 		i++;
 	}
-	handler_signal_pipe(pid);
-	restore_standard(sa_std);
-	return (0);
+	return (handler_signal_pipe(pid));
 }

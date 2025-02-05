@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 22:29:44 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 06:20:27 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,11 @@ char	*resolve_cmd_path(t_shell *shell, char *cmd)
 int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)
 {
 	pid_t	pid;
+	int		sa_std[2];
 
 	setup_signal();
+	sa_std[0] = sa_stdin;
+	sa_std[1] = sa_stdout;
 	pid = fork();
 	if (pid < 0)
 	{
@@ -57,10 +60,7 @@ int	other_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdo
 		setup_signal();
 		g_global()->exit_status = other_cmd_with_pipe(shell, cmd);
 		ft_free_all(shell);
-		// if (sa_stdin != -1)
-		// 	close(sa_stdin);
-		// if (sa_stdout != -1)
-		// 	close(sa_stdout);
+		restore_standard(sa_std);
 		exit(g_global()->exit_status);
 	}
 	else
@@ -113,7 +113,7 @@ void	what_cmd_without_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdo
 		g_global()->exit_status = ft_exit(shell, cmd->argv, sa_stdin, sa_stdout);
 	else
 		g_global()->exit_status = other_cmd_without_pipe(shell, cmd, sa_stdin,
-				sa_stdin);
+				sa_stdout);
 }
 
 void	what_cmd_with_pipe(t_shell *shell, t_cmd *cmd, int sa_stdin, int sa_stdout)

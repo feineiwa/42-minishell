@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 14:51:40 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/04 22:16:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 06:20:17 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	launch_cmd(t_shell *shell, t_cmd *cmd, int sa_std[2])
 	in_fd = -1;
 	out_fd = -1;
 	g_global()->shell = shell;
-	if (g_global()->use_pipe == FALSE)
+	if (g_global()->use_pipe == 0)
 	{
 		g_global()->exit_status = setup_heredoc(cmd, &in_fd, sa_std);
 		if (g_global()->exit_status)

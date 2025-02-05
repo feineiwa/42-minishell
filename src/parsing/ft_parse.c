@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:35:59 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:38:05 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ static t_cmd	*parse_into_cmd(t_shell *shell, t_token *tok)
 	if (!tok || !shell)
 		return (NULL);
 	g_global()->shell = shell;
-	tmp = init_cmd(NULL);
+	tmp = NULL;
+	tmp = init_cmd(tmp);
 	if (!tmp)
 		return (NULL);
 	cmd_list = tmp;
@@ -87,7 +88,7 @@ t_cmd	*parsing(t_shell *shell, char *input)
 		return (ft_free(expand), NULL);
 	ft_free(expand);
 	shell->cmd = parse_into_cmd(shell, tok);
-	if (!shell->cmd)
+	if (shell->cmd == NULL)
 		return (ft_free_token(tok), NULL);
 	return (ft_free_token(tok), shell->cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 14:44:40 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 14:43:40 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:48:44 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ char	*ft_expand_for_hdoc(t_shell *shell, char *s)
 	g_global()->shell = shell;
 	while (s[i])
 	{
-		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) \
-			|| s[i + 1] == '_')))
+		if (s[i] == '$' && (s[i + 1] && (ft_isalnum(s[i + 1]) || \
+			s[i + 1] == '_')))
 			expand_variable(s, &start, &i, &expanded);
 		else if (s[i] == '$' && (s[i + 1] && s[i + 1] == '?'))
 			expand_status(s, &start, &i, &expanded);

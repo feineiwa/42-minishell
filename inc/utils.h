@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 09:46:39 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 13:47:08 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 16:45:49 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int		update_pwd(t_env *envp, char *path);
 int		update_oldpwd(t_env *envp, char *old_pwd);
 
 // EXTRA_LIBFT
-void	print_synthax_error(t_cmd **cmd_list);
 int		ft_skip_space(char *str);
 int		ft_search_equ(char *s);
 int		ft_is_quote(char c);

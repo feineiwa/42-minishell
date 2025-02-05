@@ -6,13 +6,13 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 11:21:53 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 14:11:28 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:12:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-static void	init_global(t_shell *shell)
+void	init_global(t_shell *shell)
 {
 	g_global()->is_runing = 2;
 	g_global()->hdoc_fd = NULL;
@@ -21,7 +21,7 @@ static void	init_global(t_shell *shell)
 	g_global()->shell = shell;
 }
 
-static void	execute_command(t_shell *shell)
+void	execute_command(t_shell *shell)
 {
 	t_cmd	*temp;
 	int		sa_std[2];
@@ -87,6 +87,5 @@ int	main(int ac, char **av, char **envp)
 	if (!shell.envp)
 		return (print_err("error env\n", NULL, NULL, 2), 1);
 	prompt_loop(&shell);
-	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	return (ft_free_env(&shell.envp), g_global()->exit_status);
 }

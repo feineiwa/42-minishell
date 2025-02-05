@@ -76,7 +76,7 @@ debug : $(NAME)
 	@make clean && clear && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --suppressions=debug -s ./minishell
 
 eval: 
-	valgrind --track-fds=yes --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
+	valgrind --track-fds=yes --track-origins=yes --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./minishell
 
 run : fclean all
 	@clear && ./minishell

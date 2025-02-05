@@ -6,31 +6,11 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 14:11:55 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:57:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-static t_bool	ft_is_number(char *s)
-{
-	int	i;
-
-	i = 0;
-	if (!s)
-		return (FALSE);
-	if (s[i] == '+' || s[i] == '-')
-		i++;
-	if (!s[i])
-		return (FALSE);
-	while (s[i])
-	{
-		if (!ft_isdigit(s[i]))
-			return (FALSE);
-		i++;
-	}
-	return (TRUE);
-}
 
 static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
 		char **argv)
@@ -47,11 +27,31 @@ static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
 	exit(g_global()->exit_status);
 }
 
-static long	ft_atol(char *str)
+static int	check_number(char *str)
 {
-	int		i;
-	int		sign;
-	long	res;
+	int	i;
+
+	i = 0;
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!(str[i] >= '0' && str[i] <= '9'))
+		return (1);
+	while ((str[i] >= '0' && str[i] <= '9') && str[i])
+		i++;
+	while ((str[i] == 32 || (str[i] >= 9 && str[i] <= 13)) && (str[i]))
+		i++;
+	if (str[i])
+		return (1);
+	return (0);
+}
+
+static __int128	ft_atoll(char *str)
+{
+	int			i;
+	int			sign;
+	__int128	res;
 
 	sign = 1;
 	i = 0;
@@ -64,7 +64,7 @@ static long	ft_atol(char *str)
 			sign = -1;
 		i++;
 	}
-	while ((str[i] >= '0' && str[i] <= '9') && str[i])
+	while ((str[i] >= '0' && str[i] <= '9') && (str[i]))
 	{
 		res = (res * 10) + (str[i] - '0');
 		i++;
@@ -75,10 +75,10 @@ static long	ft_atol(char *str)
 static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell,
 		char **argv)
 {
-	long	nbr;
+	__int128	nbr;
 
-	nbr = ft_atol(argv[1]);
-	if (nbr > INT_MAX || nbr < INT_MIN)
+	nbr = ft_atoll(argv[1]);
+	if (nbr > LLONG_MAX || nbr < LLONG_MIN)
 		exit_not_number(sa_stdin, sa_stdout, shell, argv);
 	if (sa_stdin != -1)
 		close(sa_stdin);
@@ -104,9 +104,9 @@ int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 			write(STDOUT_FILENO, "exit\n", 5);
 		exit(g_global()->exit_status);
 	}
-	if (!ft_is_number(argv[1]))
+	if (check_number(argv[1]))
 		exit_not_number(sa_stdin, sa_stdout, shell, argv);
-	if (ft_is_number(argv[1]) && !argv[2])
+	if (!check_number(argv[1]) && !argv[2])
 		exit_number(sa_stdin, sa_stdout, shell, argv);
 	else
 	{

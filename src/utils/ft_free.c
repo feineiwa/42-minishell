@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 22:33:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 09:56:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:18:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,13 @@ void	ft_free_token(t_token *tok)
 {
 	t_token	*next;
 
+	if (!tok)
+		return ;
 	while (tok)
 	{
 		next = tok->next;
-		ft_free(tok->value);
+		if (tok->value)
+			ft_free(tok->value);
 		ft_free(tok);
 		tok = next;
 	}
@@ -31,8 +34,6 @@ void	ft_free_arg(char **argv)
 {
 	int	i;
 
-	if (!argv || !*argv)
-		return ;
 	i = 0;
 	while (argv[i])
 	{
@@ -63,16 +64,21 @@ void	ft_free_cmd(t_cmd **cmd)
 {
 	t_cmd	*next;
 
-	if (!*cmd)
+	if (*cmd == NULL || cmd == NULL)
 		return ;
 	while (*cmd)
 	{
 		next = (*cmd)->next;
-		ft_free((*cmd)->input_file);
-		ft_free((*cmd)->output_file);
-		ft_free((*cmd)->error_file);
-		ft_free_hdoc(&(*cmd)->hdoc);
-		ft_free_arg((*cmd)->argv);
+		if ((*cmd)->input_file)
+			ft_free((*cmd)->input_file);
+		if ((*cmd)->output_file)
+			ft_free((*cmd)->output_file);
+		if ((*cmd)->error_file)
+			ft_free((*cmd)->error_file);
+		if ((*cmd)->hdoc)
+			ft_free_hdoc(&(*cmd)->hdoc);
+		if ((*cmd)->argv)
+			ft_free_arg((*cmd)->argv);
 		ft_free(*cmd);
 		*cmd = next;
 	}

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 13:16:31 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 12:10:33 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:08:52 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ t_cmd	*init_cmd(t_cmd *cmd)
 	if (!cmd)
 		return (NULL);
 	cmd->argc = 0;
-	cmd->argv = (char **)malloc(sizeof(char *));
+	cmd->argv = malloc(sizeof(char *) * 1);
+	cmd->argv[0] = NULL;
 	if (!cmd->argv)
 	{
 		ft_free(cmd);

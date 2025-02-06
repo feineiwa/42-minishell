@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 14:05:55 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:06 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 14:55:11 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

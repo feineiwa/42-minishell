@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_signal.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
+/*   By: nrasamim <nrasamim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 17:15:44 by nrasamim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void	setup_signal(void)
 	sa_quit.sa_flags = 0;
 	sigemptyset(&sa_int.sa_mask);
 	sigemptyset(&sa_quit.sa_mask);
+	signal(SIGPIPE, SIG_IGN);
 	if (g_global()->is_runing == 1)
 	{
 		sa_int.sa_handler = SIG_DFL;

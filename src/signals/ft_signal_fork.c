@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:24:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 18:00:51 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@ int	handler_signal_pipe(pid_t pid)
 	int	status;
 
 	waitpid(pid, &status, 0);
-	close(g_global()->pipfd[0]);
-	close(g_global()->pipfd[1]);
 	if (WIFSIGNALED(status))
 	{
 		g_global()->exit_status = 128 + WTERMSIG(status);

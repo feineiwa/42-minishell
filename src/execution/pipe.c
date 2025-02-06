@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:03 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 18:25:25 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,17 @@
 
 static t_bool	update_std_fds(t_cmd *cmd, int fd)
 {
-	if (fd != -1)
+	if (cmd->hdoc && cmd->hdoc->del)
 	{
-		if (dup2(fd, STDIN_FILENO) < 0)
+		if (fd != -1)
 		{
-			perror("dup2 pipe");
-			return (FALSE);
+			if (dup2(fd, STDIN_FILENO) < 0)
+			{
+				perror("dup2 pipe");
+				return (FALSE);
+			}
+			close(fd);
 		}
-		close(fd);
 	}
 	if (cmd->next)
 	{
@@ -35,19 +38,13 @@ static t_bool	update_std_fds(t_cmd *cmd, int fd)
 	return (TRUE);
 }
 
-static void	child_process(t_cmd *cmd, int *input_fd, int hdoc_fd, int sa_std[2])
+static void	child_process(t_cmd *cmd, int hdoc_fd, int sa_std[2])
 {
 	g_global()->use_pipe = TRUE;
 	g_global()->is_runing = 1;
 	setup_signal();
 	close(g_global()->pipfd[0]);
-	if (cmd->hdoc && cmd->hdoc->del)
-	{
-		if (*input_fd != -1)
-			close(*input_fd);
-		*input_fd = hdoc_fd;
-	}
-	if (!update_std_fds(cmd, *input_fd))
+	if (!update_std_fds(cmd, hdoc_fd))
 	{
 		close(g_global()->pipfd[1]);
 		close_hdoc_fd_inherited_from_parent();
@@ -63,17 +60,29 @@ static void	child_process(t_cmd *cmd, int *input_fd, int hdoc_fd, int sa_std[2])
 	exit(g_global()->exit_status);
 }
 
-static void	parent_process(int *input_fd, int hdoc_fd, t_cmd *cmd)
+static int	parent_process(int hdoc_fd, t_cmd *cmd)
 {
 	close(g_global()->pipfd[1]);
-	if (*input_fd != -1 && *input_fd != hdoc_fd)
-		close(*input_fd);
+	if (g_global()->pipfd[0] != hdoc_fd && cmd->input_file)
+		close(g_global()->pipfd[0]);
 	if (cmd->next)
-		*input_fd = g_global()->pipfd[0];
+	{
+		if (g_global()->pipfd[0] != -1)
+		{
+			if (dup2(g_global()->pipfd[0], STDIN_FILENO) < -1)
+				return (perror("dup2 pipe"), 1);
+			close(g_global()->pipfd[0]);
+			g_global()->pipfd[0] = -1;
+		}
+	}
 	else
-		*input_fd = -1;
+	{
+		close(g_global()->pipfd[0]);
+		g_global()->pipfd[0] = -1;
+	}
 	if (hdoc_fd != -1)
 		close(hdoc_fd);
+	return (0);
 }
 
 static int	create_pipe_and_fork(pid_t *pid)
@@ -95,7 +104,6 @@ static int	create_pipe_and_fork(pid_t *pid)
 int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 {
 	int		i;
-	int		input_fd;
 	pid_t	pid;
 
 	g_global()->shell = shell;
@@ -103,15 +111,15 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 	if (handle_heredoc_with_pipe(cmd, shell, sa_std))
 		return (g_global()->exit_status);
 	i = 0;
-	input_fd = -1;
 	while (cmd)
 	{
 		if ((cmd->next && !g_global()->pipfd) || create_pipe_and_fork(&pid))
 			return (restore_standard(sa_std), 1);
 		if (pid == 0)
-			child_process(cmd, &input_fd, g_global()->hdoc_fd[i], sa_std);
+			child_process(cmd, g_global()->hdoc_fd[i], sa_std);
 		else
-			parent_process(&input_fd, g_global()->hdoc_fd[i], cmd);
+			if (parent_process(g_global()->hdoc_fd[i], cmd))
+				return (1);
 		cmd = cmd->next;
 		i++;
 	}

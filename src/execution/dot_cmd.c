@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 13:53:35 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:12:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 08:21:06 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,6 @@ static int	relatif_path_for_dot_cmd(t_shell *shell, t_cmd *cmd)
 	cmd_path = resolve_cmd_path(shell, cmd->argv[1]);
 	if (cmd_path)
 	{
-		if (access(cmd_path, F_OK) == -1)
-		{
-			perror(cmd_path);
-			return (ft_free(cmd_path), 1);
-		}
 		if (stat(cmd_path, &file_stat) == -1)
 		{
 			perror(cmd_path);
@@ -81,6 +76,8 @@ static int	relatif_path_for_dot_cmd(t_shell *shell, t_cmd *cmd)
 		else
 			return (check_path_dot_if_exec(cmd_path));
 	}
+	else
+		return (perror(cmd->argv[1]), 1);
 	return (0);
 }
 

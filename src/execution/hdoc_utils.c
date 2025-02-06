@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:05 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:12:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 08:36:27 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ void	handle_ctrl_c(char *content, int pipe_fd[2], int std_fds[2], pid_t pid)
 	{
 		ft_free(content);
 		content = NULL;
+		rl_clear_history();
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		close_saved_std(std_fds);

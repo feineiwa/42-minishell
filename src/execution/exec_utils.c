@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:12:42 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 08:11:54 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ char	*resolve_cmd_path(t_shell *shell, char *cmd)
 			return (cmd_path);
 		}
 		ft_free(cmd_path);
+		cmd_path = NULL;
 		i++;
 	}
 	ft_free_arr(paths);

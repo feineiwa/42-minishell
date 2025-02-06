@@ -6,11 +6,19 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 11:30:42 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:00 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 08:48:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+static char	*readline_and_clear_history(char *content)
+{
+	content = NULL;
+	content = readline(HDOC);
+	rl_clear_history();
+	return (content);
+}
 
 static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
 		int std_fds[2])
@@ -19,7 +27,7 @@ static void	read_heredoc(t_hdoc *hdoc, pid_t pid, int pipe_fd[2],
 
 	while (42)
 	{
-		content = readline(HDOC);
+		content = readline_and_clear_history(content);
 		handle_ctrl_c(content, pipe_fd, std_fds, pid);
 		if (content == NULL)
 		{

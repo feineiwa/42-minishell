@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 18:57:04 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 11:15:23 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
 		close(sa_stdin);
 	if (sa_stdout != -1)
 		close(sa_stdout);
-	write(STDOUT_FILENO, "exit\n", 5);
+	if (g_global()->use_pipe)
+		close_hdoc_fd_inherited_from_parent();
+	else
+		write(STDOUT_FILENO, "exit\n", 5);
 	ft_putstr_fd(argv[1], 2);
 	ft_putstr_fd(": numeric argument required\n", 2);
 	ft_free_all(shell);
@@ -85,7 +88,9 @@ static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell,
 	if (sa_stdout != -1)
 		close(sa_stdout);
 	g_global()->exit_status = nbr % 256;
-	if (g_global()->use_pipe == 0)
+	if (g_global()->use_pipe)
+		close_hdoc_fd_inherited_from_parent();
+	else
 		write(STDOUT_FILENO, "exit\n", 5);
 	ft_free_all(shell);
 	exit(g_global()->exit_status);
@@ -99,9 +104,11 @@ int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 			close(sa_stdin);
 		if (sa_stdout != -1)
 			close(sa_stdout);
-		ft_free_all(shell);
-		if (g_global()->use_pipe == 0)
+		if (g_global()->use_pipe)
+			close_hdoc_fd_inherited_from_parent();
+		else
 			write(STDOUT_FILENO, "exit\n", 5);
+		ft_free_all(shell);
 		exit(g_global()->exit_status);
 	}
 	if (check_number(argv[1]))
@@ -112,9 +119,8 @@ int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 	{
 		if (g_global()->use_pipe == 0)
 			write(STDOUT_FILENO, "exit\n", 5);
-		ft_putstr_fd("exit: too many arguments\n", 2);
 		g_global()->exit_status = 1;
-		return (g_global()->exit_status);
+		return (ft_putstr_fd("exit: too many arguments\n", 2), 1);
 	}
 	return (g_global()->exit_status);
 }

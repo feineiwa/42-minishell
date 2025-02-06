@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:21:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:12:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 10:15:01 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ int	ft_pwd(void)
 			printf("%s\n", cwd_copy);
 			return (ft_free(cwd_copy), 0);
 		}
+		else
+			return (perror("pwd"), 1);
 	}
 	if (cwd)
 	{

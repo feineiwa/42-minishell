@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 11:22:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 15:12:17 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/06 10:27:04 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,18 @@ static int	ft_get_path_value(t_cmd *cmd, t_env *envp, char **path,
 		char **path_to_free)
 {
 	if (!cmd->argv[1])
+	{
 		*path = ft_get_env_value(envp, "$HOME");
+		if (!*path)
+			return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 1);
+	}
 	else if (cmd->argv[1][0] == '~')
-		*path_to_free = ft_strjoin(ft_get_env_value(envp, "$HOME"), cmd->argv[1]
-				+ 1);
+	{
+		*path = ft_get_env_value(envp, "$HOME");
+		if (!*path)
+			return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 1);
+		*path_to_free = ft_strjoin(*path, cmd->argv[1] + 1);
+	}
 	else if (cmd->argv[1][0] == '-')
 	{
 		if (cmd->argv[1][1])

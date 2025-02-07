@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/06 18:25:25 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/07 19:10:48 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,3 +125,4 @@ int	config_with_pipe(t_shell *shell, t_cmd *cmd, int sa_std[2])
 	}
 	return (handler_signal_pipe(pid));
 }
+//asdfasdfa

@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:24:47 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/06 18:00:51 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/07 17:20:39 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ int	handler_signal_pipe(pid_t pid)
 		}
 	}
 	else if (WIFEXITED(status))
+	{
 		g_global()->exit_status = WEXITSTATUS(status);
+	}
 	while (wait(&status) > 0)
 		;
 	if (WIFSIGNALED(status))

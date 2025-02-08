@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:27:26 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/08 14:22:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/08 14:59:40 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	ft_is_after_equal(char *s, int i)
 		return (0);
 	while (j <= i)
 	{
-		if (s[j] && s[j] == '=')
+		if (s[j] && (s[j] == '=' || s[j] == '<' || s[j] == '>'))
 		{
 			j += 1 + ft_skip_space(s + j + 1);
 			if (ft_is_quote(s[i]))

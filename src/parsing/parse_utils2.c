@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:13:21 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:38 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/08 14:11:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,10 @@ int	ft_is_between(char *str, int index)
 	int		open;
 	int		close;
 
-	i = 0;
+	i = -1;
 	open = 0;
 	close = 0;
-	while (str[i])
+	while (str[++i] && str)
 	{
 		if (str[i] == '"' || str[i] == '\'')
 		{
@@ -89,12 +89,13 @@ int	ft_is_between(char *str, int index)
 			quote = str[i++];
 			while (str[i] && str[i] != quote)
 				i++;
-			if (str[i] == quote)
+			if (str[i] && str[i] == quote)
 				close = i;
 			if (index >= open && index <= close)
 				return (quote);
+			if (str[i] == '\0')
+				return (0);
 		}
-		i++;
 	}
 	return (0);
 }

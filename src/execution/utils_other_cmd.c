@@ -6,11 +6,25 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 16:34:52 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/06 09:36:22 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/07 09:11:24 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+char	*handle_if_pwd_is_bin(char *cmd)
+{
+	char	*path;
+
+	path = getcwd(NULL, 0);
+	if (path)
+	{
+		if (!ft_strcmp(path, "/usr/bin"))
+			return (ft_strjoin("/usr/bin/", cmd));
+		return (ft_free(path), NULL);
+	}
+	return (NULL);
+}
 
 int	check_execution(char **envp, char *cmd_path, t_cmd *cmd)
 {

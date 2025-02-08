@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 09:45:14 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 15:08:32 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/07 09:10:19 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,5 +48,6 @@ int		handle_dot_cmd(t_shell *shell, t_cmd *cmd);
 int		handle_relatif_cmd(t_shell *shell, t_cmd *cmd, char **envp);
 int		handle_absolute_cmd(t_cmd *cmd, char **envp);
 int		check_execution(char **envp, char *cmd_path, t_cmd *cmd);
+char	*handle_if_pwd_is_bin(char *cmd);
 
 #endif

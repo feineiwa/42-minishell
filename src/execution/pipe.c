@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/07 19:04:27 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/08 08:46:54 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,35 +17,26 @@ static t_bool	update_std_fds(int *in, t_cmd *cmd, int fd)
 	if (*in != -1)
 	{
 		if (dup2(*in, STDIN_FILENO) < 0)
-		{
-			perror("dup2");
-			return (FALSE);
-		}
+			return (perror("dup2"), FALSE);
 		close(*in);
 		*in = -1;
 	}
 	if (fd != -1)
 	{
 		if (dup2(fd, STDIN_FILENO) < 0)
-		{
-			perror("dup2 pipe");
-			return (FALSE);
-		}
+			return (perror("dup2 pipe"), FALSE);
 		close(fd);
+		fd = -1;
 	}
 	if (cmd->next)
 	{
 		if (!cmd->next->hdoc && !cmd->next->input_file)
-		{
 			if (g_global()->pipfd[0] != -1)
 				close(g_global()->pipfd[0]);
-		}
 		if (dup2(g_global()->pipfd[1], STDOUT_FILENO) < 0)
-		{
-			perror("dup2");
-			return (FALSE);
-		}
+			return (perror("dup2"), FALSE);
 		close(g_global()->pipfd[1]);
+		g_global()->pipfd[1] = -1;
 	}
 	return (TRUE);
 }
@@ -83,6 +74,11 @@ static int	parent_process(int *in, int hdoc_fd, t_cmd *cmd)
 		close(*in);
 		*in = -1;
 	}
+	if (hdoc_fd != -1)
+	{
+		close(hdoc_fd);
+		hdoc_fd = -1;
+	}
 	if (cmd->next)
 	{
 		*in = dup(g_global()->pipfd[0]);
@@ -95,11 +91,6 @@ static int	parent_process(int *in, int hdoc_fd, t_cmd *cmd)
 	{
 		close(g_global()->pipfd[0]);
 		g_global()->pipfd[0] = -1;
-	}
-	if (hdoc_fd != -1)
-	{
-		close(hdoc_fd);
-		hdoc_fd = -1;
 	}
 	return (0);
 }

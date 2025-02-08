@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 12:04:43 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/06 08:11:54 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/07 09:10:59 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	*resolve_cmd_path(t_shell *shell, char *cmd)
 
 	path = ft_get_env_value(shell->envp, "$PATH");
 	if (!path)
-		return (NULL);
+		return (handle_if_pwd_is_bin(cmd));
 	paths = ft_split(path, ':');
 	i = 0;
 	while (paths[i])

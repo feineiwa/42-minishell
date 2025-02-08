@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:27:26 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:14 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/08 14:22:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,37 @@ static t_bool	after_here_condition(char *s, int j)
 	return (FALSE);
 }
 
-int	ft_is_after_here(char *s, int i)
+static void	ft_is_quote_after_equal(char *s, int *i, int *j)
 {
-	int		j;
 	char	quote;
 
+	quote = s[*j];
+	(*j)++;
+	while (s[*j] && s[*j] != quote && *j < *i)
+		(*j)++;
+	if (s[*j] == quote)
+		(*j)++;
+}
+
+int	ft_is_after_here(char *s, int i)
+{
+	int	j;
+
 	j = 0;
+	if (!s)
+		return (0);
 	while (j <= i)
 	{
 		if (after_here_condition(s, j))
 		{
 			j += 2 + ft_skip_space(s + j + 2);
 			if (ft_is_quote(s[j]))
-			{
-				quote = s[j++];
-				while (s[j] && s[j] != quote && j < i)
-					j++;
-				if (s[j] == quote)
-					j++;
-			}
+				ft_is_quote_after_equal(s, &i, &j);
 			else
 				while (s[j] && !ft_isspace(s[j]) && j < i)
 					j++;
-			return (j == i);
+			if (j == i)
+				return (1);
 		}
 		j++;
 	}
@@ -66,18 +74,6 @@ t_bool	ft_is_expanded(char *s, int i)
 	return (FALSE);
 }
 
-static void	ft_is_quote_after_equal(char *s, int *i, int *j)
-{
-	char	quote;
-
-	quote = s[*j];
-	(*j)++;
-	while (s[*j] && s[*j] != quote && *j < *i)
-		(*j)++;
-	if (s[*j] == quote)
-		(*j)++;
-}
-
 int	ft_is_after_equal(char *s, int i)
 {
 	int	j;
@@ -95,7 +91,8 @@ int	ft_is_after_equal(char *s, int i)
 			else
 				while (s[j] && ft_isspace(s[i]) && j < i)
 					j++;
-			return (j == i);
+			if (i == j)
+				return (1);
 		}
 		j++;
 	}

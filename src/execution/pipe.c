@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 12:38:58 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/08 08:46:54 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/09 13:13:45 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 
 static t_bool	update_std_fds(int *in, t_cmd *cmd, int fd)
 {
-	if (*in != -1)
+	if (!cmd->hdoc && !cmd->input_file)
 	{
-		if (dup2(*in, STDIN_FILENO) < 0)
-			return (perror("dup2"), FALSE);
-		close(*in);
-		*in = -1;
+		if (*in != -1)
+		{
+			if (dup2(*in, STDIN_FILENO) < 0)
+				return (perror("dup2"), FALSE);
+			close(*in);
+			*in = -1;
+		}
 	}
 	if (fd != -1)
 	{
@@ -30,9 +33,6 @@ static t_bool	update_std_fds(int *in, t_cmd *cmd, int fd)
 	}
 	if (cmd->next)
 	{
-		if (!cmd->next->hdoc && !cmd->next->input_file)
-			if (g_global()->pipfd[0] != -1)
-				close(g_global()->pipfd[0]);
 		if (dup2(g_global()->pipfd[1], STDOUT_FILENO) < 0)
 			return (perror("dup2"), FALSE);
 		close(g_global()->pipfd[1]);
@@ -46,6 +46,7 @@ static void	child_process(int *in, t_cmd *cmd, int hdoc_fd, int sa_std[2])
 	g_global()->use_pipe = TRUE;
 	g_global()->is_runing = 1;
 	setup_signal();
+	close(g_global()->pipfd[0]);
 	if (!update_std_fds(in, cmd, hdoc_fd))
 	{
 		if (g_global()->pipfd[0] != -1)
@@ -80,18 +81,9 @@ static int	parent_process(int *in, int hdoc_fd, t_cmd *cmd)
 		hdoc_fd = -1;
 	}
 	if (cmd->next)
-	{
-		*in = dup(g_global()->pipfd[0]);
-		if (*in == -1)
-			return (perror("dup pipe read end"), 1);
+		*in = g_global()->pipfd[0];
+	else
 		close(g_global()->pipfd[0]);
-		g_global()->pipfd[0] = -1;
-	}
-	if (g_global()->pipfd[0] != -1)
-	{
-		close(g_global()->pipfd[0]);
-		g_global()->pipfd[0] = -1;
-	}
 	return (0);
 }
 

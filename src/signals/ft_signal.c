@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 17:58:21 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 15:13:45 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:35:54 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_g_sig	*g_global(void)
 {
-	static t_g_sig	value = {0, 0, {-1, -1}, NULL, 0, NULL};
+	static t_g_sig	value = {0, 0, {-1, -1}, NULL, 0, -1, NULL};
 
 	return (&value);
 }

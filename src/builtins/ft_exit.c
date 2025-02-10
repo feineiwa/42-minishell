@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 10:57:19 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/06 11:15:23 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:53:13 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,11 @@ static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
 	if (sa_stdout != -1)
 		close(sa_stdout);
 	if (g_global()->use_pipe)
+	{
+		if (g_global()->old_pipefd != -1)
+			close(g_global()->old_pipefd);
 		close_hdoc_fd_inherited_from_parent();
+	}
 	else
 		write(STDOUT_FILENO, "exit\n", 5);
 	ft_putstr_fd(argv[1], 2);
@@ -28,26 +32,6 @@ static void	exit_not_number(int sa_stdin, int sa_stdout, t_shell *shell,
 	ft_free_all(shell);
 	g_global()->exit_status = 2;
 	exit(g_global()->exit_status);
-}
-
-static int	check_number(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i] == '+' || str[i] == '-')
-		i++;
-	if (!(str[i] >= '0' && str[i] <= '9'))
-		return (1);
-	while ((str[i] >= '0' && str[i] <= '9') && str[i])
-		i++;
-	while ((str[i] == 32 || (str[i] >= 9 && str[i] <= 13)) && (str[i]))
-		i++;
-	if (str[i])
-		return (1);
-	return (0);
 }
 
 static __int128	ft_atoll(char *str)
@@ -89,14 +73,19 @@ static void	exit_number(int sa_stdin, int sa_stdout, t_shell *shell,
 		close(sa_stdout);
 	g_global()->exit_status = nbr % 256;
 	if (g_global()->use_pipe)
+	{
+		if (g_global()->old_pipefd != -1)
+			close(g_global()->old_pipefd);
 		close_hdoc_fd_inherited_from_parent();
+	}
 	else
 		write(STDOUT_FILENO, "exit\n", 5);
 	ft_free_all(shell);
 	exit(g_global()->exit_status);
 }
 
-int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
+static void	ex_without_arg(t_shell *shell, char **argv, int sa_stdin,
+		int sa_stdout)
 {
 	if (!argv[1])
 	{
@@ -105,12 +94,21 @@ int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
 		if (sa_stdout != -1)
 			close(sa_stdout);
 		if (g_global()->use_pipe)
+		{
+			if (g_global()->old_pipefd != -1)
+				close(g_global()->old_pipefd);
 			close_hdoc_fd_inherited_from_parent();
+		}
 		else
 			write(STDOUT_FILENO, "exit\n", 5);
 		ft_free_all(shell);
 		exit(g_global()->exit_status);
 	}
+}
+
+int	ft_exit(t_shell *shell, char **argv, int sa_stdin, int sa_stdout)
+{
+	ex_without_arg(shell, argv, sa_stdin, sa_stdout);
 	if (check_number(argv[1]))
 		exit_not_number(sa_stdin, sa_stdout, shell, argv);
 	if (!check_number(argv[1]) && !argv[2])

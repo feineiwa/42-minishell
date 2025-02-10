@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 09:46:39 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 16:45:49 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:52:16 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 t_shell	init_shell(char **envp);
 void	ft_swap_env(t_env *i, t_env *j, t_env *tmp);
 char	**convert_env_to_array(t_env *envp);
+int		check_number(char *str);
 
 // ERROR_UTILS
 t_bool	synthax_error(t_token *tok);

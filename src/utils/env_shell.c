@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 15:17:44 by nrasamim          #+#    #+#             */
-/*   Updated: 2025/02/05 17:32:43 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:52:00 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,24 @@ t_shell	init_shell(char **envp)
 	}
 	shell.cmd = NULL;
 	return (shell);
+}
+
+int	check_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!(str[i] >= '0' && str[i] <= '9'))
+		return (1);
+	while ((str[i] >= '0' && str[i] <= '9') && str[i])
+		i++;
+	while ((str[i] == 32 || (str[i] >= 9 && str[i] <= 13)) && (str[i]))
+		i++;
+	if (str[i])
+		return (1);
+	return (0);
 }

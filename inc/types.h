@@ -6,7 +6,7 @@
 /*   By: frahenin <frahenin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 09:26:30 by frahenin          #+#    #+#             */
-/*   Updated: 2025/02/05 15:08:48 by frahenin         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:35:34 by frahenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ struct				s_sig
 	int				pipfd[2];
 	int				*hdoc_fd;
 	int				use_pipe;
+	int				old_pipefd;
 	t_shell			*shell;
 };
 
